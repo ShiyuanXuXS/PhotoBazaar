@@ -1,0 +1,203 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<project name="MongoDb" id="Project-269" database="MongoDb" >
+	<schema name="PhotoBazaar" >
+		<table name="artworks" virtual="y" >
+			<column name="_id" type="objectId" length="800" decimal="0" jt="-8" mandatory="y" />
+			<column name="title" type="string" length="800" decimal="0" jt="12" mandatory="y" />
+			<column name="tags" type="array[object]" length="800" decimal="0" jt="4999545" mandatory="y" >
+				<column name="tag" type="string" length="800" decimal="0" jt="12" mandatory="y" />
+			</column>
+			<column name="description" type="string" length="800" decimal="0" jt="12" mandatory="y" />
+			<column name="cover_url" type="string" length="800" decimal="0" jt="12" mandatory="y" />
+			<column name="author_id" type="string" length="800" decimal="0" jt="12" mandatory="y" />
+			<column name="owner_ids" type="array[object]" length="800" decimal="0" jt="4999545" mandatory="y" >
+				<column name="user_id" type="string" length="800" decimal="0" jt="12" mandatory="y" />
+			</column>
+			<column name="price" type="double" length="800" decimal="0" jt="8" mandatory="y" />
+			<column name="upload_time" type="string" length="800" decimal="0" jt="12" mandatory="y" />
+			<column name="items" type="array[object]" length="800" decimal="0" jt="4999545" mandatory="y" >
+				<column name="file_id" type="string" length="800" decimal="0" jt="12" />
+				<column name="file_url" type="string" length="800" decimal="0" jt="12" />
+				<column name="artwork_id" type="string" length="800" decimal="0" jt="12" />
+			</column>
+			<index name="_id_" unique="PRIMARY_KEY" >
+				<column name="_id" />
+			</index>
+			<fk name="fk_artworks_users_author_id" virtual="y" to_schema="PhotoBazaar" to_table="users" >
+				<fk_column name="author_id" pk="_id" />
+			</fk>
+			<fk name="fk_artworks_users_owner_id" virtual="y" to_schema="PhotoBazaar" to_table="users" >
+				<fk_column name="owner_ids" pk="_id" />
+			</fk>
+		</table>
+		<table name="purchases" virtual="y" >
+			<column name="_id" type="objectId" length="800" decimal="0" jt="-8" mandatory="y" />
+			<column name="seller_id" type="string" length="800" decimal="0" jt="12" mandatory="y" />
+			<column name="buyer_id" type="string" length="800" decimal="0" jt="12" mandatory="y" />
+			<column name="artwork_id" type="string" length="800" decimal="0" jt="12" mandatory="y" />
+			<column name="purchase_time" type="string" length="800" decimal="0" jt="12" mandatory="y" />
+			<column name="is_paid" type="Boolean" length="800" decimal="0" jt="12" mandatory="y" />
+			<column name="transaction_price" type="string" length="800" decimal="0" jt="12" mandatory="y" />
+			<column name="serial_number" type="string" length="800" decimal="0" jt="12" mandatory="y" />
+			<index name="_id_" unique="PRIMARY_KEY" >
+				<column name="_id" />
+			</index>
+			<fk name="fk_purchases_users_seller_id" virtual="y" to_schema="PhotoBazaar" to_table="users" >
+				<fk_column name="seller_id" pk="_id" />
+			</fk>
+			<fk name="fk_purchases_users_buyer_id" virtual="y" to_schema="PhotoBazaar" to_table="users" >
+				<fk_column name="buyer_id" pk="_id" />
+			</fk>
+			<fk name="fk_purchases_artworks_artwork_id" virtual="y" to_schema="PhotoBazaar" to_table="artworks" >
+				<fk_column name="artwork_id" pk="_id" />
+			</fk>
+		</table>
+		<table name="users" virtual="y" >
+			<column name="_id" type="objectId" length="800" decimal="0" jt="-8" mandatory="y" />
+			<column name="username" type="string" length="800" decimal="0" jt="12" mandatory="y" />
+			<column name="password" type="string" length="800" decimal="0" jt="12" mandatory="y" />
+			<column name="email" type="string" length="800" decimal="0" jt="12" mandatory="y" />
+			<column name="role" type="string" length="800" decimal="0" jt="12" mandatory="y" />
+			<index name="_id_" unique="PRIMARY_KEY" >
+				<column name="_id" />
+			</index>
+			<index name="email_1" unique="UNIQUE_KEY" >
+				<column name="email" />
+			</index>
+			<index name="username_1" unique="UNIQUE_KEY" >
+				<column name="username" />
+			</index>
+		</table>
+	</schema>
+	<connector name="MongoDb" database="MongoDb" driver_class="com.wisecoders.dbschema.mongodb.JdbcDriver" driver_jar="mongojdbc4.8.2.jar" driver_desc="No Authentication" host="localhost" port="27017" instance="PhotoBazaar" user="admin" useSystemProxy="false" />
+	<layout name="Main Layout" id="Layout-22ed" show_relation="name" >
+		<entity schema="PhotoBazaar" name="artworks" color="C7F4BE" x="144" y="80" />
+		<entity schema="PhotoBazaar" name="artworks" column="items" color="C7F4BE" x="304" y="304" />
+		<entity schema="PhotoBazaar" name="artworks" column="owner_ids" color="C7F4BE" x="48" y="304" />
+		<entity schema="PhotoBazaar" name="purchases" color="BED3F4" x="672" y="192" />
+		<entity schema="PhotoBazaar" name="artworks" column="tags" color="C7F4BE" x="48" y="128" />
+		<entity schema="PhotoBazaar" name="users" color="BED3F4" x="464" y="96" />
+		<group name="Collection &#039;purchases&#039;" color="ECF0F7" >
+			<entity schema="PhotoBazaar" name="purchases" />
+		</group>
+		<group name="Collection &#039;artworks&#039;" color="EEF7EC" >
+			<entity schema="PhotoBazaar" name="artworks" />
+			<entity schema="PhotoBazaar" name="artworks" column="tags" />
+			<entity schema="PhotoBazaar" name="artworks" column="owner_ids" />
+			<entity schema="PhotoBazaar" name="artworks" column="items" />
+		</group>
+	</layout>
+	<layout name="~Layout with Sample Tools" id="Layout-13fa" show_column_type="y" show_relation="name" >
+		<entity schema="PhotoBazaar" name="artworks" color="C7F4BE" x="160" y="80" />
+		<entity schema="PhotoBazaar" name="artworks" column="items" color="C7F4BE" x="400" y="384" />
+		<entity schema="PhotoBazaar" name="artworks" column="owner_ids" color="C7F4BE" x="208" y="384" />
+		<entity schema="PhotoBazaar" name="purchases" color="BED3F4" x="704" y="80" />
+		<entity schema="PhotoBazaar" name="artworks" column="tags" color="C7F4BE" x="48" y="384" />
+		<entity schema="PhotoBazaar" name="users" color="BED3F4" x="1024" y="80" />
+		<group name="purchases" color="ECF0F7" >
+			<entity schema="PhotoBazaar" name="purchases" />
+			<entity schema="PhotoBazaar" name="users" />
+		</group>
+		<group name="artworks" color="EEF7EC" >
+			<entity schema="PhotoBazaar" name="artworks" />
+			<entity schema="PhotoBazaar" name="artworks" column="items" />
+			<entity schema="PhotoBazaar" name="artworks" column="owner_ids" />
+			<entity schema="PhotoBazaar" name="artworks" column="tags" />
+		</group>
+		<script name="Query Editor" id="Editor-22da" language="SQL" >
+			<string><![CDATA[PhotoBazaar.artworks.find()
+
+//OR
+
+USE PhotoBazaar;
+db.artworks.find()
+
+//OR
+
+USE PhotoBazaar;
+db.getCollection('artworks').find()]]></string>
+		</script>
+		<browser id="Browse-135f" name="Relational Data Explorer" confirm_updates="y" >
+			<browse_table schema="PhotoBazaar" entity="artworks" x="-2147483648" y="-2147483648" width="-2147483648" height="-2147483648" record_view="y" />
+		</browser>
+		<query id="Query-1172" name="Query Builder" >
+			<query_table schema="PhotoBazaar" name="artworks" alias="artworks" x="48" y="48" >
+				<column name="_id" />
+				<column name="title" />
+				<column name="tags" />
+				<column name="description" />
+				<column name="cover_url" />
+				<column name="author_id" />
+				<column name="owner_ids" />
+				<column name="price" />
+				<column name="upload_time" />
+				<column name="items" />
+			</query_table>
+		</query>
+		<form name="Report" id="Report-e9e" template="Page" css="container-fluid" view="frame" >
+			<var name="samplePageNumber" type="4" value="0" mandatory="n" />
+			<var name="sampleRecordsPerPage" type="4" value="100" mandatory="n" />
+			<body name="Body" template="Grid" pos="0,0,0,0,f,f" layout="{{-2,-2,-2,-2,-1},{-2,-2,-2,-2}}" scroll="n" html="n" >
+				<cell type="label" name="Artworks Data" template="H3" pos="0,0,1,0,l,c" />
+				<cell type="chart" name="Pie" template="Pie" pos="0,1,4,1,l,c" max_records="20" >
+					<form_script type="DataSource" language="SQL" >
+						<var name="_id" type="-8" />
+						<var name="title" />
+						<var name="tags" type="4999545" />
+						<var name="description" />
+						<var name="cover_url" />
+						<var name="author_id" />
+						<var name="owner_ids" type="4999545" />
+						<var name="price" type="8" />
+						<var name="upload_time" />
+						<var name="items" type="4999545" />
+						<script ><![CDATA[PhotoBazaar.artworks.find()]]></script>
+					</form_script>
+					<param name="item" value="upload_time" />
+					<param name="width" value="100%" />
+					<param name="title" value="Sample Chart" />
+					<param name="value" value="price" />
+					<param name="height" value="400px" />
+				</cell>
+				<tableview name="sample" template="Table" css="table table-striped table-sm table-hover" pos="0,2,4,2,f,f" layout="{{-2,-2,-2,-2,-2,-2,-2},{-2,-2}}" scroll="n" html="n" header_rows="1" >
+					<form_script type="DataSource" language="SQL" >
+						<var name="_id" type="-8" />
+						<var name="title" />
+						<var name="tags" type="4999545" />
+						<var name="description" />
+						<var name="cover_url" />
+						<var name="author_id" />
+						<var name="owner_ids" type="4999545" />
+						<var name="price" type="8" />
+						<var name="upload_time" />
+						<var name="items" type="4999545" />
+						<script ><![CDATA[PhotoBazaar.artworks.find()]]></script>
+					</form_script>
+					<cell type="label" name="_id" pos="0,0,0,0,c,c" />
+					<cell type="label" name="title" pos="1,0,1,0,c,c" />
+					<cell type="label" name="tags" pos="2,0,2,0,c,c" />
+					<cell type="label" name="description" pos="3,0,3,0,c,c" />
+					<cell type="label" name="cover_url" pos="4,0,4,0,c,c" />
+					<cell type="label" name="author_id" pos="5,0,5,0,c,c" />
+					<cell type="label" name="${_id}" template="Plain" pos="0,1,0,1,l,c" />
+					<cell type="label" name="${title}" template="Plain" pos="1,1,1,1,l,c" />
+					<cell type="label" name="${tags}" template="Plain" pos="2,1,2,1,l,c" />
+					<cell type="label" name="${description}" template="Plain" pos="3,1,3,1,l,c" />
+					<cell type="label" name="${cover_url}" template="Plain" pos="4,1,4,1,l,c" />
+					<cell type="label" name="${author_id}" template="Plain" pos="5,1,5,1,l,c" />
+					<cell type="button" name="More" template="Plain" css="btn btn-sm btn-secondary" pos="6,1,6,1,c,c" ref_id="Report-e9e" />
+				</tableview>
+				<cell type="href" name="" disabled="${samplePageNumber&lt;1}" pos="0,3,0,3,l,c" glyph="bi-chevron_double_left" ref_id="Report-e9e" >
+					<var name="samplePageNumber" value="0" />
+				</cell>
+				<cell type="href" name="" disabled="${samplePageNumber&lt;1}" pos="1,3,1,3,l,c" glyph="bi-chevron_left" ref_id="Report-e9e" >
+					<var name="samplePageNumber" value="${Math.max(0,samplePageNumber-1)}" />
+				</cell>
+				<cell type="label" name="Page ${samplePageNumber+1}" pos="2,3,2,3,l,c" />
+				<cell type="href" name="" disabled="${!sampleHasNextPage}" pos="3,3,3,3,l,c" glyph="bi-chevron_right" ref_id="Report-e9e" >
+					<var name="samplePageNumber" value="${( samplePageNumber+1 )}" />
+				</cell>
+			</body>
+		</form>
+	</layout>
+</project>

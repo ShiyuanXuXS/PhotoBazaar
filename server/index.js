@@ -2,11 +2,11 @@ const express = require('express');
 const app = express();
 const port = process.env.PORT || 3001;
 
-const tagRoutes = require('./src/routes/tag.routes'); // 导入路由
+const tagRoutes = require('./src/routes/tag.routes');
 
-app.use(express.json()); // 使用 JSON 解析中间件
+app.use(express.json()); 
 
-app.use('/api/tags', tagRoutes); // 配置标签路由
+app.use('/api/tags', tagRoutes); 
 
 app.listen(port, () => {
   console.log(`Server is running on port ${port}`);

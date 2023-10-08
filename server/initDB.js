@@ -7,7 +7,7 @@ const dbURI = process.env.MONGODB_URI;
 
 const client = new MongoClient(dbURI);
 
-const insertExampleData = () => {
+const insertExampleData = async () => {
   const db = client.db("PhotoBazaar")
   //users
   let document = {
@@ -26,6 +26,7 @@ const insertExampleData = () => {
     ],
     nickname: "John Doe"
   }
+  await db.createCollection("users")
   let collection = db.collection("users")
   collection.insertOne(document)
   collection.createIndex({ username: 1 }, { unique: true });
@@ -35,6 +36,7 @@ const insertExampleData = () => {
     "tag": "Food",
     "count": 0
   }
+  await db.createCollection("tags")
   collection = db.collection("tags")
   collection.insertOne(document)
   collection.createIndex({ tag: 1 }, { unique: true })
@@ -72,6 +74,7 @@ const insertExampleData = () => {
       }
     ]
   }
+  await db.createCollection("artworks")
   collection = db.collection("artworks")
   collection.insertOne(document)
   //purchases
@@ -85,6 +88,7 @@ const insertExampleData = () => {
     transaction_price: "199.99",
     transaction_ref: "transaction_reference"
   }
+  await db.createCollection("purchases")
   collection = db.collection("purchases")
   collection.insertOne(document)
   //messages
@@ -95,6 +99,7 @@ const insertExampleData = () => {
     isread: false,
     message: "Helllo!"
   }
+  await db.createCollection("messages")
   collection = db.collection("messages")
   collection.insertOne(document)
 
@@ -105,7 +110,7 @@ const initDB = async () => {
   try {
     await client.connect()
     await client.db("PhotoBazaar").dropDatabase()
-    insertExampleData()
+    await insertExampleData()
     process.exit()
   } catch (err) {
     console.error(err)

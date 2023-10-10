@@ -5,10 +5,15 @@ module.exports = {
         await Artwork.find()
             .sort({ _id: 1 })
             .then((result) => {
-                res.send(result);
+                console.log(result);
+                res.send(result).status(200);
             })
             .catch((err) => {
-                res.status(400).json(err);
+                console.log(err);
+                res.status(400).json({
+                    message: "error from artwork controller",
+                    err
+                });
             });
     }
 }

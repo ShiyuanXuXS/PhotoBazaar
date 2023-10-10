@@ -1,19 +1,22 @@
-import { Routes,Route } from 'react-router-dom';
+import React, { useContext } from 'react';
+import { Route, Routes } from 'react-router-dom';
+import Login from './pages/Login';
+import Register from './pages/Register';
+import Home from './pages/Home';
+import HeaderComponent from './components/Header';
+import "./App.css";
 
-import { Login } from './pages/Login';
-import { Register } from './pages/Register';
-import { Home } from './pages/Home';
-
-import "./App.css"
-
-export const App = () => {
+function App() {
     return (
         <div className="page-container">
+            <HeaderComponent />
             <Routes>
-                <Route exact path="/" element={<Home />} />
+                <Route path="/" element={<Home />} />
                 <Route path="/login" element={<Login />} />
                 <Route path="/register" element={<Register />} />
             </Routes>
         </div>
     )
 }
+
+export default App;

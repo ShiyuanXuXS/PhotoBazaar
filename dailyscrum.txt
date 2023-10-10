@@ -3,7 +3,7 @@
 Shiyuan
 1.  Done / not done since last scrum:
 - created project on mongoDB Atlas
-- created initDB.js to created the database and insert example data
+- created initDB.js to create the database and insert example data
 - initialed the project
 - wrote the tags api 
 2. To do until next Scrum:

@@ -10,3 +10,12 @@ Shiyuan
 - research and choose a solution for message function 
 3. Need assistance / figure things out
 N/A
+
+
+Chang Liu
+1.  Done
+- run the project 
+- complete the login/signup/forget passowrd API using stytch.
+2. To do
+- Add third party email login API
+

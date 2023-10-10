@@ -4,7 +4,7 @@ import axios from 'axios';
 
 const socket = io('/');
 
-export function Message() {
+function Message() {
   const [userList, setUserList] = useState([]);
   const [selectedUser, setSelectedUser] = useState(null);
   const [messages, setMessages] = useState([]);
@@ -115,3 +115,5 @@ export function Message() {
     </div>
   );
 }
+
+export default Message

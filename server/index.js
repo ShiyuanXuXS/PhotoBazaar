@@ -9,10 +9,11 @@ const port = process.env.PORT || 3001;
 const tagRoutes = require('./src/routes/tag.routes');
 const messageRoutes = require('./src/routes/message.routes');
 
-app.use(express.json()); 
+app.use(express.json());
 
-app.use('/api/tags', tagRoutes); 
-app.use('api/messages', messageRoutes);
+app.use('/api/tags', tagRoutes);
+app.use('/api/messages', messageRoutes);
+
 io.on('connection', (socket) => {
   console.log('A user connected');
 

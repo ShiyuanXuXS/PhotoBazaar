@@ -11,13 +11,13 @@ const messageRoutes = require('./src/routes/message.routes');
 app.use(express.json()); 
 
 app.use('/api/tags', tagRoutes); 
-app.use('api/messages', messageRoutes);
+app.use('/api/messages', messageRoutes);
 
 
 
 const server = http.createServer(app);
 const io = socketIo(server);
-const Message = require('../models/message.model');
+const Message = require('./src/models/message.model');
 const messageModel = new Message();
 const userSockets = {};
 userSockets['user1'] = 'socketId1'; //for test

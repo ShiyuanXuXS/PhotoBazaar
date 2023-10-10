@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Transition } from '@headlessui/react';
 
@@ -36,7 +36,7 @@ function HeaderComponent() {
                     </button>
                 </div>
                 {/* shows up when user haven't login in or sign up */}
-                {/* <div className="lg:flex lg:flex-1 lg:justify-end">
+                <div className="lg:flex lg:flex-1 lg:justify-end">
                     <button href="#" className="text-sm font-semibold leading-6 text-gray-900"
                         onClick={navigateToLogin}>
                         Sign in <span aria-hidden="true"></span>
@@ -45,7 +45,7 @@ function HeaderComponent() {
                         onClick={navigateToRegister}>
                         Join Us
                     </button>
-                </div> */}
+                </div>
                 {/* shows up when user have loged in */}
 
                 <div className="lg:flex lg:flex-1 lg:justify-end mx-3">

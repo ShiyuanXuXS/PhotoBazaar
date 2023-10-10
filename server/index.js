@@ -1,4 +1,5 @@
 const express = require('express');
+const mongoose = require('mongoose');
 const http = require('http');
 const socketIo = require('socket.io');
 const app = express();
@@ -7,11 +8,14 @@ const port = process.env.PORT || 3001;
 
 const tagRoutes = require('./src/routes/tag.routes');
 const messageRoutes = require('./src/routes/message.routes');
+const artworkRoutes = require('./src/routes/artwork.routes');
+app.use('/auctions', auctionRouter);
 
-app.use(express.json()); 
+app.use(express.json());
 
-app.use('/api/tags', tagRoutes); 
+app.use('/api/tags', tagRoutes);
 app.use('/api/messages', messageRoutes);
+app.use('/api/artworks', artworkRoutes);
 
 
 
@@ -32,7 +36,7 @@ io.on('connection', async (socket) => {
     const sender_id = data.sender_username; //todo: auth & find userid by username
     const receiver_id = data.receiver_username; //todo: find userid by username
     const message = data.message;
-    
+
     try {
       const insertedId = await messageModel.save(sender_id, receiver_id, message);
       const receiverSocket = io.sockets.sockets[data.receiver_username];
@@ -43,8 +47,8 @@ io.on('connection', async (socket) => {
       console.error('Failed to save message to database:', error);
       socket.emit('message-sent', { error: 'Failed to send message' });
     }
-    });
-    socket.on('disconnect', () => {
+  });
+  socket.on('disconnect', () => {
     console.log('A user disconnected');
   });
 });

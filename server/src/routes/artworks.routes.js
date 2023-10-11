@@ -9,7 +9,7 @@ router.get("/", artworkController.getAllArtworks);
 router.post("/", artworkController.createArtwork);
 
 // Retrieve a single artwork with artwork—_id
-router.get("/:id([0-9]+)", artworkController.findArtworkItemById);
+router.get("/:id", artworkController.findArtworkById);
 
 // Delete a artwork with artwork—_id
 // router.delete("/:id([0-9]+)", artworkController.deleteOneItemById);

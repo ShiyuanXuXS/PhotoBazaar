@@ -9,7 +9,7 @@ module.exports = {
                 res.send(result).status(200);
             })
             .catch((err) => {
-                console.log(err);
+                // console.log(err);
                 res.status(400).json({
                     message: "error from artwork controller",
                     err
@@ -18,8 +18,6 @@ module.exports = {
     },
     createArtwork: async (req, res) => {
         const { _id, author_id, cover_url, description, photos, price, tags, title } = req.body;
-        console.log(req.body);
-
         const newArtwork = new Artwork({
             _id,
             author_id,
@@ -41,11 +39,28 @@ module.exports = {
 
         await newArtwork.save()
             .then((result) => {
-                console.log(result);
+                // console.log(result);
                 res.send(result).status(200);
             })
             .catch((err) => {
-                console.log(err);
+                // console.log(err);
+                res.status(400).json({
+                    message: "error from artwork controller",
+                    err
+                });
+            });
+    },
+    findArtworkById: async (req, res) => {
+        const id = req.params.id;
+        Artwork.findOne({ _id: id })
+            .then((result) => {
+                if (result) {
+                    res.send(result).status(200);
+                } else {
+                    res.status(404).send({ message: "error from artwork controller: No such product found" });
+                }
+            })
+            .catch((err) => {
                 res.status(400).json({
                     message: "error from artwork controller",
                     err

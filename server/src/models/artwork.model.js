@@ -63,7 +63,9 @@ const artworkSchema = new Schema(
             required: true,
         },
     },
-    { timestamps: true }
+    { timestamps: true },
+    { versionKey: false } // exclude __v field
+
 );
 
 const Artwork = mongoose.model("Artwork", artworkSchema);

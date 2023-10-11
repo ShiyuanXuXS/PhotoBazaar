@@ -2,49 +2,61 @@ import React, { useState, useEffect } from 'react';
 import io from 'socket.io-client';
 import axios from 'axios';
 
-const socket = io('/');
 
 function Message() {
-    const [userList, setUserList] = useState([]);
-    const [selectedUser, setSelectedUser] = useState(null);
+    const [userList, setUserList] = useState([]);//users to chat with 
+    const [selectedUser, setSelectedUser] = useState(null);//user chatting with
     const [messages, setMessages] = useState([]);
     const [newMessage, setNewMessage] = useState('');
-    const [searchUserBy, setSearchUserBy] = useState('');
-    const [userListFromSearch, setUserListFromSearch] = useState([]);
+    const [searchUserBy, setSearchUserBy] = useState('');//string for searching username or nickname
+    const [userListFromSearch, setUserListFromSearch] = useState([]);//result of searching users
+    const [socket, setSocket] = useState(null);
+    const [receivedMessages, setReceivedMessages] = useState([]);
+    const [currentUser, setCurrentUser] = useState(null);//user logged in
+
     useEffect(() => {
         fetchUserList();
-
-        socket.on('new-message', (data) => {
-        if (selectedUser && data.sender_id === selectedUser.id) {
-            setMessages([...messages, data]);
-        } else {
-            setUserList((prevUsers) =>
-            prevUsers.map((user) =>
-                user.id === data.sender_id
-                ? { ...user, unreadMessages: user.unreadMessages + 1 }
-                : user
-            )
-            );
-        }
+        const newSocket = io.connect('http://localhost:3001'); 
+        newSocket.on('connect', () => {
+            console.log('Connected to server');
         });
 
+        newSocket.on('connect_error', (error) => {
+            console.error('Connection error:', error);
+        });
+        newSocket.on('message', (data) => {
+            setReceivedMessages([...receivedMessages, data]);
+        });
+        setSocket(newSocket);
         return () => {
-        socket.off('new-message');
+            if (socket) {
+                socket.disconnect();
+            }
         };
-    }, [selectedUser, messages]);
+
+        
+    }, []);
+
+
 
     const fetchUserList = async () => {
         setUserList([
             {
                 username: 'user1',
                 nickname: 'nickname1',
-                messages: [{ sender_username: 'user1', receiver_username: 'me', message: 'hello!', isread: false }],
+                messages: [
+                    { sender_username: 'user1', receiver_username: 'user2', message: 'hello, I am user1', isread: false },
+                    { sender_username: 'user2', receiver_username: 'user1', message: 'hello, I am user2', isread: false }
+                ],
                 hasMessageUnread: true
             },
             {
                 username: 'user2',
                 nickname: 'nickname2',
-                messages: [{ sender_username: 'me', receiver_username: 'user2', message: 'bonjour!', isread: false }],
+                messages: [
+                    { sender_username: 'user2', receiver_username: 'user1', message: 'bonjour, je suis user2', isread: false },
+                    { sender_username: 'user1', receiver_username: 'user2', message: 'bonjour, je suis user1', isread: false }
+                ],
                 hasMessageUnread: true
             }])
         //todo: get contacted users
@@ -58,19 +70,32 @@ function Message() {
     };
 
     const sendMessage = () => {
-        if (!selectedUser || !newMessage) return;
+        if (!socket || !selectedUser || !newMessage) return;
 
-        socket.emit('send-message', {
-            sender_username: "my username",
+        const message={
+            sender_username: currentUser,
             receiver_username: selectedUser.username, 
             message: newMessage,
-        });
+        }
+        socket.emit('private-message',message );
 
-        setMessages([...messages, { sender_username: 'user1', message: newMessage }]);
+        setMessages([...messages, message]);
+        setUserList((prevUserList) => {
+            return prevUserList.map((user) => {
+                if (user.username === selectedUser.username) {
+                    return {
+                        ...user,
+                        messages: [...user.messages, message],
+                    };
+                }
+                return user;
+            });
+        });
         setNewMessage('');
     };
 
     const searchUsers = () => {
+        //todo: search users from api/users
         setUserListFromSearch([
             {
                 username: 'user1',
@@ -82,8 +107,6 @@ function Message() {
             }
         ])
         
-        console.log(userListFromSearch)
-        //todo: search users
     }
     const selectUserFromSearch = (selectedResult) => {
         const existingUser = userList.find((user) => user.username === selectedResult.username);
@@ -102,36 +125,49 @@ function Message() {
         setUserListFromSearch([]);
     }
     return (
-        <div className="Message">
-            <div className='users-container'>
+        <div className="Message flex justify-center items-center h-screen border p-4">
+            <div>
+                {currentUser === 'user1' && (<p>user1</p>)}
+                {currentUser==='user2' && (<p>user2</p>)}
+                <button onClick={() => {
+                    setCurrentUser(currentUser === 'user1' ?'user2':'user1')
+                }}>Switch User</button>
+
+            </div>
+            <div className='users-container border p-4'>
                 <div className="user-list">
                     {userList.map((user) => (
                     <div
                         key={user.username}
                         className={`user-item ${
-                            selectedUser && selectedUser.username === user.username ? 'active' : ''
-                        }`}
+                            selectedUser && selectedUser.username === user.username ? 'bg-blue-500 text-white rounded' : ''
+                          }`}
                         onClick={() => selectUser(user)}
                     >
-                        {user.nickname}
-                        {user.hasMessageUnread > 0 && (<div className="unread-badge">New message!</div>)}
+                            {user.nickname} ({user.username })
+                        {user.hasMessageUnread  && (<div className="bg-red-500 text-white rounded-full w-9 h-5 flex items-center justify-center ml-4">New</div>)}
                         
                     </div>
                     ))}
                 </div>
-                <div className="user-search">
+                <div className="user-search border p-4">
                     <input
                         type="text"
                         placeholder="Search user..."
                         value={searchUserBy}
                         onChange={(e) => setSearchUserBy(e.target.value)}
+                        className="border border-gray-300 rounded p-2 mr-2"
                         />
-                    <button onClick={searchUsers}>Search</button>
+                    <button
+                        onClick={searchUsers}
+                        className="bg-blue-500 text-white rounded px-4 py-2 hover:bg-blue-600"
+                    >Search
+                    </button>
                     <div className="search-results">
                         {userListFromSearch.map((user) => (
                             <div
                             key={user.username}
-                            className="search-result-item"
+                            className="search-result-item cursor-pointer hover:bg-gray-100 p-2"
                             onClick={() => selectUserFromSearch(user)}
                             >
                             {user.username} - {user.nickname}
@@ -142,30 +178,49 @@ function Message() {
                 </div>
             </div>
             
-            {selectedUser &&(<div className="chat-container">
+            {selectedUser &&(<div className="chat-container border p-4">
                 
-                <div className="chat-header">{`Chat with ${selectedUser.nickname}`}</div>
+                <div className="chat-header bg-blue-500 text-white p-4 rounded" >
+                    {`Chat with ${selectedUser.nickname}`}
+                </div>
                 
                 <div className="chat-messages">
                 {messages.map((message, index) => (
                     <div
-                    key={index}
-                    className={`message ${
-                        message.sender_id === 'me' ? 'sent' : 'received'
-                    }`}
+                        key={index}
+                        className={`message mb-2 ${
+                        message.sender_username === currentUser
+                            ? 'text-right'
+                            : ''
+                        }`}
                     >
-                    {message.message}
-                    </div>
+                    <span
+                        className={`message-content inline-block p-2 rounded ${
+                        message.sender_username === currentUser
+                            ? 'bg-green-500 text-black'
+                            : 'bg-gray-200 text-black'
+                        }`}
+                    >
+                        {message.message}
+                    </span>
+                </div>
+                
                 ))}
                 </div>
-                <div className="chat-input">
+                <div className="chat-input p-4">
                 <input
                     type="text"
                     placeholder="Type a message..."
                     value={newMessage}
                     onChange={(e) => setNewMessage(e.target.value)}
+                    className="border border-gray-300 rounded p-2 w-full mr-2"
                 />
-                <button onClick={sendMessage}>Send</button>
+                    <button
+                        onClick={sendMessage}
+                        className="bg-blue-500 text-white rounded px-4 py-2 hover:bg-blue-600"
+                    >
+                        Send
+                    </button>
                 </div>
             </div>)}
         </div>

@@ -48,7 +48,7 @@ io.on('connection', async (socket) => {
 
     try {
       const insertedId = await messageModel.save(sender_id, receiver_id, message);
-      console.log("inserted:" + insertedId)
+      console.log("message inserted:" + insertedId)
       const receiverSocket = io.sockets.sockets[data.receiver_username];
       if (receiverSocket) {
         receiverSocket.emit('private-message', data);

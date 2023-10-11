@@ -46,3 +46,16 @@ Xiaoxing Pan
 2. To do
 - artwork other back-end
 
+2023/10/11
+Shiyuan
+1.  Done / not done since last scrum:
+- created a message frontend structure
+    - users list and search user
+    - message box
+    - switch user chatting with
+    - send message
+- store message to db
+2. To do until next Scrum:
+- send private message to indicated user
+- receive message and refresh message box
+

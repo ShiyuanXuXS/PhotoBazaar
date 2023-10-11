@@ -1,40 +1,40 @@
-const express = require('express');
-const mongoose = require('mongoose');
-const http = require('http');
-const socketIo = require('socket.io');
-
-
+const express = require("express");
+const mongoose = require("mongoose");
+const http = require("http");
+const socketIo = require("socket.io");
 
 const app = express();
-const cors = require('cors');
+const cors = require("cors");
 const port = process.env.PORT || 3001;
 
-const tagRoutes = require('./src/routes/tag.routes');
-const messageRoutes = require('./src/routes/message.routes');
-const artworkRoutes = require('./src/routes/artworks.routes');
+const tagRoutes = require("./src/routes/tag.routes");
+const messageRoutes = require("./src/routes/message.routes");
+const artworkRoutes = require("./src/routes/artworks.routes");
+const userRouter = require("./src/routes/users.routes");
 
 app.use(express.json());
 
-app.use('/api/tags', tagRoutes);
-app.use('/api/messages', messageRoutes);
+app.use("/api/tags", tagRoutes);
+app.use("/api/messages", messageRoutes);
 app.use(cors());
-app.use('/api/artworks', artworkRoutes);
+app.use("/api/artworks", artworkRoutes);
+app.use("/users", userRouter);
 
-const Message = require('./src/models/message.model');
+const Message = require("./src/models/message.model");
 const messageModel = new Message();
 const userSockets = {};
 // userSockets['user1'] = 'socketId1'; //for test
 // userSockets['user2'] = 'socketId2'; //for test
 
-const { createServer } = require('node:http');
-const { join } = require('node:path');
-const { Server } = require('socket.io');
+const { createServer } = require("node:http");
+const { join } = require("node:path");
+const { Server } = require("socket.io");
 const server = createServer(app);
 const io = new Server(server, {
   cors: {
-    origin: '*',
-    methods: ['GET', 'POST'],
-  }
+    origin: "*",
+    methods: ["GET", "POST"],
+  },
 });
 
 io.on('connection', async (socket) => {
@@ -48,7 +48,7 @@ io.on('connection', async (socket) => {
     console.log(userSockets['user2']?userSockets['user2'].id:"no user2")
   })
 
-  socket.on('private-message', async (data) => {
+  socket.on("private-message", async (data) => {
     const sender_id = data.sender_username; //todo: auth & find userid by username
     const receiver_id = data.receiver_username; //todo: find userid by username
     const message = data.message;
@@ -67,12 +67,12 @@ io.on('connection', async (socket) => {
       console.error('Failed to save message to database:', error);
     }
   });
-  socket.on('disconnect', () => {
-    console.log('A user disconnected');
+  socket.on("disconnect", () => {
+    console.log("A user disconnected");
   });
 });
 
-// connect Database 
+// connect Database
 mongoose
   .connect(process.env.MONGODB_URI, {
     dbName: "PhotoBazaar",
@@ -87,8 +87,6 @@ mongoose
   .catch((err) => {
     console.log(err);
   });
-
-
 
 server.listen(port, () => {
   console.log(`Server is running on port ${port}`);

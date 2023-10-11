@@ -39,3 +39,10 @@ Chang Liu
 -use mailgun to implement reset password function
 2. To do
 - integrate the front end to the project
+Xiaoxing Pan
+1.  Done
+- header/footer 
+- artwork.model and artwork controller-getAll
+2. To do
+- artwork other back-end
+

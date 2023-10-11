@@ -1,4 +1,4 @@
-const { ObjectId, Double } = require("mongodb");
+const { ObjectId } = require("mongodb");
 const { mongoose } = require("mongoose");
 const Schema = mongoose.Schema;
 
@@ -6,7 +6,7 @@ const artworkSchema = new Schema(
     {
         //artwork id
         _id: {
-            type: ObjectId,
+            type: mongoose.Schema.Types.ObjectId,
             required: true,
         },
         author_id: {
@@ -23,8 +23,20 @@ const artworkSchema = new Schema(
         },
         photos: [
             {
+                photo_name: {
+                    type: String,
+                    required: true,
+                },
                 description: {
                     type: String,
+                    required: true,
+                },
+                upload_time: {
+                    type: Date,
+                    required: true,
+                },
+                modify_time: {
+                    type: Date,
                     required: true,
                 },
                 file_url: {
@@ -34,13 +46,15 @@ const artworkSchema = new Schema(
             },
         ],
         price: {
-            type: Double,
+            type: Number,
             required: true,
         },
         tags: [
             {
-                type: String,
-                required: true,
+                tag_id: {
+                    type: String,
+                    required: true,
+                },
             },
         ],
         title: {

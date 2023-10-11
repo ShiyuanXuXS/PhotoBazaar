@@ -1,7 +1,7 @@
 const Artwork = require('../models/artwork.model');
 
 module.exports = {
-    findAllArtwork: async (req, res) => {
+    getAllArtworks: async (req, res) => {
         await Artwork.find()
             .sort({ _id: 1 })
             .then((result) => {

@@ -12,7 +12,6 @@ const port = process.env.PORT || 3001;
 const tagRoutes = require('./src/routes/tag.routes');
 const messageRoutes = require('./src/routes/message.routes');
 const artworkRoutes = require('./src/routes/artworks.routes');
-app.use('/auctions', auctionRouter);
 
 app.use(express.json());
 
@@ -21,15 +20,11 @@ app.use('/api/messages', messageRoutes);
 app.use(cors());
 app.use('/api/artworks', artworkRoutes);
 
-
 const Message = require('./src/models/message.model');
 const messageModel = new Message();
 const userSockets = {};
 userSockets['user1'] = 'socketId1'; //for test
 userSockets['user2'] = 'socketId2'; //for test
-
-
-
 
 const { createServer } = require('node:http');
 const { join } = require('node:path');
@@ -53,7 +48,7 @@ io.on('connection', async (socket) => {
 
     try {
       const insertedId = await messageModel.save(sender_id, receiver_id, message);
-      console.log("inserted:"+insertedId)
+      console.log("inserted:" + insertedId)
       const receiverSocket = io.sockets.sockets[data.receiver_username];
       if (receiverSocket) {
         receiverSocket.emit('private-message', data);
@@ -68,7 +63,21 @@ io.on('connection', async (socket) => {
   });
 });
 
-
+// connect Database 
+mongoose
+  .connect(process.env.MONGODB_URI, {
+    dbName: "PhotoBazaar",
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+    retryWrites: true,
+    w: "majority",
+  })
+  .then(() => {
+    console.log("Connected to MongoDB");
+  })
+  .catch((err) => {
+    console.log(err);
+  });
 
 
 

@@ -1,4 +1,4 @@
-import React from "react";
+import React from 'react';
 
 function FooterComponent() {
     return (
@@ -7,7 +7,7 @@ function FooterComponent() {
             <div
                 className="flex items-center justify-center border-b-2 border-neutral-200 p-6 dark:border-neutral-500 lg:justify-between">
                 <div className="mr-12 hidden lg:block">
-                    <span>© 2023 Copyright: Tailwind Elements</span>
+                    <span>© 2023 Copyright: Shiyuan Xu, Chang Liu, Xiaoxing Pan</span>
                 </div>
                 <div className="flex justify-center">
                     <button className="mr-6 text-neutral-600 dark:text-neutral-200">

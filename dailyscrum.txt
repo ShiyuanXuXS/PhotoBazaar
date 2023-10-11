@@ -34,3 +34,8 @@ Shiyuan
 2. To do until next Scrum:
 - create a frontend interface for message function
 - test the backend crud code of the message function
+Chang Liu
+1.Done
+-use mailgun to implement reset password function
+2. To do
+- integrate the front end to the project

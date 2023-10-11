@@ -6,26 +6,44 @@ import axios from 'axios';
 function Message() {
     const [userList, setUserList] = useState([]);//users to chat with 
     const [selectedUser, setSelectedUser] = useState(null);//user chatting with
-    const [messages, setMessages] = useState([]);
+    
     const [newMessage, setNewMessage] = useState('');
     const [searchUserBy, setSearchUserBy] = useState('');//string for searching username or nickname
     const [userListFromSearch, setUserListFromSearch] = useState([]);//result of searching users
     const [socket, setSocket] = useState(null);
-    const [receivedMessages, setReceivedMessages] = useState([]);
     const [currentUser, setCurrentUser] = useState(null);//user logged in
 
     useEffect(() => {
         fetchUserList();
+        setCurrentUser('user1');
+    },[])
+    useEffect(() => {
+        
         const newSocket = io.connect('http://localhost:3001'); 
         newSocket.on('connect', () => {
-            console.log('Connected to server');
+            newSocket.emit('user_info', {username:currentUser})
+            console.log(currentUser + ' Connected to server');
         });
 
         newSocket.on('connect_error', (error) => {
             console.error('Connection error:', error);
         });
-        newSocket.on('message', (data) => {
-            setReceivedMessages([...receivedMessages, data]);
+
+        newSocket.on("sendback",function(message){
+            
+            setUserList((prevUserList) => {
+                return prevUserList.map((user) => {
+                    if (user.username === message.sender_username) {
+                        return {
+                            ...user,
+                            messages: [...user.messages, message],
+                        };
+                    }
+                    
+                    return user;
+                });
+            });
+            
         });
         setSocket(newSocket);
         return () => {
@@ -35,8 +53,7 @@ function Message() {
         };
 
         
-    }, []);
-
+    }, [currentUser]);
 
 
     const fetchUserList = async () => {
@@ -64,9 +81,8 @@ function Message() {
         //todo: get messages from each user
     };
 
-    const selectUser = async (user) => {
+    const selectUser =  (user) => {
         setSelectedUser(user);
-        setMessages(user.messages)
     };
 
     const sendMessage = () => {
@@ -79,7 +95,7 @@ function Message() {
         }
         socket.emit('private-message',message );
 
-        setMessages([...messages, message]);
+        // setMessages([...messages, message]);
         setUserList((prevUserList) => {
             return prevUserList.map((user) => {
                 if (user.username === selectedUser.username) {
@@ -94,16 +110,27 @@ function Message() {
         setNewMessage('');
     };
 
+    useEffect(() => {
+        if (selectedUser) {
+            userList.map(user => {
+                if (user.username === selectedUser.username) {
+                    setSelectedUser(user)
+                }
+            })
+        }
+    },[userList])
     const searchUsers = () => {
         //todo: search users from api/users
         setUserListFromSearch([
             {
                 username: 'user1',
-                nickname: 'nickname1'
+                nickname: 'nickname1',
+                messages: []
             },
             {
                 username: 'new user',
-                nickname: 'new user from search'
+                nickname: 'new user from search',
+                messages: []
             }
         ])
         
@@ -142,7 +169,7 @@ function Message() {
                         className={`user-item ${
                             selectedUser && selectedUser.username === user.username ? 'bg-blue-500 text-white rounded' : ''
                           }`}
-                        onClick={() => selectUser(user)}
+                        onClick={() => setSelectedUser(user)}
                     >
                             {user.nickname} ({user.username })
                         {user.hasMessageUnread  && (<div className="bg-red-500 text-white rounded-full w-9 h-5 flex items-center justify-center ml-4">New</div>)}
@@ -185,7 +212,7 @@ function Message() {
                 </div>
                 
                 <div className="chat-messages">
-                {messages.map((message, index) => (
+                {selectedUser.messages.map((message, index) => (
                     <div
                         key={index}
                         className={`message mb-2 ${

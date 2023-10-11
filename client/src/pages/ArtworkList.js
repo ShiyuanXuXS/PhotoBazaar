@@ -1,10 +1,12 @@
 import React from 'react';
+import ArtworkListComponent from '../components/ArtworkList';
 
 
 function ArtworkList() {
 
     return (
-        <div className='text-5xl'>This is your artwork page!</div>
+        <ArtworkListComponent />
+
     )
 }
 

@@ -3,8 +3,8 @@ const mongoose = require('mongoose');
 const http = require('http');
 const socketIo = require('socket.io');
 
-const app = express();
 const cors = require('cors');
+const app = express();
 const port = process.env.PORT || 3001;
 
 const tagRoutes = require('./src/routes/tag.routes');
@@ -76,8 +76,6 @@ mongoose
   .catch((err) => {
     console.log(err);
   });
-
-
 
 server.listen(port, () => {
   console.log(`Server is running on port ${port}`);

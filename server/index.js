@@ -11,7 +11,7 @@ const port = process.env.PORT || 3001;
 
 const tagRoutes = require('./src/routes/tag.routes');
 const messageRoutes = require('./src/routes/message.routes');
-const artworkRoutes = require('./src/routes/artwork.routes');
+const artworkRoutes = require('./src/routes/artworks.routes');
 app.use('/auctions', auctionRouter);
 
 app.use(express.json());

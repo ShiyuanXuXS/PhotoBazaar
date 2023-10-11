@@ -6,6 +6,8 @@ import Home from './pages/Home';
 import Message from './pages/Message';
 import HeaderComponent from './components/Header';
 import FooterComponent from './components/Footer';
+import Artwork from './pages/ArtworkList';
+
 
 import "./App.css";
 
@@ -18,6 +20,7 @@ function App() {
                 <Route path="/login" element={<Login />} />
                 <Route path="/register" element={<Register />} />
                 <Route path="/message" element={<Message />} />
+                <Route path="/artwork" element={<Artwork />} />
             </Routes>
             <FooterComponent />
         </div>

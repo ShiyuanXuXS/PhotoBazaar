@@ -9,12 +9,12 @@ router.get("/", artworkController.getAllArtworks);
 router.post("/", artworkController.createArtwork);
 
 // Retrieve a single artwork with artwork—_id
-router.get("/:id", artworkController.findArtworkById);
+router.get("/:id(\\w{24})", artworkController.findArtworkById);
 
 // Delete a artwork with artwork—_id
-// router.delete("/:id([0-9]+)", artworkController.deleteOneItemById);
+router.delete("/:id(\\w{24})", artworkController.deleteArtworkById);
 
 // Update a artwork with artwork—_id
-// router.patch("/:id([0-9]+)", artworkController.updateOneItemById);
+router.patch("/:id", artworkController.updateArtworkById);
 
 module.exports = router;

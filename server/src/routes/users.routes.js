@@ -8,6 +8,9 @@ router.get("/", userController.findAll);
 // Retrieve a single user with user email
 router.get("/:email", userController.findUserByEmail);
 
+// Retrieve a single user with user id
+router.get("/id/:id", userController.findUserById);
+
 // Create a new user
 router.post("/", userController.addUser);
 

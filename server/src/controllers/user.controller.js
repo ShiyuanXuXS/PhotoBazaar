@@ -2,6 +2,9 @@ const User = require("../models/user.model");
 const validator = require("validator");
 const bcrypt = require("bcrypt");
 const { sign } = require("jsonwebtoken");
+const mailgun = require("mailgun.js");
+const formdata = require("form-data");
+// const { isAuth, isAdmin, generateToken, baseUrl } = require("../utils.js");
 
 module.exports = {
   //find all the users
@@ -39,6 +42,26 @@ module.exports = {
       });
   },
 
+  //find a user by user id
+  findUserById: async (req, res) => {
+    const user_id = req.params._id;
+    User.findOne({ _id: user_id })
+      .then((result) => {
+        if (result) {
+          res.send(result).status(200);
+        } else {
+          res.status(404).send({
+            message: "error from user controller: No such user found",
+          });
+        }
+      })
+      .catch((err) => {
+        res.status(400).json({
+          message: "error from user controller",
+          err,
+        });
+      });
+  },
   //add a user
   addUser: async (req, res) => {
     try {
@@ -88,16 +111,57 @@ module.exports = {
         res.status(400).json(err);
       });
   },
-  //update user password
+
+  //update user password by email
   updateUserByEmail: async (req, res) => {
     const user_email = req.params.email;
     // console.log(req.body.password);
+    if (req.body.password != req.body.confirmPassword) {
+      return res
+        .status(400)
+        .send({ message: "confirm password mush be the same" });
+    }
     const hash = await bcrypt.hash(req.body.password, 10);
     const update = { password: hash };
 
+    // find the user by user email, and generate new token
+    const user = await User.findOne({ email: user_email });
+    const token = sign({ _id: user._id }, process.env.JWT_SECRET, {
+      expiresIn: "3h",
+    });
+
+    //find the user and update the password
     await User.findOneAndUpdate({ email: user_email }, update, { new: true })
       .then((result) => {
         if (result) {
+          console.log("inside update");
+          //maigun
+          const mg = new mailgun(formdata);
+          const client = mg.client({
+            username: "api",
+            key: process.env.MAILGUN_API_KEY,
+          });
+          const messageData = {
+            from: process.env.MAILGUN_SERVEREMAIL,
+            // to: [`${user_email}`],
+            to: [process.env.MAILGUN_CLIENTEMAIL],
+            subject: "Hello",
+            text: "aaa",
+            html: `
+             <p>Please Click the following link to reset your password:</p>
+             <a href="${baseUrl()}/reset-password/${token}"}>Reset Password</a>
+             `,
+          };
+          client.messages
+            .create(process.env.MAILGUN_DOMIAN, messageData)
+            .then((res) => {
+              console.log(res);
+            })
+            .catch((err) => {
+              console.error(err);
+            });
+          //maigun end
+
           res
             .status(200)
             .send({ message: "user password updated successfully" });
@@ -110,7 +174,7 @@ module.exports = {
       });
   },
 
-  //authentication
+  //authentication:user login
   authUser: async (req, res) => {
     try {
       const user = req.body;
@@ -126,7 +190,7 @@ module.exports = {
       const match = await bcrypt.compare(user.password, existingUser.password);
       if (!match) {
         return res
-          .status(200)
+          .status(400)
           .json({ error: "Wrong Username And Password Combination" });
       }
       // generate a token and pass the front-end

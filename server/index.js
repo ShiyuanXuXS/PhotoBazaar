@@ -20,7 +20,7 @@ app.use("/api/purchases", purchaseRoutes)
 app.use("/api/tags", tagRoutes);
 app.use("/api/messages", messageRoutes);
 app.use("/api/artworks", artworkRoutes);
-app.use("/users", userRouter);
+app.use("/api/users", userRouter);
 
 // connect Database 
 mongoose

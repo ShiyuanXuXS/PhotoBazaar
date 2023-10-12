@@ -63,4 +63,11 @@ Chang Liu
 integrate login/register/forgot password into project from backend
 2. Todo
 add login/register/forget password with authentication from backend
+Xiaoxing Pan
+1.  Done
+- artwork model and artwork controller and self-testing on postman
+- artworkList page
+2. To do
+- artwork front-end: show artwork details, artwork crud
+
 

@@ -13,12 +13,32 @@ const artworkRoutes = require("./src/routes/artworks.routes");
 const userRouter = require("./src/routes/users.routes");
 
 app.use(express.json());
+<<<<<<< Updated upstream
 
 app.use("/api/tags", tagRoutes);
 app.use("/api/messages", messageRoutes);
 app.use(cors());
 app.use("/api/artworks", artworkRoutes);
 app.use("/users", userRouter);
+=======
+app.use(cors());
+
+// connect Database 
+mongoose
+  .connect(process.env.MONGODB_URI, {
+    dbName: "PhotoBazaar",
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+    retryWrites: true,
+    w: "majority",
+  })
+  .then(() => {
+    console.log("Connected to MongoDB");
+  })
+  .catch((err) => {
+    console.log(err);
+  });
+>>>>>>> Stashed changes
 
 const Message = require("./src/models/message.model");
 const messageModel = new Message();
@@ -87,6 +107,12 @@ mongoose
   .catch((err) => {
     console.log(err);
   });
+=======
+app.use('/api/tags', tagRoutes);
+app.use('/api/messages', messageRoutes);
+app.use('/api/artworks', artworkRoutes);
+
+>>>>>>> Stashed changes
 
 server.listen(port, () => {
   console.log(`Server is running on port ${port}`);

@@ -1,19 +1,19 @@
 const express = require("express");
 const mongoose = require("mongoose");
-const http = require("http");
-const socketIo = require("socket.io");
+// const http = require("http");
+// const socketIo = require("socket.io");
 
 const app = express();
 const cors = require("cors");
 const port = process.env.PORT || 3001;
-
+const purchaseRoutes=require("./src/routes/purchase.routes")
 const tagRoutes = require("./src/routes/tag.routes");
 const messageRoutes = require("./src/routes/message.routes");
 const artworkRoutes = require("./src/routes/artworks.routes");
 const userRouter = require("./src/routes/users.routes");
 
 app.use(express.json());
-
+app.use("/api/purchases",purchaseRoutes)
 app.use("/api/tags", tagRoutes);
 app.use("/api/messages", messageRoutes);
 app.use(cors());
@@ -29,6 +29,7 @@ const userSockets = {};
 const { createServer } = require("node:http");
 const { join } = require("node:path");
 const { Server } = require("socket.io");
+const purchaseController = require("./src/controllers/purchase.controller");
 const server = createServer(app);
 const io = new Server(server, {
   cors: {

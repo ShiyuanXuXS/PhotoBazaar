@@ -1,11 +1,9 @@
-import React from 'react';
-
+import React from "react";
+import LoginComponent from "../components/login";
+import "bootstrap/dist/css/bootstrap.min.css";
 
 function Login() {
-
-    return (
-        <div className='text-5xl'>This is Login!</div>
-    )
+  return <LoginComponent />;
 }
 
 export default Login;

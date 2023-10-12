@@ -29,7 +29,7 @@ const userSockets = {};
 const { createServer } = require("node:http");
 const { join } = require("node:path");
 const { Server } = require("socket.io");
-const purchaseController = require("./src/controllers/purchase.controller");
+// const purchaseController = require("./src/controllers/purchase.controller");
 const server = createServer(app);
 const io = new Server(server, {
   cors: {
@@ -45,8 +45,8 @@ io.on('connection', async (socket) => {
       userSockets[userInfo.username]=socket
     // }
     console.log(`${userInfo.username} Connected to server, socket_id: ${socket.id}`);
-    console.log(userSockets['user1']?userSockets['user1'].id:"no user1")
-    console.log(userSockets['user2']?userSockets['user2'].id:"no user2")
+    // console.log(userSockets['user1']?userSockets['user1'].id:"no user1")
+    // console.log(userSockets['user2']?userSockets['user2'].id:"no user2")
   })
 
   socket.on("private-message", async (data) => {

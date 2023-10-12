@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import Axios from 'axios';
+import UploadImageComponent from './UploadImage';
 // import {
 //     S3Client,
 //     DeleteObjectCommand,
@@ -9,35 +10,48 @@ import Axios from 'axios';
 
 function AddArtworkComponent() {
     const [tagList, setTagList] = useState([]);
+    const [tagArray, setTagArray] = useState([]);
+    const [uploadImages, setUploadImages] = useState([{
+        index: 1,
+        status: "show",
+    }]);
 
-    const [tags, setTags] = useState([]);
+    const handleAddImage = (event) => {
+        event.preventDefault();
+        const newUploadImage = {
+            index: uploadImages.length + 1,
+            status: "show",
+        };
 
-    const [isDisabled, setIsDisabled] = useState(false);
-    const [isActive, setIsActive] = useState(false);
-
-    const handleClick = () => {
-        if (!isDisabled) {
-            // Toggle the active state
-            setIsActive(!isActive);
-            // Disable the button
-            setIsDisabled(true);
-        } else {
-            // Re-enable the button and reset the active state
-            setIsActive(false);
-            setIsDisabled(false);
+        const newUploadImages = [...uploadImages, newUploadImage];
+        setUploadImages(newUploadImages);
+        if (newUploadImages.length === 8) {
+            // disable the add image button
+            alert("You can only upload 8 images.");
         }
     };
 
-    const handleTagClick = (tag) => {
-        // if (tags.includes(tag._id)) {
-        //     // Remove the tag from the selected tags
-        //     setTags(tags.filter((selectedTag) => selectedTag !== tag._id));
-        // } else {
-        //     // Add the tag to the selected tags
-        //     if (tags.length < 5) {
-        //         setTags([...tags, tag._id]);
-        //     }
-        // }
+    const handleShowImage = (index) => {
+        //change status in newUploadImages based on index
+        const updatedUploadImages = uploadImages.filter((uploadImage) => uploadImage.index !== index);
+        setUploadImages(updatedUploadImages);
+    };
+
+    const handleTags = (event, id) => {
+        event.preventDefault();
+
+        if (tagArray.includes(id)) {
+            const updatedTagArray = tagArray.filter((_id) => _id !== id);
+            setTagArray(updatedTagArray);
+        }
+        else {
+            if (tagArray.length < 5) {
+                setTagArray([...tagArray, id]);
+            } else {
+                alert("You can only choose 5 tags.");
+            }
+        }
+
     };
 
     useEffect(() => {
@@ -55,8 +69,8 @@ function AddArtworkComponent() {
                 <h1 className="text-2xl font-semibold capitalize">Create new artwork</h1>
                 <div className="mt-4">
                     <form>
-                        <div className="mb-4">
-                            <label htmlFor="formArtworkId" className="block font-medium">artwork Id:</label>
+                        {/* <div className="mb-4">
+                            <label htmlFor="formArtworkId" className="block font-medium mb-2">artwork Id:</label>
                             <input
                                 type="text"
                                 id="formArtworkId"
@@ -64,10 +78,10 @@ function AddArtworkComponent() {
                                 className="block w-full border border-gray-300 rounded p-2"
                                 disabled
                             />
-                        </div>
+                        </div> */}
 
                         <div className="mb-4">
-                            <label htmlFor="formArtworkTitle" className="block font-medium">title:</label>
+                            <label htmlFor="formArtworkTitle" className="block font-medium mb-2">title:</label>
                             <input
                                 type="text"
                                 id="formArtworkTitle"
@@ -78,7 +92,7 @@ function AddArtworkComponent() {
                         </div>
 
                         <div className="mb-4">
-                            <label htmlFor="formArtworkDescription" className="block font-medium">Description:</label>
+                            <label htmlFor="formArtworkDescription" className="block font-medium mb-2">Description:</label>
                             <input
                                 type="text"
                                 id="formArtworkDescription"
@@ -89,7 +103,7 @@ function AddArtworkComponent() {
                         </div>
 
                         <div className="mb-4">
-                            <label htmlFor="formCoverUrl" className="block font-medium">cover image:</label>
+                            <label htmlFor="formCoverUrl" className="block font-medium mb-2">cover image:</label>
                             <input
                                 type="file"
                                 id="formCoverUrl"
@@ -101,25 +115,29 @@ function AddArtworkComponent() {
                         </div>
 
                         <div className="mb-4">
-                            <label htmlFor="formArtworkTag" className="block font-medium">Tags:</label>
+                            <label htmlFor="formArtworkTag" className="block font-medium mb-2">Tags:</label>
+                            <input
+                                type="text"
+                                id="formArtworkTag"
+                                name="artworkTag"
+                                defaultValue={tagArray.map((id) => {
+                                    const matchingTag = tagList.find((tag) => tag._id === id);
+                                    return matchingTag ? matchingTag.tag : ''; // If a matching tag is found, return its tag, otherwise an empty string
+                                }).join(', ')}
+                                className="block w-full border border-gray-300 rounded p-2 mb-2"
+                            />
+                            <p className="text-gray-500 text-sm">Required, maximum choose 5 tags.</p>
                             {tagList.map((tag, index) => {
                                 return (
                                     <button
                                         key={index}
-                                        onClick={handleClick}
-                                        className={`font-serif capitalize p-1 text-sm inline ml-2 rounded-lg ${isDisabled
-                                            ? 'bg-gray-300 text-gray-600'
-                                            : isActive
-                                                ? 'bg-sky-600 text-white'
-                                                : 'bg-sky-500 text-white hover:bg-sky-600'
-                                            }`}
-                                        disabled={isDisabled}
+                                        className={`font-serif capitalize p-1 text-sm inline ml-2 rounded-lg bg-sky-600 text-white mt-2`}
+                                        onClick={(event) => handleTags(event, tag._id)}
                                     >
                                         {tag.tag}
                                     </button>
                                 );
                             })}
-                            <p className="text-gray-500 text-sm">Required, maximum choose 5 tags.</p>
                         </div>
 
                         <div className="mb-4">
@@ -134,17 +152,34 @@ function AddArtworkComponent() {
                             />
                             <p className="text-gray-500 text-sm">Required, must be equal or higher than 0.</p>
                         </div>
+                        <div className='flex items-center mb-4'>
+                            <div className='text-xl font-bold capitalize'>Photo</div>
+                            <button className={"items-center px-1 bg-blue"} onClick={handleAddImage} disabled={uploadImages.length >= 8}>
+                                <svg
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    fill="none"
+                                    viewBox="0 0 24 24"
+                                    strokeWidth={3}
+                                    stroke={uploadImages.length >= 8 ? 'gray' : 'blue'}
+                                    className="w-6 h-6"
+                                >
+                                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v6m3-3H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                            </button>
+                        </div>
+                        <p className="text-gray-500 text-sm">Required, maximum 8 photos.</p>
 
-                        <div className="mb-4">
-                            <label htmlFor="formUploadImg" className="block font-medium">Upload Image:</label>
-                            <input
-                                type="file"
-                                id="formUploadImg"
-                                name="uploadImg"
-                                accept=".jpg, .png, .jpeg"
-                                className="block w-full border border-gray-300 rounded p-2"
-                            />
-                            <p className="text-gray-500 text-sm">Required, image format should be jpg, png.</p>
+                        <div className="flex flex-wrap">
+                            {uploadImages.map((uploadImage, index) => (
+                                <div key={index} className="w-1/4"> {/* w-1/4 means each element takes 25% width */}
+                                    <UploadImageComponent
+                                        key={index}
+                                        index={uploadImage.index}
+                                        status={uploadImage.status}
+                                        handleShowImage={(index) => handleShowImage(index)}
+                                    />
+                                </div>
+                            ))}
                         </div>
 
                         <div className="flex items-center mt-4 font-bold">

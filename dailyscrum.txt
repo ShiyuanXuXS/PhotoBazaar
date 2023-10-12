@@ -58,4 +58,9 @@ Shiyuan
 2. To do until next Scrum:
 - send private message to indicated user
 - receive message and refresh message box
+Chang Liu
+1. Done
+integrate login/register/forgot password into project from backend
+2. Todo
+add login/register/forget password with authentication from backend
 

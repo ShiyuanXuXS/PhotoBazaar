@@ -18,6 +18,7 @@ class PurchaseController {
 
 
     async createPurchase(req, res) {
+        //todo: auth
         try {
             const { seller_id, buyer_id, artwork_id, transaction_price } = req.body;
             if (!seller_id || !buyer_id || !artwork_id ) {
@@ -27,10 +28,9 @@ class PurchaseController {
                 seller_id:seller_id,
                 buyer_id:buyer_id,
                 artwork_id:artwork_id,
-                purchase_time,
-                is_paid:transaction_price===0,
-                pay_time:new Date(),
-                transaction_price:transaction_price
+                purchase_time:new Date(),
+                is_paid:!transaction_price ||transaction_price===0,
+                transaction_price:transaction_price || 0
             };
             const newPurchaseId = await PurchaseModel.createPurchase(purchaseData);
             res.status(200).json({ message: 'Add to purchase list', purchaseId: newPurchaseId });
@@ -41,6 +41,7 @@ class PurchaseController {
     }
 
     async getAllPurchases(req, res) {
+        //todo: auth
         try {
             const purchases = await PurchaseModel.getAllPurchases();
             res.status(200).json(purchases);
@@ -51,6 +52,7 @@ class PurchaseController {
     }
 
     async getPurchaseById(req, res) {
+        //todo: auth
         try {
             const { id } = req.params;
             const purchase = await PurchaseModel.getPurchaseById(id);
@@ -65,6 +67,7 @@ class PurchaseController {
     }
 
     async payPurchase(req, res) {
+        //todo: add payment
         try {
             const { id } = req.params;
             const existingPurchase = await PurchaseModel.getPurchaseById(id);
@@ -89,6 +92,7 @@ class PurchaseController {
     }
 
     async deletePurchase(req, res) {
+        //todo: auth
         try {
             const { id } = req.params;
             const deletedCount = await PurchaseModel.deletePurchase(id);

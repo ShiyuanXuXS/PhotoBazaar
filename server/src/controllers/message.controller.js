@@ -7,6 +7,7 @@ class MessageController {
     }
 
     async createMessage(req, res) {
+        //todo: auth
         const { sender_id, receiver_id, message } = req.body;
 
         try {
@@ -18,6 +19,7 @@ class MessageController {
     }
 
     async getUserMessages(req, res) {
+        //todo: auth
         const { sender_id, receiver_id } = req.query;
 
         try {
@@ -29,6 +31,7 @@ class MessageController {
     }
 
     async markMessageAsRead(req, res) {
+        //todo: auth
         const { messageId } = req.params;
 
         try {
@@ -40,6 +43,7 @@ class MessageController {
     }
 
     async deleteMessage(req, res) {
+        //todo: auth
         const { messageId } = req.params;
 
         try {

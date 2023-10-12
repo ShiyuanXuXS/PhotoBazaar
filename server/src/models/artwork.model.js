@@ -4,12 +4,6 @@ const Schema = mongoose.Schema;
 
 const artworkSchema = new Schema(
     {
-        //artwork id
-        _id: {
-            type: mongoose.Schema.Types.ObjectId,
-            default: new mongoose.Types.ObjectId(),
-            required: true,
-        },
         author_id: {
             type: String,
             required: true,

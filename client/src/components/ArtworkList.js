@@ -16,18 +16,19 @@ function ArtworkListComponent() {
         // Fetch the tag data
         Axios.get("http://localhost:3001/api/tags").then((response) => {
             console.log("enter");
+            console.log(response.data);
             setTagList(response.data);
-            console.log(tagList);
+
         })
             .catch((error) => {
                 console.error(error);
             });
     }, []);
-
+    console.log(tagList);
     return (
         <div className="flex flex-wrap justify-center">
             {artworkList.map((artwork, index) => (
-                <div key={index} className="card border-4 w-96 h-96 m-5 flex flex-col justify-between">
+                <div key={index} className="card border-4 w-96 h-100 m-5 flex flex-col justify-between">
                     <img src={artwork.cover_url} className="mx-auto my-auto w-90 h-60" alt="Artwork" />
                     <div className="ml-4">
                         <div className="text-lg subpixel-antialiased font-bold uppercase">{artwork.title}</div>
@@ -68,15 +69,13 @@ function ArtworkListComponent() {
                             </div>
                         </div>
                         <div className="text-base capitalize mt-2">{artwork.description}</div>
-                        <div className='mb-2 flex justify-center'>
+                        <div className="mb-2 flex justify-center mt-1">
                             {artwork.tags.map((tag, tagIndex) => {
                                 // Find the corresponding tag object in tagList
                                 const tagData = tagList.find(t => t._id === tag.tag_id);
-
-                                // Display tagData.name if found
                                 return (
-                                    <div key={tagIndex} className="capitalize border-2 p-1 text-sm inline ml-2">
-                                        {tagData ? tagData.name : 'Tag Not Found'}
+                                    <div key={tagIndex} className="capitalize p-1 text-sm inline ml-2 bg-sky-500/50">
+                                        {tagData ? tagData.tag : ""}
                                     </div>
                                 );
                             })}

@@ -7,7 +7,7 @@ class TagController {
             if (!tag) {
                 return res.status(400).json({ message: 'Tag name is required' });
             }
-            const count = (req.body.count) ?req.body.count: 0 
+            const count = (req.body.count) ? req.body.count : 0
             const newTagId = await tagModel.createTag(tag, count)
             res.status(200).json({ message: 'Tag created', tagId: newTagId });
         } catch (error) {
@@ -20,6 +20,7 @@ class TagController {
         try {
             const tags = await tagModel.getAllTags();
             res.status(200).json(tags);
+            console.log(tags);
         } catch (error) {
             console.error('Error fetching tags:', error);
             res.status(500).json({ message: 'Error fetching tags' });

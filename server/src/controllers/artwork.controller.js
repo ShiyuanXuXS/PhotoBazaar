@@ -37,7 +37,7 @@ module.exports = {
             title,
         });
 
-        await newArtwork.save()
+        newArtwork.save()
             .then((result) => {
                 // console.log(result);
                 res.send(result).status(200);

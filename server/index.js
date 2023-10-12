@@ -43,24 +43,6 @@ const { createServer } = require("node:http");
 const server = createServer(app);
 socketController(server);
 
-// connect Database
-mongoose
-  .connect(process.env.MONGODB_URI, {
-    dbName: "PhotoBazaar",
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-    retryWrites: true,
-    w: "majority",
-  })
-  .then(() => {
-    console.log("Connected to MongoDB");
-  })
-  .catch((err) => {
-    console.log(err);
-  });
-
-
-
 
 server.listen(port, () => {
   console.log(`Server is running on port ${port}`);

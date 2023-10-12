@@ -6,7 +6,7 @@ const cors = require("cors");
 const port = process.env.PORT || 3001;
 
 
-const purchaseRoutes=require("./src/routes/purchase.routes")
+const purchaseRoutes = require("./src/routes/purchase.routes")
 const tagRoutes = require("./src/routes/tag.routes");
 const messageRoutes = require("./src/routes/message.routes");
 const artworkRoutes = require("./src/routes/artworks.routes");
@@ -15,13 +15,13 @@ const userRouter = require("./src/routes/users.routes");
 app.use(express.json());
 app.use(cors());
 
-<<<<<<< Updated upstream
+
 app.use("/api/purchases", purchaseRoutes)
 app.use("/api/tags", tagRoutes);
 app.use("/api/messages", messageRoutes);
 app.use("/api/artworks", artworkRoutes);
 app.use("/users", userRouter);
-=======
+
 // connect Database 
 mongoose
   .connect(process.env.MONGODB_URI, {
@@ -43,14 +43,12 @@ const messageModel = new Message();
 const userSockets = {};
 // userSockets['user1'] = 'socketId1'; //for test
 // userSockets['user2'] = 'socketId2'; //for test
->>>>>>> Stashed changes
+
 
 const socketController = require("./src/controllers/socket.controller");
 const { createServer } = require("node:http");
 const server = createServer(app);
 socketController(server);
-
-<<<<<<< Updated upstream
 
 // connect Database
 mongoose
@@ -67,7 +65,8 @@ mongoose
   .catch((err) => {
     console.log(err);
   });
-=======
+
+
 io.on('connection', async (socket) => {
   console.log('A user connected');
   socket.on('user_info', (userInfo) => {
@@ -102,12 +101,6 @@ io.on('connection', async (socket) => {
     console.log("A user disconnected");
   });
 });
-
-app.use("/api/tags", tagRoutes);
-app.use("/api/messages", messageRoutes);
-app.use("/api/artworks", artworkRoutes);
-app.use("/users", userRouter);
->>>>>>> Stashed changes
 
 server.listen(port, () => {
   console.log(`Server is running on port ${port}`);

@@ -7,6 +7,8 @@ import Message from './pages/Message';
 import HeaderComponent from './components/Header';
 import FooterComponent from './components/Footer';
 import Artwork from './pages/ArtworkList';
+import AddArtwork from './pages/AddArtwork';
+
 
 
 import "./App.css";
@@ -21,6 +23,7 @@ function App() {
                 <Route path="/register" element={<Register />} />
                 <Route path="/message" element={<Message />} />
                 <Route path="/artwork" element={<Artwork />} />
+                <Route path="/addArtwork" element={<AddArtwork />} />
             </Routes>
             <FooterComponent />
         </div>

@@ -92,6 +92,7 @@ io.on('connection', async (socket) => {
   });
 });
 
+<<<<<<< Updated upstream
 // connect Database
 mongoose
   .connect(process.env.MONGODB_URI, {

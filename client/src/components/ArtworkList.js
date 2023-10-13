@@ -38,7 +38,7 @@ function ArtworkListComponent() {
                     <div className="text-2xl font-bold subpixel-antialiased capitalize">New Artwork</div>
                 </button>
                 {artworkList.map((artwork, index) => (
-                    <div key={index} className="border-4 w-96 h-100 m-5 flex flex-col justify-between rounded-lg">
+                    <div key={index} className="border-4 w-96 h-100 m-5 flex flex-col justify-between rounded-lg w-1/4">
                         <img src={artwork.cover_url} className="mx-auto my-auto w-90 h-60" alt="Artwork" />
                         <div className="ml-4">
                             <div className="text-lg subpixel-antialiased font-bold uppercase">{artwork.title}</div>

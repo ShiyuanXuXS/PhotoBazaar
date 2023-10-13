@@ -12,6 +12,7 @@ import FooterComponent from "./components/Footer";
 import AddArtwork from "./pages/AddArtwork";
 import Message from "./pages/Message";
 import Payment from "./pages/Payment";
+import AddArtwork from "./pages/AddArtwork";
 //fix me: footer cover the register button
 import Artwork from "./pages/ArtworkList";
 import "./App.css";
@@ -62,6 +63,7 @@ function App() {
             <Route path="/payment" element={<Payment />} />
             <Route path="/artwork" element={<Artwork />} />
             <Route path="/addArtwork" element={<AddArtwork />} />
+
           </Routes>
           <FooterComponent />
         </Router>

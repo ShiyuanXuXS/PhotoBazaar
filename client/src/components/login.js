@@ -52,41 +52,6 @@ function LoginComponent() {
   };
 
   return (
-    // <div className="form-signin w-50 m-auto">
-    //   <Container>
-    //     <Form>
-    //       <h1 className="h3 my-5 fw-normal">Please Signin</h1>
-    //       <Form.Group className="mb-3" controlId="formUserName">
-    //         <Form.Label className="text-left">User email:</Form.Label>
-    //         <Form.Control
-    //           type="text"
-    //           placeholder="Enter user email"
-    //           name="email"
-    //           value={email}
-    //           onChange={(e) => setEmail(e.target.value)}
-    //         />
-    //       </Form.Group>
-
-    //       <Form.Group className="mb-3" controlId="formPassword">
-    //         <Form.Label className="text-left">Password:</Form.Label>
-    //         <Form.Control
-    //           type="password"
-    //           placeholder="Enter password"
-    //           name="password"
-    //           value={password}
-    //           onChange={(e) => setPassword(e.target.value)}
-    //         />
-    //       </Form.Group>
-    //       <div>
-    //         Forget Password?
-    //         <Link to={`/forgotpassword`}>Reset Password</Link>
-    //       </div>
-    //       <Button onClick={authUser}>Login</Button>
-    //     </Form>
-    //   </Container>
-    // </div>
-    //tailwind
-
     <div className="w-1/2 mx-auto">
       <form>
         <h1 className="text-3xl my-5 font-bold text-center">Please Sign In</h1>

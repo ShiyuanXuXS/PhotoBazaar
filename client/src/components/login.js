@@ -20,7 +20,7 @@ function LoginComponent() {
   useEffect(() => {
     //fixme:
     // if (authStatus.status) Navigate("/login");
-    if (authStatus.status) Navigate("/home");
+    if (authStatus.status) Navigate("/");
   });
   //user login
   const authUser = (e) => {
@@ -45,7 +45,7 @@ function LoginComponent() {
             status: true,
             username: response.data.username,
           });
-          Navigate("/home");
+          Navigate("/");
         }
       })
       .catch((error) => {

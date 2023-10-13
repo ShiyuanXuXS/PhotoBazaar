@@ -49,8 +49,8 @@ function App() {
       <AuthContext.Provider value={{ authStatus, setAuthStatus }}>
         <Router>
           <Routes>
-            <Route path="/" element={<Login />} />
-            <Route path="/home" element={<Home />} />
+            <Route path="/Login" element={<Login />} />
+            <Route path="/" element={<Home />} />
             <Route path="/register" element={<Register />} />
             <Route path="/message" element={<Message />} />
             <Route path="/artwork" element={<Artwork />} />

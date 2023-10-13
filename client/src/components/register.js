@@ -88,57 +88,131 @@ function SignupComponent() {
   };
 
   return (
-    <div className="form-signup w-50 m-auto">
-      <Container>
-        <Form>
-          <h1 className="h3 my-5 fw-normal">Please Register to Photobazaar</h1>
-          <Form.Group className="mb-3" controlId="formUserName">
-            <Form.Label className="text-left">Username:</Form.Label>
-            <Form.Control
-              type="text"
-              placeholder="Enter username"
-              name="username"
-              value={username}
-              onChange={(e) => setUserName(e.target.value)}
-            />
-            <Form.Text className="text-muted">
-              Required, 4-20 characters, contains only numbers and lowercase
-              letters.
-            </Form.Text>
-          </Form.Group>
+    // <div className="form-signup w-50 m-auto">
+    //   <Container>
+    //     <Form>
+    //       <h1 className="h3 my-5 fw-normal">Please Register to Photobazaar</h1>
+    //       <Form.Group className="mb-3" controlId="formUserName">
+    //         <Form.Label className="text-left">Username:</Form.Label>
+    //         <Form.Control
+    //           type="text"
+    //           placeholder="Enter username"
+    //           name="username"
+    //           value={username}
+    //           onChange={(e) => setUserName(e.target.value)}
+    //         />
+    //         <Form.Text className="text-muted">
+    //           Required, 4-20 characters, contains only numbers and lowercase
+    //           letters.
+    //         </Form.Text>
+    //       </Form.Group>
 
-          <Form.Group className="mb-3" controlId="formPassword">
-            <Form.Label className="text-left">Password:</Form.Label>
-            <Form.Control
-              type="password" // hide the password
-              placeholder="Enter password"
-              name="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-            />
-            <Form.Text className="text-muted">
-              Required, 6-100 characters, at least one uppercase letter, one
-              lowercase letter, one number or special character.
-            </Form.Text>
-          </Form.Group>
+    //       <Form.Group className="mb-3" controlId="formPassword">
+    //         <Form.Label className="text-left">Password:</Form.Label>
+    //         <Form.Control
+    //           type="password" // hide the password
+    //           placeholder="Enter password"
+    //           name="password"
+    //           value={password}
+    //           onChange={(e) => setPassword(e.target.value)}
+    //         />
+    //         <Form.Text className="text-muted">
+    //           Required, 6-100 characters, at least one uppercase letter, one
+    //           lowercase letter, one number or special character.
+    //         </Form.Text>
+    //       </Form.Group>
 
-          <Form.Group className="mb-3" controlId="formEmail">
-            <Form.Label className="text-left">Email:</Form.Label>
-            <Form.Control
-              type="email"
-              placeholder="Enter email"
-              name="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-            />
-            <Form.Text className="text-muted">
-              Required, please provide a valid email.
-            </Form.Text>
-          </Form.Group>
+    //       <Form.Group className="mb-3" controlId="formEmail">
+    //         <Form.Label className="text-left">Email:</Form.Label>
+    //         <Form.Control
+    //           type="email"
+    //           placeholder="Enter email"
+    //           name="email"
+    //           value={email}
+    //           onChange={(e) => setEmail(e.target.value)}
+    //         />
+    //         <Form.Text className="text-muted">
+    //           Required, please provide a valid email.
+    //         </Form.Text>
+    //       </Form.Group>
 
-          <Button onClick={addUser}>Register</Button>
-        </Form>
-      </Container>
+    //       <Button onClick={addUser}>Register</Button>
+    //     </Form>
+    //   </Container>
+    // </div>
+
+    <div className="w-1/2 mx-auto">
+      <form>
+        <h1 className="text-3xl my-5 font-bold text-center">
+          Please Register to Photobazaar
+        </h1>
+
+        <div className="mb-4">
+          <label className="text-left block text-sm font-medium text-gray-700">
+            Username:
+          </label>
+
+          <input
+            type="text"
+            placeholder="Enter username"
+            className="mt-1 p-2 w-full rounded-md border border-gray-300"
+            name="username"
+            value={username}
+            onChange={(e) => setUserName(e.target.value)}
+          />
+
+          <p className="text-sm text-gray-500">
+            Required, 4-20 characters, contains only numbers and lowercase
+            letters.
+          </p>
+        </div>
+
+        <div className="mb-4">
+          <label className="text-left block text-sm font-medium text-gray-700">
+            Password:
+          </label>
+
+          <input
+            type="password" // hide the password
+            placeholder="Enter password"
+            className="mt-1 p-2 w-full rounded-md border border-gray-300"
+            name="password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+          />
+
+          <p className="text-sm text-gray-500">
+            Required, 6-100 characters, at least one uppercase letter, one
+            lowercase letter, one number or special character.
+          </p>
+        </div>
+
+        <div className="mb-4">
+          <label className="text-left block text-sm font-medium text-gray-700">
+            Email:
+          </label>
+
+          <input
+            type="email"
+            placeholder="Enter email"
+            className="mt-1 p-2 w-full rounded-md border border-gray-300"
+            name="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+          />
+
+          <p className="text-sm text-gray-500">
+            Required, please provide a valid email.
+          </p>
+        </div>
+
+        <button
+          onClick={addUser}
+          className="w-full px-4 py-2 text-white bg-blue-500 rounded-md hover:bg-blue-600"
+        >
+          Register
+        </button>
+      </form>
     </div>
   );
 }

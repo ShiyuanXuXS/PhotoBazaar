@@ -32,8 +32,11 @@ function HeaderComponent() {
       email: "",
       _id: 0,
       status: false,
+      username: "",
     });
-    Navigate("/login");
+    //fix me
+    Navigate("/");
+    // Navigate("/login");
   };
 
   return (

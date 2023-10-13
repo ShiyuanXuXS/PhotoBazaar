@@ -3,7 +3,7 @@ import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { AuthContext } from "./Helpers/AuthContext";
 import axios from "axios";
-import Profile from "./pages/Profile";
+// import Profile from "./pages/Profile";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Home from "./pages/Home";
@@ -22,7 +22,7 @@ function App() {
 
   useEffect(() => {
     axios
-      .get("http://localhost:3001/api/users/", {
+      .get("http://localhost:3001/api/users/auth", {
         headers: {
           accessToken: localStorage.getItem("accessToken"),
         },

@@ -1,11 +1,15 @@
-import React from 'react';
-
+import React from "react";
+import HeaderComponent from "../components/Header";
+import FooterComponent from "../components/Footer";
 
 function Home() {
-
-    return (
-        <div className='text-5xl'>This is homepage!</div>
-    )
+  return (
+    <div>
+      <HeaderComponent />
+      This is homepage!
+      <FooterComponent />
+    </div>
+  );
 }
 
 export default Home;

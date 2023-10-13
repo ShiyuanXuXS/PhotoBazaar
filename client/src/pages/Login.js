@@ -1,6 +1,6 @@
 import React from "react";
 import LoginComponent from "../components/login";
-import "bootstrap/dist/css/bootstrap.min.css";
+// import "bootstrap/dist/css/bootstrap.min.css";
 import HeaderComponent from "../components/Header";
 import FooterComponent from "../components/Footer";
 

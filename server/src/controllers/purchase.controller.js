@@ -2,19 +2,30 @@ const stripe = require('stripe')(process.env.STRIPE_API_KEY);
 const PurchaseModel = require('../models/purchase.model');
 
 class PurchaseController {
-  //todo: 
-    makePayment = async (req, res) => {
-      try {
+
+
+    async createPaymentIntent(req, res) {
+        const { pruchase_id } = req.body;
+        const purchase = await PurchaseModel.getPurchaseById(pruchase_id);
+
+        if ( !purchase) {
+            return res.status(400).json({ message: 'Order not found' });
+        }
+        if ( purchase.is_paid) {
+            return res.status(400).json({ message: 'Already paid, please do not pay again' });
+        }
         const paymentIntent = await stripe.paymentIntents.create({
-          amount: 1000, 
-          currency: 'cad',
+            amount: purchase.transaction_price,
+            currency: 'cad',
+            automatic_payment_methods: {
+                enabled: true,
+            },
         });
-        res.json({ clientSecret: paymentIntent.client_secret }); 
-      } catch (error) {
-        console.error(error);
-        res.status(500).send(error);
-      }
-    };
+        res.status(200).send({
+            clientSecret: paymentIntent.client_secret,
+        });
+
+    }
 
 
     async createPurchase(req, res) {

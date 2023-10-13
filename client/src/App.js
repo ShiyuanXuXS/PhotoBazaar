@@ -11,6 +11,7 @@ import HeaderComponent from "./components/Header";
 import FooterComponent from "./components/Footer";
 
 import Message from "./pages/Message";
+import Payment from "./pages/Payment";
 //fix me: footer cover the register button
 import Artwork from "./pages/ArtworkList";
 import "./App.css";
@@ -57,6 +58,7 @@ function App() {
             <Route path="/" element={<Home />} />
             <Route path="/register" element={<Register />} />
             <Route path="/message" element={<Message />} />
+            <Route path="/payment" element={<Payment />} />
             <Route path="/artwork" element={<Artwork />} />
           </Routes>
           <FooterComponent />

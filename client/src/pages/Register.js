@@ -1,11 +1,9 @@
-import React from 'react';
+import React from "react";
+import SignupComponent from "../components/register";
+import "bootstrap/dist/css/bootstrap.min.css";
 
-
-function Register() {
-
-    return (
-        <div className='text-5xl'>This is register!</div>
-    )
+function Signup() {
+  return <SignupComponent />;
 }
 
-export default Register;
+export default Signup;

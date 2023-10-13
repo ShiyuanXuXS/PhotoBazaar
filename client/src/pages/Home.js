@@ -1,13 +1,13 @@
 import React from "react";
-import HeaderComponent from "../components/Header";
-import FooterComponent from "../components/Footer";
+// import HeaderComponent from "../components/Header";
+// import FooterComponent from "../components/Footer";
 
 function Home() {
   return (
     <div>
-      <HeaderComponent />
+      {/* <HeaderComponent /> */}
       This is homepage!
-      <FooterComponent />
+      {/* <FooterComponent /> */}
     </div>
   );
 }

@@ -5,6 +5,9 @@ const userController = require("../controllers/user.controller.js");
 // Retrieve all users
 router.get("/", userController.findAll);
 
+//validate token
+router.get("/auth", userController.validateToken);
+
 // Retrieve a single user with user email
 router.get("/:email", userController.findUserByEmail);
 

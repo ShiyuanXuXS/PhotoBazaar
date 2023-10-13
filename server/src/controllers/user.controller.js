@@ -210,6 +210,22 @@ module.exports = {
         .json({ message: "User Controllers: Internal Server Error" });
     }
   },
+
+  validateToken: async (req, res) => {
+    const accessToken = req.header("accessToken");
+    if (!accessToken) return res.json({ error: "User not logged In!" });
+
+    try {
+      const validToken = verify(accessToken, "importantsecret");
+      req.user = validToken;
+
+      if (validToken) {
+        return next();
+      }
+    } catch (err) {
+      res.json({ error: err });
+    }
+  },
 };
 
 //register validation

@@ -10,7 +10,7 @@ const tagRoutes = require("./src/routes/tag.routes");
 const messageRoutes = require("./src/routes/message.routes");
 const artworkRoutes = require("./src/routes/artworks.routes");
 const userRouter = require("./src/routes/users.routes");
-const authRouter = require("./src/routes/auth.routes");
+// const authRouter = require("./src/routes/auth.routes");
 
 app.use(express.json());
 app.use(cors());
@@ -20,7 +20,7 @@ app.use("/api/tags", tagRoutes);
 app.use("/api/messages", messageRoutes);
 app.use("/api/artworks", artworkRoutes);
 app.use("/api/users", userRouter);
-app.use("/api/auth", authRouter);
+// app.use("/api/auth", authRouter);
 
 // connect Database
 mongoose

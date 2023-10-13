@@ -1,40 +1,54 @@
 import React, { useState, useEffect } from 'react';
 import Axios from 'axios';
-import UploadImageComponent from './UploadImage';
-// import {
-//     S3Client,
-//     DeleteObjectCommand,
-//     PutObjectCommand,
-// } from "@aws-sdk/client-s3";
+import * as Yup from "yup";
+import UploadImagesBoxComponent from './UploadImagesBox';
+import {
+    S3Client,
+    DeleteObjectCommand,
+    PutObjectCommand,
+} from "@aws-sdk/client-s3";
 // window.Buffer = window.Buffer || require("buffer").Buffer;
 
-function AddArtworkComponent() {
+//S3 config
+const config = {
+    bucketName: "photobazarr",
+    dirName: "artwork",
+    region: "ca-central-1",
+    credentials: {
+        accessKeyId: process.env.REACT_APP_ACCESSKEYID,
+        secretAccessKey: process.env.REACT_APP_SECRETACCESSKEY,
+    },
+};
+
+const client = new S3Client(config);
+
+function AddArtworkComponent(props) {
     const [tagList, setTagList] = useState([]);
     const [tagArray, setTagArray] = useState([]);
-    const [uploadImages, setUploadImages] = useState([{
+    const [imagesBoxes, setImagesBoxes] = useState([{
         index: 1,
         status: "show",
     }]);
 
-    const handleAddImage = (event) => {
+    const handleAddImagesBox = (event) => {
         event.preventDefault();
-        const newUploadImage = {
-            index: uploadImages.length + 1,
+        const newImagesBox = {
+            index: imagesBoxes.length + 1,
             status: "show",
         };
 
-        const newUploadImages = [...uploadImages, newUploadImage];
-        setUploadImages(newUploadImages);
-        if (newUploadImages.length === 8) {
+        const newImagesBoxes = [...imagesBoxes, newImagesBox];
+        setImagesBoxes(newImagesBoxes);
+        if (newImagesBoxes.length === 8) {
             // disable the add image button
             alert("You can only upload 8 images.");
         }
     };
 
-    const handleShowImage = (index) => {
-        //change status in newUploadImages based on index
-        const updatedUploadImages = uploadImages.filter((uploadImage) => uploadImage.index !== index);
-        setUploadImages(updatedUploadImages);
+    const handleShowImagesBox = (index) => {
+        //change status in newImagesBoxes based on index
+        const updatedUploadImages = imagesBoxes.filter((imagesBox) => imagesBox.index !== index);
+        setImagesBoxes(updatedUploadImages);
     };
 
     const handleTags = (event, id) => {
@@ -63,6 +77,103 @@ function AddArtworkComponent() {
             });
     }, []);
 
+    const [title, setTitle] = useState('');
+    const [description, setDescription] = useState('');
+    const [price, setPrice] = useState();
+    const [uploadImg, setUploadImg] = useState([]);
+
+    const handleSaveCoverImage = (event) => {
+        event.preventDefault();
+        const data = {
+            index: 0,
+            name: title,
+            description: "cover image",
+            file: event.target.files[0],
+        };
+
+        const newUploadImg = [...uploadImg, data];
+        setUploadImg(newUploadImg);
+    }
+    const handleSaveChildrenPhoto = (data) => {
+
+        const updatedUploadImages = uploadImg.filter((photo) => photo.index !== data.index);
+        const newUploadImg = [...updatedUploadImages, data];
+        setUploadImg(newUploadImg);
+    }
+    const saveArtwork = (event) => {
+        event.preventDefault();
+
+        //Validate
+        validationSchema
+            .validate({ title, description, price }, { abortEarly: false })
+            .then(() => {
+                //Validate Cover Image
+                if (uploadImg === null || uploadImg[0] === null ||
+                    uploadImg[0] === undefined || uploadImg[0].file.size > 5000000) {
+                    alert("Please select a file less than 5MB");
+                    return;
+                } else {
+                    // save cover image to s3 bucket
+                    uploadImg.map((data) => {
+                        const date = new Date();
+                        const timestamp = date.getTime();
+                        const newFileName = `${timestamp}_user1_id.${data.file.name.split(".").pop()}`; //TODO: replace user1_id with user id
+                        const fullFileName = `https://${config.bucketName}.s3.${config.region}.amazonaws.com/${config.dirName}/${newFileName}`;
+
+                        const params = {
+                            Bucket: config.bucketName,
+                            Key: "artwork/" + newFileName,
+                            Body: data.file,
+                        };
+
+                        client
+                            .send(new PutObjectCommand(params))
+                            .then((data) => {
+                                console.log("Image uploaded successfully:", data);
+
+                            })
+                            .catch((error) => {
+                                console.error("Error uploading image:", error);
+                            });
+                    })
+
+                    // save artwork to database
+                }
+            })
+            .catch((errors) => {
+                // if (errors.inner.length > 0) {
+                //     alert(errors.inner[0].message);
+                // }
+                alert(errors);
+
+            });
+
+    }
+
+    const validationSchema = Yup.object().shape({
+        title: Yup.string()
+            .min(1, "Title must be at least 10 Characters, Only Letters Or Spaces.")
+            .max(50, "Title must not exceed 50 characters.")
+            .matches(/^[a-zA-Z ]*$/, "Only letters and spaces are allowed")
+            .required("Title is required"),
+        description: Yup.string()
+            .min(5, "Description must be at least 5 characters")
+            .max(100, "Description must not exceed 100 characters")
+            .matches(
+                /^[a-zA-Z0-9 ./,_()-]*$/,
+                "Item name must only contain uppercase, lowercase, digits, spaces, and: ./,_()-"
+            )
+            .required("Description is required"),
+        price: Yup.number()
+            .min(0, "price must be equal or higher than 0")
+            .required("price is required")
+            .test("is-decimal", "Price must be a decimal number", (value) => {
+                if (value === undefined) return true; // Allow undefined values
+                return /^\d+(\.\d+)?$/.test(value);
+            }),
+
+    });
+
     return (
         <div className="my-4">
             <div className="container mx-auto capitalize">
@@ -87,6 +198,7 @@ function AddArtworkComponent() {
                                 id="formArtworkTitle"
                                 name="artworkTitle"
                                 className="block w-full border border-gray-300 rounded p-2"
+                                onChange={(e) => setTitle(e.target.value)}
                             />
                             <p className="text-gray-500 text-sm">Required, 10-50 characters, only letters or spaces.</p>
                         </div>
@@ -98,6 +210,7 @@ function AddArtworkComponent() {
                                 id="formArtworkDescription"
                                 name="artworkDescription"
                                 className="block w-full border border-gray-300 rounded p-2"
+                                onChange={(e) => setDescription(e.target.value)}
                             />
                             <p className="text-gray-500 text-sm">Required, 50-100 characters.</p>
                         </div>
@@ -110,6 +223,7 @@ function AddArtworkComponent() {
                                 name="coverUrl"
                                 accept=".jpg, .png, .jpeg"
                                 className="block w-full border border-gray-300 rounded p-2"
+                                onChange={handleSaveCoverImage}
                             />
                             <p className="text-gray-500 text-sm">Required, image format should be JPG or PNG.</p>
                         </div>
@@ -149,18 +263,19 @@ function AddArtworkComponent() {
                                 className="block w-full border border-gray-300 rounded p-2"
                                 min="0"
                                 step="any"
+                                onChange={(e) => setPrice(e.target.value)}
                             />
                             <p className="text-gray-500 text-sm">Required, must be equal or higher than 0.</p>
                         </div>
                         <div className='flex items-center mb-4'>
                             <div className='text-xl font-bold capitalize'>Photo</div>
-                            <button className={"items-center px-1 bg-blue"} onClick={handleAddImage} disabled={uploadImages.length >= 8}>
+                            <button className={"items-center px-1 bg-blue"} onClick={handleAddImagesBox} disabled={imagesBoxes.length >= 8}>
                                 <svg
                                     xmlns="http://www.w3.org/2000/svg"
                                     fill="none"
                                     viewBox="0 0 24 24"
                                     strokeWidth={3}
-                                    stroke={uploadImages.length >= 8 ? 'gray' : 'blue'}
+                                    stroke={imagesBoxes.length >= 8 ? 'gray' : 'blue'}
                                     className="w-6 h-6"
                                 >
                                     <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v6m3-3H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -170,13 +285,14 @@ function AddArtworkComponent() {
                         <p className="text-gray-500 text-sm">Required, maximum 8 photos.</p>
 
                         <div className="flex flex-wrap">
-                            {uploadImages.map((uploadImage, index) => (
+                            {imagesBoxes.map((imagesBox, index) => (
                                 <div key={index} className="w-1/4"> {/* w-1/4 means each element takes 25% width */}
-                                    <UploadImageComponent
+                                    <UploadImagesBoxComponent
                                         key={index}
-                                        index={uploadImage.index}
-                                        status={uploadImage.status}
-                                        handleShowImage={(index) => handleShowImage(index)}
+                                        index={imagesBox.index}
+                                        status={imagesBox.status}
+                                        handleShowImagesBox={(index) => handleShowImagesBox(index)}
+                                        handleSaveChildrenPhoto={handleSaveChildrenPhoto}
                                     />
                                 </div>
                             ))}
@@ -184,6 +300,7 @@ function AddArtworkComponent() {
 
                         <div className="flex items-center mt-4 font-bold">
                             <button
+                                onClick={(e) => saveArtwork(e)}
                                 className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 mr-4"
                             >
                                 Save

@@ -80,4 +80,12 @@ Xiaoxing Pan
 - validate the information in addArtwork pages
 - upload multiple files to s3
 
+Shiyuan
+1. Done
+- Send message to indicated user
+- receive message and show
+2. To do
+- Research implementation of payment function
+
+
 

@@ -4,14 +4,12 @@ import { useState, useEffect } from "react";
 import { AuthContext } from "./Helpers/AuthContext";
 import axios from "axios";
 import Profile from "./pages/Profile";
-import Header from "./components/Header";
-import Footer from "./components/Footer";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Home from "./pages/Home";
 import HeaderComponent from "./components/Header";
 import FooterComponent from "./components/Footer";
-
+import AddArtwork from "./pages/AddArtwork";
 import Message from "./pages/Message";
 import Payment from "./pages/Payment";
 //fix me: footer cover the register button
@@ -63,6 +61,7 @@ function App() {
             <Route path="/message" element={<Message />} />
             <Route path="/payment" element={<Payment />} />
             <Route path="/artwork" element={<Artwork />} />
+            <Route path="/addArtwork" element={<AddArtwork />} />
           </Routes>
           <FooterComponent />
         </Router>

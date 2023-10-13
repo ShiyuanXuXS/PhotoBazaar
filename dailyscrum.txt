@@ -70,4 +70,13 @@ Xiaoxing Pan
 2. To do
 - artwork front-end: show artwork details, artwork crud
 
-
+2023/10/12
+Shiyuan
+1.  Done / not done since last scrum:
+- send private message to indicated user
+- receive message and refresh message box
+- create purchase crud backend
+- store message to db
+2. To do until next Scrum:
+- update purchase crud
+- research stripe for payment function

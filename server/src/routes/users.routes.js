@@ -14,6 +14,9 @@ router.get("/:email", userController.findUserByEmail);
 // Retrieve a single user with user id
 router.get("/id/:id", userController.findUserById);
 
+//get user profile by user id
+router.get("/userProfile/:id", userController.userProfile);
+
 // Create a new user
 router.post("/", userController.addUser);
 

@@ -62,6 +62,16 @@ module.exports = {
         });
       });
   },
+
+  //find user information for profile
+  userProfile: async (req, res) => {
+    const id = req.params._id;
+    const basicInfo = await User.findOne(id, {
+      attributes: { exclude: ["password"] },
+    });
+
+    res.json({ basicInfo: basicInfo });
+  },
   //add a user
   addUser: async (req, res) => {
     try {
@@ -195,13 +205,16 @@ module.exports = {
       }
       // generate a token and pass the front-end
       const accessToken = sign(
-        { username: user.username, id: existingUser._id },
+        { username: existingUser.username, id: existingUser._id },
         "importantsecret"
       );
-      console.log("Controller: " + accessToken);
+      // console.log("Controller: " + accessToken);
       res.status(201).json({
-        message: `You are loggin in as ${user.username}.`,
+        message: `You are loggin in as ${existingUser.username}.`,
         token: accessToken,
+        username: existingUser.username,
+        _id: existingUser._id,
+        email: existingUser.username,
       });
     } catch (error) {
       console.log(error);

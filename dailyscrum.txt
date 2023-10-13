@@ -80,3 +80,9 @@ Shiyuan
 2. To do until next Scrum:
 - update purchase crud
 - research stripe for payment function
+ChangLiu
+1.Done:
+-integrate login, register frontend part
+2. todo:
+- implement authorization and profile part
+

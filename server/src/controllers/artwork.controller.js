@@ -18,6 +18,7 @@ module.exports = {
     },
     createArtwork: async (req, res) => {
         const { _id, author_id, cover_url, description, photos, price, tags, title } = req.body;
+        console.log(req.body);
         const newArtwork = new Artwork({
             _id,
             author_id,
@@ -29,6 +30,7 @@ module.exports = {
                     description: photo.description,
                     upload_time: new Date(photo.upload_time),
                     modify_time: new Date(photo.modify_time),
+
                     file_url: photo.file_url,
                 };
             }),

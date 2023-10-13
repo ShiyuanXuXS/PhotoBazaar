@@ -2,8 +2,8 @@ import React, { useState, useEffect } from 'react';
 import io from 'socket.io-client';
 import axios from 'axios';
 
-import Header from '../components/Header'
-import Footer from '../components/Footer'
+// import Header from '../components/Header'
+// import Footer from '../components/Footer'
 
 function Message() {
     const [userList, setUserList] = useState([]);//users to chat with 
@@ -155,7 +155,7 @@ function Message() {
     }
     return (
         <div>
-            <Header/>
+            {/* <Header/> */}
         
             <div className="Message flex justify-center items-center h-screen border p-4">
                 <div>
@@ -256,7 +256,7 @@ function Message() {
                     </div>
                 </div>)}
             </div>
-            <Footer/>
+            {/* <Footer/> */}
         </div>
     );
 }

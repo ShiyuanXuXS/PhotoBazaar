@@ -3,7 +3,9 @@ import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { AuthContext } from "./Helpers/AuthContext";
 import axios from "axios";
-// import Profile from "./pages/Profile";
+import Profile from "./pages/Profile";
+import Header from "./components/Header";
+import Footer from "./components/Footer";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Home from "./pages/Home";
@@ -57,6 +59,7 @@ function App() {
             <Route path="/Login" element={<Login />} />
             <Route path="/" element={<Home />} />
             <Route path="/register" element={<Register />} />
+            <Route path="/profile" element={<Profile />} />
             <Route path="/message" element={<Message />} />
             <Route path="/payment" element={<Payment />} />
             <Route path="/artwork" element={<Artwork />} />

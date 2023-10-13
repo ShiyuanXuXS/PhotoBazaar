@@ -1,10 +1,6 @@
 import React, { useContext, useEffect, useState } from "react";
 import Axios from "axios";
-import "bootstrap/dist/css/bootstrap.min.css";
-import Container from "react-bootstrap/Container";
-import Form from "react-bootstrap/Form";
-import Button from "react-bootstrap/Button";
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../Helpers/AuthContext";
 // import ForgotPassword from "../pages/ForgotPassword";
 

@@ -7,6 +7,9 @@ import axios from "axios";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Home from "./pages/Home";
+import HeaderComponent from "./components/Header";
+import FooterComponent from "./components/Footer";
+
 import Message from "./pages/Message";
 //fix me: footer cover the register button
 import Artwork from "./pages/ArtworkList";
@@ -48,6 +51,7 @@ function App() {
     <div className="page-container">
       <AuthContext.Provider value={{ authStatus, setAuthStatus }}>
         <Router>
+          <HeaderComponent />
           <Routes>
             <Route path="/Login" element={<Login />} />
             <Route path="/" element={<Home />} />
@@ -55,7 +59,7 @@ function App() {
             <Route path="/message" element={<Message />} />
             <Route path="/artwork" element={<Artwork />} />
           </Routes>
-          {/* <FooterComponent /> */}
+          <FooterComponent />
         </Router>
       </AuthContext.Provider>
     </div>

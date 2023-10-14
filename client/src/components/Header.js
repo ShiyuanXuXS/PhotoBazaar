@@ -1,9 +1,13 @@
-import React, { useContext, useState, useRef } from "react";
+import React, { useContext, useState, useRef, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { Transition } from "@headlessui/react";
 import { AuthContext } from "../Helpers/AuthContext";
+<<<<<<< Updated upstream
 // import { set } from "mongoose";
 
+=======
+import Axios from "axios";
+>>>>>>> Stashed changes
 
 function HeaderComponent() {
   const { loginStatus, role, userId, setRole, setUserId, setLoginStatus } = useContext(AuthContext);

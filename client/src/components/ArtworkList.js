@@ -2,43 +2,58 @@ import React, { useState, useEffect } from 'react';
 import Axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 
-function ArtworkListComponent() {
+
+function ArtworkListComponent({ userId }) {
     const [artworkList, setArtworkList] = useState([]);
     const [tagList, setTagList] = useState([]);
     const navigate = useNavigate();
+    const [arworkIds, setArtworkIds] = useState([]);
 
-    const navigateToAddArtwork = () => {
-        navigate('/addArtwork');
-    }
+    console.log("user id is:" + userId);
 
     useEffect(() => {
-        Axios.get("http://localhost:3001/api/artworks").then((response) => {
-            setArtworkList(response.data);
-        })
-            .catch((error) => {
-                console.error(error);
-            });
+        if (userId !== null && userId !== undefined) {
+            // If userId is not null, fetch data for a specific user
+            // get artwork_id from user_id
+            // Axios.get(`http://localhost:3001/api/artworks/${userId}`)
+            //     .then((response) => {
+            //         setArtworkList(response.data);
+            //     })
+            //     .catch((error) => {
+            //         console.error(error);
+            //     });
+        } else {
+            // If userId is null, fetch data for all users
+            Axios.get("http://localhost:3001/api/artworks")
+                .then((response) => {
+                    setArtworkList(response.data);
+                })
+                .catch((error) => {
+                    console.error(error);
+                });
+        }
 
         // Fetch the tag data
-        Axios.get("http://localhost:3001/api/tags").then((response) => {
-            setTagList(response.data);
-        })
+        Axios.get("http://localhost:3001/api/tags")
+            .then((response) => {
+                setTagList(response.data);
+            })
             .catch((error) => {
                 console.error(error);
             });
-    }, []);
+    }, [userId]);
 
     return (
         <>
             <div className="card flex flex-wrap justify-center">
-                <button className="border-4 w-60 h-60 m-auto flex flex-col justify-center items-center rounded-full" onClick={navigateToAddArtwork}>
+                <button className="border-4 w-60 h-60 m-auto flex flex-col justify-center items-center rounded-full" onClick={() => navigate('/addArtwork')}>
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-20 h-20">
                         <path strokeLinecap="round" strokeLinejoin="round" d="M12 10.5v6m3-3H9m4.06-7.19l-2.12-2.12a1.5 1.5 0 00-1.061-.44H4.5A2.25 2.25 0 002.25 6v12a2.25 2.25 0 002.25 2.25h15A2.25 2.25 0 0021.75 18V9a2.25 2.25 0 00-2.25-2.25h-5.379a1.5 1.5 0 01-1.06-.44z" />
                     </svg>
                     <div className="text-2xl font-bold subpixel-antialiased capitalize">New Artwork</div>
                 </button>
                 {artworkList.map((artwork, index) => (
-                    <div key={index} className="border-4 w-96 h-100 m-5 flex flex-col justify-between rounded-lg">
+                    <div key={index} className="border-4 w-96 h-100 m-5 flex flex-col justify-between rounded-lg w-1/4">
                         <img src={artwork.cover_url} className="mx-auto my-auto w-90 h-60" alt="Artwork" />
                         <div className="ml-4">
                             <div className="text-lg subpixel-antialiased font-bold uppercase">{artwork.title}</div>

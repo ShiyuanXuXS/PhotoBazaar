@@ -1,7 +1,7 @@
 const User = require("../models/user.model");
 const validator = require("validator");
 const bcrypt = require("bcrypt");
-const { sign } = require("jsonwebtoken");
+const { sign, verify } = require("jsonwebtoken");
 const mailgun = require("mailgun.js");
 const formdata = require("form-data");
 // const { isAuth, isAdmin, generateToken, baseUrl } = require("../utils.js");
@@ -62,6 +62,17 @@ module.exports = {
         });
       });
   },
+
+  //find user information for profile
+  userProfile: async (req, res) => {
+    const id = req.params._id;
+    const basicInfo = await User.findOne(id, {
+      attributes: { exclude: ["password"] },
+    });
+
+    res.json({ basicInfo: basicInfo });
+  },
+
   //add a user
   addUser: async (req, res) => {
     try {
@@ -195,13 +206,16 @@ module.exports = {
       }
       // generate a token and pass the front-end
       const accessToken = sign(
-        { username: user.username, id: existingUser._id },
-        "importantsecret"
+        { username: existingUser.username, id: existingUser._id },
+        "importantsecret", { expiresIn: "1d" }
       );
-      console.log("Controller: " + accessToken);
       res.status(201).json({
-        message: `You are loggin in as ${user.username}.`,
+        message: `You are loggin in as ${existingUser.username}.`,
         token: accessToken,
+        username: existingUser.username,
+        _id: existingUser._id,
+        email: existingUser.email,
+        role: existingUser.role,
       });
     } catch (error) {
       console.log(error);
@@ -213,19 +227,25 @@ module.exports = {
 
   validateToken: async (req, res) => {
     const accessToken = req.header("accessToken");
-    if (!accessToken) return res.json({ error: "User not logged In!" });
+
+    if (!accessToken) {
+      return res.json({ error: "User not logged In!" });
+    }
 
     try {
       const validToken = verify(accessToken, "importantsecret");
       req.user = validToken;
-
       if (validToken) {
-        return next();
+        // return next();
+        res.json(req.user);
       }
     } catch (err) {
       res.json({ error: err });
     }
   },
+
+  //Todo: retrive artwork_id list from user_id
+  // crud artwork_id list
 };
 
 //register validation

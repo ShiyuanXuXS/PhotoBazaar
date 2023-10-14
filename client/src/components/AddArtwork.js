@@ -1,5 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext, } from 'react';
 import Axios from 'axios';
+import { AuthContext } from "../Helpers/AuthContext";
 import * as Yup from "yup";
 import UploadImagesBoxComponent from './UploadImagesBox';
 import {
@@ -7,6 +8,7 @@ import {
     DeleteObjectCommand,
     PutObjectCommand,
 } from "@aws-sdk/client-s3";
+import { useNavigate } from 'react-router-dom';
 // window.Buffer = window.Buffer || require("buffer").Buffer;
 
 //S3 config
@@ -25,6 +27,12 @@ const client = new S3Client(config);
 function AddArtworkComponent(props) {
     const [tagList, setTagList] = useState([]);
     const [tagArray, setTagArray] = useState([]);
+    const tags = tagArray.map(data => ({ tag_id: data }));
+    const Navigate = useNavigate();
+
+
+    const { userId } = useContext(AuthContext);
+
     const [imagesBoxes, setImagesBoxes] = useState([{
         index: 1,
         status: "show",
@@ -65,7 +73,6 @@ function AddArtworkComponent(props) {
                 alert("You can only choose 5 tags.");
             }
         }
-
     };
 
     useEffect(() => {
@@ -77,6 +84,8 @@ function AddArtworkComponent(props) {
             });
     }, []);
 
+    // const [author_id, setAuthor_id] = useState('652226c2f905b8dea4f7712d'); //TODO: replace 1 with user id
+    // const author_id = '652226c2f905b8dea4f7712d';
     const [title, setTitle] = useState('');
     const [description, setDescription] = useState('');
     const [price, setPrice] = useState();
@@ -113,42 +122,84 @@ function AddArtworkComponent(props) {
                     alert("Please select a file less than 5MB");
                     return;
                 } else {
+                    console.log(uploadImg);
                     // save cover image to s3 bucket
-                    uploadImg.map((data) => {
-                        const date = new Date();
+                    // Create an array to store promises for image uploads
+                    const uploadPromises = [];
+                    const date = new Date();
+                    for (const data of uploadImg) {
                         const timestamp = date.getTime();
-                        const newFileName = `${timestamp}_user1_id.${data.file.name.split(".").pop()}`; //TODO: replace user1_id with user id
-                        const fullFileName = `https://${config.bucketName}.s3.${config.region}.amazonaws.com/${config.dirName}/${newFileName}`;
+                        const newFileName = `${timestamp}_${userId}.${data.file.name.split(".").pop()}`; //TODO: replace user1_id with user id
 
                         const params = {
                             Bucket: config.bucketName,
                             Key: "artwork/" + newFileName,
                             Body: data.file,
                         };
-
-                        client
+                        // Create a promise for each image upload
+                        const uploadPromise = client
                             .send(new PutObjectCommand(params))
                             .then((data) => {
                                 console.log("Image uploaded successfully:", data);
-
+                                // setNewFileNames([...newFileNames, newFileName]);
+                                return newFileName;
                             })
                             .catch((error) => {
                                 console.error("Error uploading image:", error);
+                                return null;
                             });
-                    })
+                        uploadPromises.push(uploadPromise);
+                    }
+                    // Use Promise.all to wait for all image uploads to complete
+                    Promise.all(uploadPromises)
+                        .then((fileNames) => {
+                            // 'fileNames' will contain an array of successfully uploaded file names
+                            console.log("All images uploaded successfully.", fileNames);
 
-                    // save artwork to database
+                            // get photos data
+                            const photos = uploadImg.map((data, index) => {
+                                return {
+                                    photo_name: data.name,
+                                    description: data.description,
+                                    file_url: `https://${config.bucketName}.s3.${config.region}.amazonaws.com/${config.dirName}/${fileNames[index]}`,
+                                    upload_time: date,
+                                    modify_time: date,
+                                }
+                            });
+
+                            console.log(photos);
+                            console.log(photos.slice(1));
+
+                            // save artwork to database
+                            Axios.post("http://localhost:3001/api/artworks", {
+                                author_id: userId,
+                                title: title,
+                                description: description,
+                                price: parseFloat(price),
+                                cover_url: `https://${config.bucketName}.s3.${config.region}.amazonaws.com/${config.dirName}/${fileNames[0]}`,
+                                tags: tags,
+                                photos: photos.slice(1),
+                            }).then((response) => {
+                                console.log(response);
+                                alert("Artwork saved successfully!");
+                                Navigate(`/artwork/${userId}`);
+                                // window.location.reload();
+                                // add tag count
+                                // add artwork_id to user
+                            })
+                                .catch((error) => {
+                                    console.error(error);
+                                });
+                        })
+                        .catch((uploadErrors) => {
+                            console.error("Error uploading images:", uploadErrors);
+                        });
                 }
             })
-            .catch((errors) => {
-                // if (errors.inner.length > 0) {
-                //     alert(errors.inner[0].message);
-                // }
-                alert(errors);
-
+            .catch((validationErrors) => {
+                console.error("Validation errors:", validationErrors);
             });
-
-    }
+    };
 
     const validationSchema = Yup.object().shape({
         title: Yup.string()

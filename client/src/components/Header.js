@@ -2,15 +2,11 @@ import React, { useContext, useState, useRef, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { Transition } from "@headlessui/react";
 import { AuthContext } from "../Helpers/AuthContext";
-<<<<<<< Updated upstream
 // import { set } from "mongoose";
 
-=======
-import Axios from "axios";
->>>>>>> Stashed changes
-
 function HeaderComponent() {
-  const { loginStatus, role, userId, setRole, setUserId, setLoginStatus } = useContext(AuthContext);
+  const { loginStatus, role, userId, setRole, setUserId, setLoginStatus } =
+    useContext(AuthContext);
   const isAdmin = role.includes("admin");
   // const { setAuthStatus, authStatus } = useContext(AuthContext);
   const [show, setShow] = useState(false);
@@ -130,7 +126,9 @@ function HeaderComponent() {
                         <button
                           className="block flex items-center px-1 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900"
                           role="menuitem"
-                          onClick={() => { Navigate(`/profile/${userId}`) }}
+                          onClick={() => {
+                            Navigate(`/profile/${userId}`);
+                          }}
                         >
                           <svg
                             xmlns="http://www.w3.org/2000/svg"
@@ -183,7 +181,6 @@ function HeaderComponent() {
                         <button
                           className="block flex items-center px-1 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900"
                           role="menuitem"
-
                         >
                           <svg
                             xmlns="http://www.w3.org/2000/svg"
@@ -202,29 +199,34 @@ function HeaderComponent() {
                           My Artwork
                         </button>
                       </div>
-                      {isAdmin ? (<><div className="mx-3 flex items-center">
-                        <button
-                          className="block flex items-center px-1 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900"
-                          role="menuitem"
-                        >
-                          <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                            strokeWidth="1.5"
-                            stroke="currentColor"
-                            className="w-6 h-6 mr-2"
-                          >
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              d="M15.042 21.672L13.684 16.6m0 0l-2.51 2.225.569-9.47 5.227 7.917-3.286-.672zM12 2.25V4.5m5.834.166l-1.591 1.591M20.25 10.5H18M7.757 14.743l-1.59 1.59M6 10.5H3.75m4.007-4.243l-1.59-1.59"
-                            />
-                          </svg>
-                          AdminCenter
-                        </button>
-                      </div></>) : (<> </>)}
-
+                      {isAdmin ? (
+                        <>
+                          <div className="mx-3 flex items-center">
+                            <button
+                              className="block flex items-center px-1 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900"
+                              role="menuitem"
+                            >
+                              <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                                strokeWidth="1.5"
+                                stroke="currentColor"
+                                className="w-6 h-6 mr-2"
+                              >
+                                <path
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  d="M15.042 21.672L13.684 16.6m0 0l-2.51 2.225.569-9.47 5.227 7.917-3.286-.672zM12 2.25V4.5m5.834.166l-1.591 1.591M20.25 10.5H18M7.757 14.743l-1.59 1.59M6 10.5H3.75m4.007-4.243l-1.59-1.59"
+                                />
+                              </svg>
+                              AdminCenter
+                            </button>
+                          </div>
+                        </>
+                      ) : (
+                        <> </>
+                      )}
                     </div>
                     <div className="mx-3 flex items-center">
                       <div className="border-t border-gray-400 w-full"></div>

@@ -1,7 +1,7 @@
 const User = require("../models/user.model");
 const validator = require("validator");
 const bcrypt = require("bcrypt");
-const { sign } = require("jsonwebtoken");
+const { sign, verify } = require("jsonwebtoken");
 const mailgun = require("mailgun.js");
 const formdata = require("form-data");
 // const { isAuth, isAdmin, generateToken, baseUrl } = require("../utils.js");
@@ -227,14 +227,17 @@ module.exports = {
 
   validateToken: async (req, res) => {
     const accessToken = req.header("accessToken");
-    if (!accessToken) return res.json({ error: "User not logged In!" });
+
+    if (!accessToken) {
+      return res.json({ error: "User not logged In!" });
+    }
 
     try {
       const validToken = verify(accessToken, "importantsecret");
       req.user = validToken;
-
       if (validToken) {
-        return next();
+        // return next();
+        res.json(req.user);
       }
     } catch (err) {
       res.json({ error: err });

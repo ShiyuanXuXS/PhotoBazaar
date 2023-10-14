@@ -206,15 +206,15 @@ module.exports = {
       // generate a token and pass the front-end
       const accessToken = sign(
         { username: existingUser.username, id: existingUser._id },
-        "importantsecret"
+        "importantsecret", { expiresIn: "1d" }
       );
-      // console.log("Controller: " + accessToken);
       res.status(201).json({
         message: `You are loggin in as ${existingUser.username}.`,
         token: accessToken,
         username: existingUser.username,
         _id: existingUser._id,
-        email: existingUser.username,
+        email: existingUser.email,
+        role: existingUser.role,
       });
     } catch (error) {
       console.log(error);

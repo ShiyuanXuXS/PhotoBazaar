@@ -13,45 +13,48 @@ import AddArtwork from "./pages/AddArtwork";
 import Message from "./pages/Message";
 import Payment from "./pages/Payment";
 import ChangePwd from "./pages/ChangePwd";
+import { AuthProvider } from './Helpers/AuthContext';
+
 //fix me: footer cover the register button
 import Artwork from "./pages/ArtworkList";
 import "./App.css";
 
 function App() {
-  const [authStatus, setAuthStatus] = useState({
-    username: "",
-    email: "",
-    _id: 0,
-    status: false,
-  });
+  // const [authStatus, setAuthStatus] = useState({
+  //   username: "",
+  //   email: "",
+  //   _id: 0,
+  //   status: false,
+  // });
 
-  useEffect(() => {
-    axios
-      .get("http://localhost:3001/api/users/auth", {
-        headers: {
-          accessToken: localStorage.getItem("accessToken"),
-        },
-      })
-      .then((res) => {
-        if (res.data.error)
-          setAuthStatus({
-            ...authStatus,
-            status: false,
-          });
-        else {
-          setAuthStatus({
-            username: res.data.username,
-            email: res.data.email,
-            _id: res.data._id,
-            status: true,
-          });
-        }
-      });
-  }, []);
+  // useEffect(() => {
+  //   axios
+  //     .get("http://localhost:3001/api/users/auth", {
+  //       headers: {
+  //         accessToken: localStorage.getItem("accessToken"),
+  //       },
+  //     })
+  //     .then((res) => {
+  //       if (res.data.error)
+  //         setAuthStatus({
+  //           ...authStatus,
+  //           status: false,
+  //         });
+  //       else {
+  //         setAuthStatus({
+  //           username: res.data.username,
+  //           email: res.data.email,
+  //           _id: res.data._id,
+  //           status: true,
+  //         });
+  //       }
+  //     });
+  // }, []);
 
   return (
-    <div className="page-container">
-      <AuthContext.Provider value={{ authStatus, setAuthStatus }}>
+    <AuthProvider>
+      <div className="page-container">
+        {/* <AuthContext.Provider value={{ authStatus, setAuthStatus }}> */}
         <Router>
           <HeaderComponent />
           <Routes>
@@ -67,8 +70,9 @@ function App() {
           </Routes>
           <FooterComponent />
         </Router>
-      </AuthContext.Provider>
-    </div>
+        {/* </AuthContext.Provider> */}
+      </div>
+    </AuthProvider>
   );
 }
 

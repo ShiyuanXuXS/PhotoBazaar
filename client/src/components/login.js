@@ -7,17 +7,19 @@ import { AuthContext } from "../Helpers/AuthContext";
 function LoginComponent() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const { authStatus, setAuthStatus } = useContext(AuthContext);
+  const { setLoginStatus, setRole, setUserId } = useContext(AuthContext);
+
+  // const { authStatus, setAuthStatus } = useContext(AuthContext);
   const Navigate = useNavigate("");
   const navigateToForgot = () => {
     Navigate("/forgotpassword");
   };
 
-  useEffect(() => {
-    //fixme:
-    // if (authStatus.status) Navigate("/login");
-    if (authStatus.status) Navigate("/");
-  });
+  // useEffect(() => {
+  //   //fixme:
+  //   // if (authStatus.status) Navigate("/login");
+  //   if (loginStatus) Navigate("/");
+  // });
   //user login
   const authUser = (e) => {
     e.preventDefault();
@@ -32,22 +34,22 @@ function LoginComponent() {
           // alert("fff"); // Display the error message
           alert(response.data.error);
         } else if (response.data.message) {
+          console.log(response.data);
           alert(response.data.message); // Display success message or token
           //set token
           localStorage.setItem("accessToken", response.data.token);
-          setAuthStatus({
-            email: response.data.email,
-            _id: response.data._id,
-            status: true,
-            username: response.data.username,
-          });
-          Navigate("/");
+          // setUserEmail(response.data.email);
+          // setUsername(response.data.username);
+          setUserId(response.data._id);
+          setRole(response.data.role);
+          setLoginStatus(true);
+          Navigate("/"); // Redirect to the home page
         }
       })
       .catch((error) => {
         // fix me : how to show backend errors, Handle errors
         // alert(error); // Display the error message
-        alert("login failed"); // Display the error message
+        alert("login failed", error); // Display the error message
       });
   };
 

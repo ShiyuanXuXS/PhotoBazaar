@@ -10,12 +10,13 @@ function ProfileComponent() {
   const [details, setdetails] = useState({});
   const [listOfArtworks, setArtworklist] = useState([]);
   const Navigate = useNavigate();
-  const { authStatus } = useContext(AuthContext);
+  // const { authStatus } = useContext(AuthContext);
+  const { loginStatus, role, userId } = useContext(AuthContext);
 
   useEffect(() => {
-    console.log("user id is:" + authStatus._id);
+    console.log("user id is:" + userId);
     axios
-      .get(`http://localhost:3001/api/users/userProfile/${authStatus._id}`)
+      .get(`http://localhost:3001/api/users/userProfile/${userId}`)
       .then((res) => {
         setbasicinfo(res.data.basicInfo);
       });
@@ -28,28 +29,28 @@ function ProfileComponent() {
   // let d = new Date(Date.parse(basicInfo.createdAt));
 
   return (
-    <>
+    <>// FIXME: change to tailwind
       <div className="Profile">
         <div className="userDesc">
           <div className="Image">
-            <i class="bi bi-person"></i>
+            <i className="bi bi-person"></i>
           </div>
           <div className="Desc">
             <div className="Name">{basicInfo.username}</div>
             <Link
               to={`mailto:${basicInfo.email}?&subject=Feedback from the users`}
             >
-              <i class="bi bi-envelope-at-fill"></i>
+              <i className="bi bi-envelope-at-fill"></i>
               {basicInfo.email}
             </Link>
           </div>
           <div className="additional">
-            <div className="Date">user name {authStatus.username}</div>
+            <div className="Date">user name {basicInfo.username}</div>
 
-            {basicInfo._id === authStatus._id && (
+            {basicInfo._id === userId && (
               <button>
                 <Link to="/changepwd">
-                  <i class="bi bi-key-fill"></i>Change Password
+                  <i className="bi bi-key-fill"></i>Change Password
                 </Link>
               </button>
             )}

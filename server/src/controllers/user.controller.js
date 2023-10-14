@@ -246,6 +246,19 @@ module.exports = {
 
   //Todo: retrive artwork_id list from user_id
   // crud artwork_id list
+  updateMyAssetsById: async (req, res) => {
+    const user_id = req.params._id;
+    const update = req.body;
+    console.log(update);
+
+    const user = await User.findOne({ _id: user_id });
+    console.log(user);
+    const my_assets = user.my_assets;
+    console.log(my_assets);
+
+
+  }
+
 };
 
 //register validation

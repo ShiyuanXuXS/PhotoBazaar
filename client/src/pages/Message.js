@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import io from 'socket.io-client';
 import axios from 'axios';
-
+import { IoIosNotificationsOutline  } from 'react-icons/io';
 
 function Message() {
     const [userList, setUserList] = useState([]);//users to chat with 
@@ -153,9 +153,7 @@ function Message() {
     }
     return (
         <div>
-            {/* <Header/> */}
-
-            <div className="Message flex justify-center items-center h-screen border p-4">
+            <div className="bg-gray-100 h-screen p-4 flex flex-col md:flex-row justify-center items-center">
                 <div>
                     {currentUser === 'user1' && (<p>user1</p>)}
                     {currentUser === 'user2' && (<p>user2</p>)}
@@ -164,22 +162,28 @@ function Message() {
                     }}>Switch User</button>
 
                 </div>
-                <div className='users-container border p-4'>
-                    <div className="user-list">
+                <div className="user-container bg-white p-4 rounded-lg shadow-lg md:w-1/2  flex-grow self-stretch mx-2 my-2">
+                    <div className="user-list font-bold text-lg mb-4">
                         {userList.map((user) => (
                             <div
                                 key={user.username}
-                                className={`user-item ${selectedUser && selectedUser.username === user.username ? 'bg-blue-500 text-white rounded' : ''
+                                className={`user-item ${selectedUser && selectedUser.username === user.username ? 'bg-blue-500 text-white rounded' : 'hover:bg-gray-100'
                                     }`}
                                 onClick={() => setSelectedUser(user)}
                             >
-                                {user.nickname} ({user.username})
-                                {user.hasMessageUnread && (<div className="bg-red-500 text-white rounded-full w-9 h-5 flex items-center justify-center ml-4">New</div>)}
-
+                                <span className="flex items-center ml-4">
+                                    {user.hasMessageUnread && (
+                                        <span className="bg-white bg-opacity-0 rounded-full w-9 h-9 flex items-center justify-center ml-4">
+                                            <IoIosNotificationsOutline size={20} color="red" />
+                                        </span>
+                                    )}
+                                    <span className="text-lg">{user.nickname}</span>
+                                    <span className="text-gray-500 ml-2">({user.username})</span>
+                                </span>
                             </div>
                         ))}
                     </div>
-                    <div className="user-search border p-4">
+                    <div className="user-search mt-4">
                         <input
                             type="text"
                             placeholder="Search user..."
@@ -189,7 +193,7 @@ function Message() {
                         />
                         <button
                             onClick={searchUsers}
-                            className="bg-blue-500 text-white rounded px-4 py-2 hover:bg-blue-600"
+                            className="bg-blue-500 hover:bg-blue-600 text-white font-bold rounded px-4 py-2"
                         >Search
                         </button>
                         <div className="search-results">
@@ -207,51 +211,56 @@ function Message() {
                     </div>
                 </div>
 
-                {selectedUser && (<div className="chat-container border p-4">
+                {selectedUser && (
+                    <div className="user-container bg-white p-4 rounded-lg shadow-lg md:w-1/2  flex-grow self-stretch mx-2 my-2" >
 
-                    <div className="chat-header bg-blue-500 text-white p-4 rounded" >
-                        {`Chat with ${selectedUser.nickname}`}
-                    </div>
+                        <div className="chat-header bg-gray-100 text-blue-500  p-1 rounded font-bold text-lg" >
+                            {`Chat with ${selectedUser.nickname}`}
+                        </div>
 
-                    <div className="chat-messages">
-                        {selectedUser.messages.map((message, index) => (
-                            <div
-                                key={index}
-                                className={`message mb-2 ${message.sender_username === currentUser
-                                        ? 'text-right'
-                                        : ''
-                                    }`}
-                            >
-                                <span
-                                    className={`message-content inline-block p-2 rounded ${message.sender_username === currentUser
-                                            ? 'bg-green-500 text-black'
-                                            : 'bg-gray-200 text-black'
+                        <div className="chat-messages mt-4">
+                            {selectedUser.messages.map((message, index) => (
+                                <div
+                                    key={index}
+                                    className={`message mb-2 ${message.sender_username === currentUser
+                                            ? 'text-right'
+                                            : ''
                                         }`}
                                 >
-                                    {message.message}
-                                </span>
-                            </div>
+                                    <span
+                                        className={`message-content inline-block p-1 rounded ${message.sender_username === currentUser
+                                                ? 'bg-green-500 text-black'
+                                                : 'bg-gray-200 text-black'
+                                            }`}
+                                    >
+                                        {message.message}
+                                    </span>
+                                </div>
 
-                        ))}
+                            ))}
+                        </div>
+                        <div className="chat-input p-4 flex flex-col items-center">
+                            <div className="flex w-full">
+                                <textarea
+                                    rows="3"
+                                    placeholder="Type a message..."
+                                    value={newMessage}
+                                    onChange={(e) => setNewMessage(e.target.value)}
+                                    className="border border-gray-300 rounded p-2 w-full"
+                                />
+                            </div>
+                            <div className="mt-2">
+                                <button
+                                onClick={sendMessage}
+                                className="bg-blue-500 hover:bg-blue-600 text-white font-bold rounded px-4 py-2"
+                                >
+                                Send
+                                </button>
+                            </div>
+                        </div>
                     </div>
-                    <div className="chat-input p-4">
-                        <input
-                            type="text"
-                            placeholder="Type a message..."
-                            value={newMessage}
-                            onChange={(e) => setNewMessage(e.target.value)}
-                            className="border border-gray-300 rounded p-2 w-full mr-2"
-                        />
-                        <button
-                            onClick={sendMessage}
-                            className="bg-blue-500 text-white rounded px-4 py-2 hover:bg-blue-600"
-                        >
-                            Send
-                        </button>
-                    </div>
-                </div>)}
+                )}
             </div>
-            {/* <Footer/> */}
         </div>
     );
 }

@@ -1,5 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext, } from 'react';
 import Axios from 'axios';
+import { AuthContext } from "../Helpers/AuthContext";
 import * as Yup from "yup";
 import UploadImagesBoxComponent from './UploadImagesBox';
 import {
@@ -7,6 +8,7 @@ import {
     DeleteObjectCommand,
     PutObjectCommand,
 } from "@aws-sdk/client-s3";
+import { useNavigate } from 'react-router-dom';
 // window.Buffer = window.Buffer || require("buffer").Buffer;
 
 //S3 config
@@ -26,6 +28,10 @@ function AddArtworkComponent(props) {
     const [tagList, setTagList] = useState([]);
     const [tagArray, setTagArray] = useState([]);
     const tags = tagArray.map(data => ({ tag_id: data }));
+    const Navigate = useNavigate();
+
+
+    const { userId } = useContext(AuthContext);
 
     const [imagesBoxes, setImagesBoxes] = useState([{
         index: 1,
@@ -79,7 +85,7 @@ function AddArtworkComponent(props) {
     }, []);
 
     // const [author_id, setAuthor_id] = useState('652226c2f905b8dea4f7712d'); //TODO: replace 1 with user id
-    const author_id = '652226c2f905b8dea4f7712d';
+    // const author_id = '652226c2f905b8dea4f7712d';
     const [title, setTitle] = useState('');
     const [description, setDescription] = useState('');
     const [price, setPrice] = useState();
@@ -123,7 +129,7 @@ function AddArtworkComponent(props) {
                     const date = new Date();
                     for (const data of uploadImg) {
                         const timestamp = date.getTime();
-                        const newFileName = `${timestamp}_user1_id.${data.file.name.split(".").pop()}`; //TODO: replace user1_id with user id
+                        const newFileName = `${timestamp}_${userId}.${data.file.name.split(".").pop()}`; //TODO: replace user1_id with user id
 
                         const params = {
                             Bucket: config.bucketName,
@@ -166,7 +172,7 @@ function AddArtworkComponent(props) {
 
                             // save artwork to database
                             Axios.post("http://localhost:3001/api/artworks", {
-                                author_id: author_id,
+                                author_id: userId,
                                 title: title,
                                 description: description,
                                 price: parseFloat(price),
@@ -176,7 +182,10 @@ function AddArtworkComponent(props) {
                             }).then((response) => {
                                 console.log(response);
                                 alert("Artwork saved successfully!");
+                                Navigate(`/artwork/${userId}`);
                                 // window.location.reload();
+                                // add tag count
+                                // add artwork_id to user
                             })
                                 .catch((error) => {
                                     console.error(error);

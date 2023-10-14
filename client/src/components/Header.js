@@ -179,7 +179,7 @@ function HeaderComponent() {
                         <button
                           className="block flex items-center px-1 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900"
                           role="menuitem"
-
+                          onClick={() => { Navigate(`/artwork/${userId}`) }}
                         >
                           <svg
                             xmlns="http://www.w3.org/2000/svg"

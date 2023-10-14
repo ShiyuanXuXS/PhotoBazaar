@@ -72,6 +72,7 @@ module.exports = {
 
     res.json({ basicInfo: basicInfo });
   },
+
   //add a user
   addUser: async (req, res) => {
     try {
@@ -239,6 +240,9 @@ module.exports = {
       res.json({ error: err });
     }
   },
+
+  //Todo: retrive artwork_id list from user_id
+  // crud artwork_id list
 };
 
 //register validation

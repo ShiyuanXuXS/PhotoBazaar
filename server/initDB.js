@@ -86,7 +86,7 @@ const insertExampleData = async () => {
     is_paid: true,
     pay_time: "2023-10-04T15:30:00Z",
     transaction_price: "199.99",
-    transaction_ref: "transaction_reference"
+    transaction_ref: []
   }
   await db.createCollection("purchases")
   collection = db.collection("purchases")

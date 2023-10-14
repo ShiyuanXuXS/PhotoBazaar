@@ -3,6 +3,7 @@ const router = express.Router();
 const purchaseController = require('../controllers/purchase.controller');
 
 router.post('/create-payment-intent', purchaseController.createPaymentIntent);
+router.post('/checkPaymentStatus/:id', purchaseController.checkPaymentStatus);
 
 router.post('/', purchaseController.createPurchase);
 

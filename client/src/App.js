@@ -17,6 +17,7 @@ import { AuthProvider } from './Helpers/AuthContext';
 
 //fix me: footer cover the register button
 import Artwork from "./pages/ArtworkList";
+import MyArtwork from "./pages/MyArtwork";
 import "./App.css";
 
 function App() {
@@ -67,6 +68,8 @@ function App() {
             <Route path="/artwork" element={<Artwork />} />
             <Route path="/addArtwork" element={<AddArtwork />} />
             <Route path="/changepwd" element={<ChangePwd />} />
+            <Route path="/artwork/:userId" element={<MyArtwork />} />
+
           </Routes>
           <FooterComponent />
         </Router>

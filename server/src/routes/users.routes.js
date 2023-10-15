@@ -5,7 +5,7 @@ const userController = require("../controllers/user.controller.js");
 // Retrieve all users
 router.get("/", userController.findAll);
 
-//validate token
+// validate token
 router.get("/auth", userController.validateToken);
 
 // Retrieve a single user with user email
@@ -27,6 +27,9 @@ router.delete("/:email", userController.deleteUserByEmail);
 router.post("/auth", userController.authUser);
 
 // Update a user password with email
-router.put("/:email", userController.updateUserByEmail);
+router.put("/:email", userController.updateUserByEmail);  // should be patch?
+
+// Update my_assets with user id
+router.patch("/my_assets/:id", userController.updateMyAssetsById);
 
 module.exports = router;

@@ -33,19 +33,10 @@ function HeaderComponent() {
     setLoginStatus(false);
     setRole("");
     setUserId("");
-    // setAuthStatus({
-    //   email: "",
-    //   _id: 0,
-    //   status: false,
-    //   username: "",
-    // });
-    //fix me
     Navigate("/");
-    // Navigate("/login");
   };
 
   return (
-    // <AuthContext.Provider value={{ authStatus, setAuthStatus }}>
     <header className="bg-white">
       <nav
         className="mx-auto flex w-full items-center justify-between p-6 lg:px-8"
@@ -54,7 +45,7 @@ function HeaderComponent() {
         <div className="flex lg:flex-1">
           <button onClick={navigateToHome} className="-m-1.5 p-1.5">
             <span className="sr-only">Photobazarr</span>
-            <img className="h-8 w-auto" src="./logo.svg" alt="photobazarr" />
+            <img className="h-8 w-auto" src="./logo2.png" alt="photobazarr" />
           </button>
         </div>
         {/* shows up when user haven't login in or sign up */}
@@ -116,7 +107,7 @@ function HeaderComponent() {
                 {(ref) => (
                   <div
                     ref={myRef}
-                    className="origin-top-right absolute right-0 mt-2 w-60 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5"
+                    className="origin-top-right absolute right-0 mt-2 w-50 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5"
                     role="menu"
                     aria-orientation="vertical"
                     aria-labelledby="options-menu"
@@ -127,6 +118,7 @@ function HeaderComponent() {
                           className="block flex items-center px-1 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900"
                           role="menuitem"
                           onClick={() => {
+                            setIsOpen(false); // Close the dropdown
                             Navigate(`/profile/${userId}`);
                           }}
                         >
@@ -146,41 +138,16 @@ function HeaderComponent() {
                           </svg>
                           {/* if you set link here, it will not work when you click the icon. */}
                           {/* <Link to={`/profile/${userId}`}> */}
-                          My Profile
+                          Profile
                           {/* </Link> */}
                         </button>
                       </div>
-                      <div className="flex mx-3 items-center">
-                        <button
-                          className="block flex items-center px-1 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900"
-                          role="menuitem"
-                        >
-                          <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                            strokeWidth="1.5"
-                            stroke="currentColor"
-                            className="w-6 h-6 mr-2"
-                          >
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              d="M10.343 3.94c.09-.542.56-.94 1.11-.94h1.093c.55 0 1.02.398 1.11.94l.149.894c.07.424.384.764.78.93.398.164.855.142 1.205-.108l.737-.527a1.125 1.125 0 011.45.12l.773.774c.39.389.44.002.12.45l-.527.737c-.25.35-.272.806-.107 1.204.165.397.505.71.93.78l.893.15c.543.09.94.56.94 1.109v1.094c0 .55-.397 1.02-.94 1.11l-.893.149c-.425.07-.765.383-.93.78-.165.398-.143.854.107 1.204l.527.738c.32.447.269 1.06-.12 1.45l-.774.773a1.125 1.125 0 01-1.449.12l-.738-.527c-.35-.25-.806-.272-1.203-.107-.397.165-.71.505-.781.929l-.149.894c-.09.542-.56.94-1.11.94h-1.094c-.55 0-1.019-.398-1.11-.94l-.148-.894c-.071-.424-.384-.764-.781-.93-.398-.164-.854-.142-1.204.108l-.738.527c-.447.32-1.06.269-1.45-.12l-.773-.774a1.125 1.125 0 01-.12-1.45l.527-.737c.25-.35.273-.806.108-1.204-.165-.397-.505-.71-.93-.78l-.894-.15c-.542-.09-.94-.56-.94-1.109v-1.094c0-.55.398-1.02.94-1.11l.894-.149c.424-.07.765-.383.93-.78.165-.398.143-.854.107-1.204l-.527-.738a1.125 1.125 0 01.12-1.45l.773-.773a1.125 1.125 0 011.45-.12l.737.527c.35.25.807.272 1.204.107.397-.165.71-.505.78-.929l.15-.894z"
-                            />
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
-                            />
-                          </svg>
-                          Edit Profile
-                        </button>
-                      </div>
+
                       <div className="mx-3 flex items-center">
                         <button
                           className="block flex items-center px-1 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900"
                           role="menuitem"
+                          onClick={() => { setIsOpen(false); Navigate(`/artwork/${userId}`) }}
                         >
                           <svg
                             xmlns="http://www.w3.org/2000/svg"
@@ -196,7 +163,33 @@ function HeaderComponent() {
                               d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 001.5-1.5V6a1.5 1.5 0 00-1.5-1.5H3.75A1.5 1.5 0 002.25 6v12a1.5 1.5 0 001.5 1.5zm10.5-11.25h.008v.008h-.008V8.25zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z"
                             />
                           </svg>
-                          My Artwork
+                          Artworks
+                        </button>
+                      </div>
+                      <div className="flex mx-3 items-center">
+                        <button
+                          className="block flex items-center px-1 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900"
+                          role="menuitem"
+                          onClick={() => { setIsOpen(false); }}
+                        >
+                          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6 mr-2">
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 10.5V6a3.75 3.75 0 10-7.5 0v4.5m11.356-1.993l1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 01-1.12-1.243l1.264-12A1.125 1.125 0 015.513 7.5h12.974c.576 0 1.059.435 1.119 1.007zM8.625 10.5a.375.375 0 11-.75 0 .375.375 0 01.75 0zm7.5 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z" />
+                          </svg>
+
+                          Assets
+                        </button>
+                      </div>
+                      <div className="flex mx-3 items-center">
+                        <button
+                          className="block flex items-center px-1 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900"
+                          role="menuitem"
+                          onClick={() => { setIsOpen(false); }}
+
+                        >
+                          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6 mr-2">
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 00-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 00-16.536-1.84M7.5 14.25L5.106 5.272M6 20.25a.75.75 0 11-1.5 0 .75.75 0 011.5 0zm12.75 0a.75.75 0 11-1.5 0 .75.75 0 011.5 0z" />
+                          </svg>
+                          Cart
                         </button>
                       </div>
                       {isAdmin ? (
@@ -205,6 +198,8 @@ function HeaderComponent() {
                             <button
                               className="block flex items-center px-1 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900"
                               role="menuitem"
+                              onClick={() => { setIsOpen(false); }}
+
                             >
                               <svg
                                 xmlns="http://www.w3.org/2000/svg"

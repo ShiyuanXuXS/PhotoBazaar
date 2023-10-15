@@ -8,7 +8,8 @@ import AddArtwork from "./pages/AddArtwork";
 import Message from "./pages/Message";
 import Payment from "./pages/Payment";
 import { AuthProvider } from "./Helpers/AuthContext";
-
+import ChangePassword from "./pages/ChangePassword";
+import ForgotPassword from "./pages/ForgotPassword";
 //fix me: footer cover the register button
 import Artwork from "./pages/ArtworkList";
 import MyArtwork from "./pages/MyArtwork";
@@ -30,6 +31,8 @@ function App() {
             <Route path="/addArtwork" element={<AddArtwork />} />
             {/* <Route path="/changepwd" element={<ChangePwd />} /> */}
             <Route path="/artwork/:userId" element={<MyArtwork />} />
+            <Route path="/forgotpassword" element={<ForgotPassword />} />
+            <Route path="/changepassword/:email" element={<ChangePassword />} />
           </Routes>
         </Router>
       </div>

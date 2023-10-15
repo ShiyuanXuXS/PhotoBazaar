@@ -12,8 +12,9 @@ import FooterComponent from "./components/Footer";
 import AddArtwork from "./pages/AddArtwork";
 import Message from "./pages/Message";
 import Payment from "./pages/Payment";
-import ChangePwd from "./pages/ChangePwd";
-import { AuthProvider } from './Helpers/AuthContext';
+// import ChangePwd from "./pages/ChangePwd";
+import { AuthProvider } from "./Helpers/AuthContext";
+import ForgotPassword from "./pages/ForgotPassword";
 
 //fix me: footer cover the register button
 import Artwork from "./pages/ArtworkList";
@@ -67,9 +68,9 @@ function App() {
             <Route path="/payment" element={<Payment />} />
             <Route path="/artwork" element={<Artwork />} />
             <Route path="/addArtwork" element={<AddArtwork />} />
-            <Route path="/changepwd" element={<ChangePwd />} />
+            {/* <Route path="/changepwd" element={<ChangePwd />} /> */}
             <Route path="/artwork/:userId" element={<MyArtwork />} />
-
+            <Route path="/forgotpassword" element={<ForgotPassword />} />
           </Routes>
           <FooterComponent />
         </Router>

@@ -19,32 +19,40 @@ function Payment() {
     const url = process.env.REACT_APP_API_URL;
     const Navigate = useNavigate();
     useEffect(() => {
-        //todo: check if is_paid
-        
+        const token = localStorage.getItem('accessToken');
+        console.log(token);
+        // check if is_paid
         const checkPaymentStatus = async () => {
-            try {
-                const response = await axios.post(`${url}/api/purchases/checkPaymentStatus/${purchase_id}`);
-                const { message: resMessage } = response.data;
-                switch (response.status) {
-                    case 200:   //not paid, show payment form without message
-                        break;
-                    case 201:   //paid
-                        setMessage(resMessage)
-                        throw new Error();
-                    case 202:   //multiple paid
-                        setError(resMessage)
-                        throw new Error();
-                    default:
-                        setError("undefined error")
-                        throw new Error();
-                }
-                
-            } catch (err) {
-                // order not found
-                const { message: resMessage } = err.response.data;
-                setError(resMessage);
+            if (!token) {
+                setError("Please log in")
+                Navigate('/login')
                 throw new Error();
+            } else {
+                try {
+                    const response = await axios.post(`${url}/api/purchases/checkPaymentStatus/${purchase_id}`);
+                    const { message: resMessage } = response.data;
+                    switch (response.status) {
+                        case 200:   //not paid, show payment form without message
+                            break;
+                        case 201:   //paid
+                            setMessage(resMessage)
+                            throw new Error();
+                        case 202:   //multiple paid
+                            setError(resMessage)
+                            throw new Error();
+                        default:
+                            setError("undefined error")
+                            throw new Error();
+                    }
+                    
+                } catch (err) {
+                    // order not found
+                    const { message: resMessage } = err.response.data;
+                    setError(resMessage);
+                    throw new Error();
+                }
             }
+            
         }
 
         //apply payment

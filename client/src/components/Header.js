@@ -40,7 +40,6 @@ function HeaderComponent() {
 
   return (
     <header className="bg-white">
-      {token ? (<div>logged in</div>) : (<div>logged out</div>) }
       <nav
         className="mx-auto flex w-full items-center justify-between p-6 lg:px-8"
         aria-label="Global"

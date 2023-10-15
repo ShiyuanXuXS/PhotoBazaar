@@ -89,3 +89,27 @@ Shiyuan
 
 
 
+2023/10/13
+Shiyuan
+1. Done
+- Choose stripe to implement payment
+- checkout form
+2. To do
+- Payment data storage, retrieve and update
+
+
+
+
+
+2023/10/14
+Shiyuan
+1. Done
+- payment form
+    - retrieve payment status
+    - update is_paid if payment status is succeded
+    - notice user payment status if something wrong
+    - apply payment intent and finish payment with checkout form if payment available
+    - payment with stripe
+2. To do
+- test payment function with a payment page
+- renew header to show different menu based on login status and role

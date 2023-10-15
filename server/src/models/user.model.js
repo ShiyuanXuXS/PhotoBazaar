@@ -33,10 +33,14 @@ const userSchema = new Schema({
     type: String,
     required: false,
   },
-  my_assets: {
-    type: Array,
-    required: false,
-  },
+  my_assets: [
+    {
+      arkwork_id: {
+        type: String,
+        required: false,
+      },
+    },
+  ],
 });
 
 const User = mongoose.model("User", userSchema);

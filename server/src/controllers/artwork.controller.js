@@ -69,6 +69,23 @@ module.exports = {
                 });
             });
     },
+    findArtworkByAuthorId: async (req, res) => {
+        const author_id = req.params.id;
+        Artwork.find({ author_id: author_id })
+            .then((result) => {
+                if (result) {
+                    res.send(result).status(200);
+                } else {
+                    res.status(404).send({ message: "error from artwork controller: No such product found" });
+                }
+            })
+            .catch((err) => {
+                res.status(400).json({
+                    message: "error from artwork controller",
+                    err
+                });
+            });
+    },
     // FIXME, if artwork is sold, can't delete by user
     deleteArtworkById: async (req, res) => {
         const artwork_id = req.params.id;

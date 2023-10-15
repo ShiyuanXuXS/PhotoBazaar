@@ -182,10 +182,25 @@ function AddArtworkComponent(props) {
                             }).then((response) => {
                                 console.log(response);
                                 alert("Artwork saved successfully!");
-                                Navigate(`/artwork/${userId}`);
+                                // Navigate(`/artwork/${userId}`);
                                 // window.location.reload();
-                                // add tag count
+
                                 // add artwork_id to user
+                                console.log(response.data._id);
+                                const my_assets = [{ "artwork_id": response.data._id }];
+                                console.log(my_assets);
+                                Axios.patch(`http://localhost:3001/api/users/my_assets/${userId}`, {
+                                    my_assets: my_assets,
+                                }).then((response) => {
+                                    console.log(response);
+                                })
+                                    .catch((error) => {
+                                        console.error(error);
+                                    });
+
+                                // add tag count
+
+
                             })
                                 .catch((error) => {
                                     console.error(error);

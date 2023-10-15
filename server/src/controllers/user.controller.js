@@ -5,8 +5,8 @@ const { sign, verify } = require("jsonwebtoken");
 const mailgun = require("mailgun.js");
 const formdata = require("form-data");
 const dotenv = require("dotenv");
-dotenv.config()
-const secretKey = process.env.SECRET_KEY || 'importantsecret';
+dotenv.config();
+const secretKey = process.env.SECRET_KEY || "importantsecret";
 // const { isAuth, isAdmin, generateToken, baseUrl } = require("../utils.js");
 
 module.exports = {
@@ -210,7 +210,8 @@ module.exports = {
       // generate a token and pass the front-end
       const accessToken = sign(
         { username: existingUser.username, id: existingUser._id },
-        "importantsecret", { expiresIn: "1d" }
+        "importantsecret",
+        { expiresIn: "1d" }
       );
       res.status(201).json({
         message: `You are loggin in as ${existingUser.username}.`,
@@ -258,10 +259,44 @@ module.exports = {
     console.log(user);
     const my_assets = user.my_assets;
     console.log(my_assets);
+  },
 
+  //send change password email from mailgun
+  forgotPassword: async (req, res) => {
+    // const user = User.findOne({ email: req.body.forgotemail });
+    await User.findOne({ email: req.body.forgotemail }).then((result) => {
+      if (result) {
+        console.log("inside user controller forgotpw findone:" + result.email);
+        // console.log(`${process.env.baseUrl}/changepassword/${req.body.token}`);
+        //fix me: change to env variable
+        console.log(
+          `http://localhost:3000/changepassword/${req.body.forgotemail}`
+        );
+        // console.log(`${user.email}`);
+      } else {
+        res.status(404).send({
+          message: "error from user controller: No such user email found",
+        });
+      }
+    });
 
-  }
+    // console.log("inside user controller userfindone:" + user.email);
 
+    // if (user) {
+    //   const token = sign({ _id: user._id }, process.env.JWT_SECRET, {
+    //     expiresIn: "3h",
+    //   });
+    // user.resetToken = token;
+    // console.log("inside user controller forgotpassword:" + user.resettoken);
+
+    // await user.save();
+    //reset link
+    //   console.log(`${process.env.baseUrl}/changepassword/${token}`);
+    //   console.log(`${user.email}`);
+    // } else {
+    //   res.status(404).send({ message: "User not found" });
+    // }
+  },
 };
 
 //register validation

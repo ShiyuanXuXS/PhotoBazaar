@@ -27,9 +27,11 @@ router.delete("/:email", userController.deleteUserByEmail);
 router.post("/auth", userController.authUser);
 
 // Update a user password with email
-router.put("/:email", userController.updateUserByEmail);  // should be patch?
+router.put("/:email", userController.updateUserByEmail); // should be patch?
 
 // Update my_assets with user id
 router.patch("/my_assets/:id", userController.updateMyAssetsById);
 
+// forgot password and send mailgun
+router.post("/forgotpassword/", userController.forgotPassword);
 module.exports = router;

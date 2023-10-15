@@ -210,7 +210,7 @@ module.exports = {
       // generate a token and pass the front-end
       const accessToken = sign(
         { username: existingUser.username, id: existingUser._id },
-        "importantsecret", { expiresIn: "1d" }
+        secretKey, { expiresIn: "1d" }
       );
       res.status(201).json({
         message: `You are loggin in as ${existingUser.username}.`,
@@ -228,22 +228,27 @@ module.exports = {
     }
   },
 
+  //decode token and return user's information
   validateToken: async (req, res) => {
     const accessToken = req.header("accessToken");
 
     if (!accessToken) {
-      return res.json({ error: "User not logged In!" });
+      return res.status(400).json({ error: "User not logged In!" });
     }
 
     try {
       const validToken = verify(accessToken, secretKey);
-      req.user = validToken;
-      if (validToken) {
-        // return next();
-        res.json(req.user);
+      // req.user = validToken;
+      if (validToken && validToken.id) {
+        const user = await User.findOne({ _id: validToken.id });
+        console.log(user)
+        res.status(200).json({
+          token: accessToken,
+          user:{id: user.id, username: user.username, role: user.role, nickname: user.nickname}
+        });
       }
     } catch (err) {
-      res.json({ error: err });
+      res.status(500).json({ error: "User not found" });
     }
   },
 

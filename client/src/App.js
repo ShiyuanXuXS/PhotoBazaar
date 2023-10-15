@@ -57,7 +57,7 @@ function App() {
       <div className="page-container">
         {/* <AuthContext.Provider value={{ authStatus, setAuthStatus }}> */}
         <Router>
-          <HeaderComponent />
+          {/* <HeaderComponent /> */}
           <Routes>
             <Route path="/Login" element={<Login />} />
             <Route path="/" element={<Home />} />
@@ -71,7 +71,7 @@ function App() {
             <Route path="/artwork/:userId" element={<MyArtwork />} />
 
           </Routes>
-          <FooterComponent />
+          {/* <FooterComponent /> */}
         </Router>
         {/* </AuthContext.Provider> */}
       </div>

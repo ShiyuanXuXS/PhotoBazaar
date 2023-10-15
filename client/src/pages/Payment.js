@@ -3,6 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import { loadStripe } from "@stripe/stripe-js";
 import { Elements } from "@stripe/react-stripe-js";
 import axios from "axios";
+import Header from '../components/Header';
+import Footer from '../components/Footer';
 
 import CheckoutForm from "../components/CheckoutForm";
 console.log(process.env);
@@ -102,6 +104,7 @@ function Payment() {
 
     return (
         <div className="Payment">
+            <Header/>
             {error &&
                 (
                     <div className="error-message h-96 flex flex-col items-center justify-center bg-white text-2xl font-medium">
@@ -136,6 +139,7 @@ function Payment() {
                     </Elements>
             )
             }
+            <Footer/>
         </div>
     );
 }

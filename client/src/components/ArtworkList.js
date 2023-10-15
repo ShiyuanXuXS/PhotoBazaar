@@ -7,21 +7,20 @@ function ArtworkListComponent({ userId }) {
     const [artworkList, setArtworkList] = useState([]);
     const [tagList, setTagList] = useState([]);
     const navigate = useNavigate();
-    const [arworkIds, setArtworkIds] = useState([]);
-
-    console.log("user id is:" + userId);
 
     useEffect(() => {
         if (userId !== null && userId !== undefined) {
             // If userId is not null, fetch data for a specific user
             // get artwork_id from user_id
-            // Axios.get(`http://localhost:3001/api/artworks/${userId}`)
-            //     .then((response) => {
-            //         setArtworkList(response.data);
-            //     })
-            //     .catch((error) => {
-            //         console.error(error);
-            //     });
+            Axios.get(`http://localhost:3001/api/artworks/author/${userId}`)
+                .then((response) => {
+                    console.log(userId);
+                    console.log(response.data);
+                    setArtworkList(response.data);
+                })
+                .catch((error) => {
+                    console.error(error);
+                });
         } else {
             // If userId is null, fetch data for all users
             Axios.get("http://localhost:3001/api/artworks")
@@ -42,6 +41,7 @@ function ArtworkListComponent({ userId }) {
                 console.error(error);
             });
     }, [userId]);
+    console.log(artworkList);
 
     return (
         <>
@@ -52,7 +52,7 @@ function ArtworkListComponent({ userId }) {
                     </svg>
                     <div className="text-2xl font-bold subpixel-antialiased capitalize">New Artwork</div>
                 </button>
-                {artworkList.map((artwork, index) => (
+                {artworkList.length > 0 ? (<>{artworkList.map((artwork, index) => (
                     <div key={index} className="border-4 w-96 h-100 m-5 flex flex-col justify-between rounded-lg w-1/4">
                         <img src={artwork.cover_url} className="mx-auto my-auto w-90 h-60" alt="Artwork" />
                         <div className="ml-4">
@@ -132,7 +132,7 @@ function ArtworkListComponent({ userId }) {
                             </div>
                         </div>
                     </div>
-                ))}
+                ))}</>) : (<p>You don't have any artworks!</p>)}
             </div>
         </>
     )

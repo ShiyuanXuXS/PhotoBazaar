@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import io from 'socket.io-client';
 import axios from 'axios';
 import { IoIosNotificationsOutline  } from 'react-icons/io';
+import Header from '../components/Header';
+import Footer from '../components/Footer';
 
 function Message() {
     const [userList, setUserList] = useState([]);//users to chat with 
@@ -153,6 +155,7 @@ function Message() {
     }
     return (
         <div>
+            <Header/>
             <div className="bg-gray-100 h-screen p-4 flex flex-col md:flex-row justify-center items-center">
                 <div>
                     {currentUser === 'user1' && (<p>user1</p>)}
@@ -261,6 +264,7 @@ function Message() {
                     </div>
                 )}
             </div>
+            <Footer/>
         </div>
     );
 }

@@ -1,7 +1,12 @@
 import React from "react";
-
+import Header from '../components/Header';
+import Footer from '../components/Footer';
 function Home() {
-  return <div>This is homepage!</div>;
+  return <div>
+    <Header/>
+    This is homepage!
+    <Footer/>
+  </div>;
 }
 
 export default Home;

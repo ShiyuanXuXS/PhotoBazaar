@@ -210,16 +210,11 @@ module.exports = {
       // generate a token and pass the front-end
       const accessToken = sign(
         { username: existingUser.username, id: existingUser._id },
-        "importantsecret",
-        { expiresIn: "1d" }
+        secretKey, { expiresIn: "1d" }
       );
       res.status(201).json({
         message: `You are loggin in as ${existingUser.username}.`,
         token: accessToken,
-        username: existingUser.username,
-        _id: existingUser._id,
-        email: existingUser.email,
-        role: existingUser.role,
       });
     } catch (error) {
       console.log(error);
@@ -229,58 +224,68 @@ module.exports = {
     }
   },
 
+  //decode token and return user's information
   validateToken: async (req, res) => {
     const accessToken = req.header("accessToken");
 
     if (!accessToken) {
-      return res.json({ error: "User not logged In!" });
+      return res.status(400).json({ error: "User not logged In!" });
     }
 
     try {
       const validToken = verify(accessToken, secretKey);
-      req.user = validToken;
-      if (validToken) {
-        // return next();
-        res.json(req.user);
+      // req.user = validToken;
+      if (validToken && validToken.id) {
+        const user = await User.findOne({ _id: validToken.id });
+        console.log(user)
+        res.status(200).json({
+          token: accessToken,
+          user: { id: user.id, username: user.username, role: user.role, nickname: user.nickname }
+        });
       }
     } catch (err) {
-      res.json({ error: err });
+      res.status(500).json({ error: "User not found" });
     }
   },
 
   //Todo: retrive artwork_id list from user_id
   // crud artwork_id list
   updateMyAssetsById: async (req, res) => {
-    const user_id = req.params._id;
-    const update = req.body;
-    console.log(update);
+    const user_id = req.params.id; // Corrected parameter name from _id to id
+    const update = req.body.my_assets;
+    // const update =
+    //   [{ "arkwork_id": "6529b5d22ae3b64352fb739d" }];
 
-    const user = await User.findOne({ _id: user_id });
-    console.log(user);
-    const my_assets = user.my_assets;
-    console.log(my_assets);
-  },
+    try {
+      const user = await User.findOne({ _id: user_id });
 
-  //send change password email from mailgun
-  forgotPassword: async (req, res) => {
-    // const user = User.findOne({ email: req.body.forgotemail });
-    await User.findOne({ email: req.body.forgotemail }).then((result) => {
-      if (result) {
-        console.log("inside user controller forgotpw findone:" + result.email);
-        // console.log(`${process.env.baseUrl}/changepassword/${req.body.token}`);
-        //fix me: change to env variable
-        console.log(
-          `http://localhost:3000/changepassword/${req.body.forgotemail}`
-        );
-        // console.log(`${user.email}`);
+      if (user) {
+        if (user.my_assets === null) {
+          user.my_assets = [update]; // Wrap update in an array
+        } else {
+          console.log("======");
+          console.log(update);
+          console.log(user.my_assets);
+          user.my_assets = [...user.my_assets, ...update.my_assets];
+          // user.my_assets.push(...update);
+          console.log(user.my_assets);
+        }
+
+        // Save the updated user
+        // const updatedUser = await user.save();
+        res.status(200).send(updatedUser);
       } else {
         res.status(404).send({
-          message: "error from user controller: No such user email found",
+          message: "Error from user controller: No such user found",
         });
       }
-    });
-
-    // console.log("inside user controller userfindone:" + user.email);
+    }
+    catch (error) {
+      res.status(500).send({
+        message: "Error from user controller: An error occurred",
+      });
+    }
+  }
 
     // if (user) {
     //   const token = sign({ _id: user._id }, process.env.JWT_SECRET, {

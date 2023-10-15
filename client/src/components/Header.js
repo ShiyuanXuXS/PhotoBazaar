@@ -1,39 +1,34 @@
-import React, { useContext, useState, useRef, useEffect } from "react";
-import { useNavigate, Link } from "react-router-dom";
+import React, { useState, useRef, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { Transition } from "@headlessui/react";
-import { AuthContext } from "../Helpers/AuthContext";
-// import { set } from "mongoose";
+import axios from 'axios';
+
 
 function HeaderComponent() {
-  const { loginStatus, role, userId, setRole, setUserId, setLoginStatus } =
-    useContext(AuthContext);
-  const isAdmin = role.includes("admin");
-  // const { setAuthStatus, authStatus } = useContext(AuthContext);
-  const [show, setShow] = useState(false);
+  const url = process.env.REACT_APP_API_URL;
   const Navigate = useNavigate();
   const myRef = useRef(null);
-
-  const navigateToHome = () => {
-    Navigate("/");
-  };
-
-  const navigateToLogin = () => {
-    Navigate("/login");
-  };
-
-  const navigateToRegister = () => {
-    Navigate("/register");
-  };
-
   const [isOpen, setIsOpen] = useState(false);
 
+  // const [token, setToken] = useToken();
+  const [token, setToken] = useState(localStorage.getItem('accessToken'))
+  const [user, setUser] = useState(null);
+
+  useEffect(() => {
+    if (token) {
+      axios.get(`${url}/api/users/auth`, { headers: { accessToken: token } })
+        .then(response => {
+          setToken(response.data.token);
+          setUser(response.data.user)
+        }).catch(() => {
+          localStorage.removeItem('token');
+        });
+    }
+  }, []);
+
   const handleLogout = () => {
-    // Your logout logic here
     localStorage.removeItem("accessToken");
-    setLoginStatus(false);
-    setRole("");
-    setUserId("");
-    Navigate("/");
+    Navigate("/login");
   };
 
   return (
@@ -43,25 +38,25 @@ function HeaderComponent() {
         aria-label="Global"
       >
         <div className="flex lg:flex-1">
-          <button onClick={navigateToHome} className="-m-1.5 p-1.5">
+          <button onClick={() => Navigate("/")} className="-m-1.5 p-1.5">
             <span className="sr-only">Photobazarr</span>
             <img className="h-8 w-auto" src="./logo2.png" alt="photobazarr" />
           </button>
         </div>
         {/* shows up when user haven't login in or sign up */}
-        {!loginStatus && (
+        {!user && (
           <>
             <div className="lg:flex lg:flex-1 lg:justify-end">
               <button
                 href="#"
                 className="text-sm font-semibold leading-6 text-gray-900"
-                onClick={navigateToLogin}
+                onClick={() => Navigate("/login")}
               >
                 Sign in <span aria-hidden="true"></span>
               </button>
               <button
                 className="mx-3 text-sm bg-sky-500 font-semibold rounded-lg px-2 py-1.5 text-base leading-6 text-white hover:bg-sky-600"
-                onClick={navigateToRegister}
+                onClick={() => Navigate("/register")}
               >
                 Join Us
               </button>
@@ -69,23 +64,30 @@ function HeaderComponent() {
           </>
         )}
         {/* shows up when user have loged in */}
-        {loginStatus && (
+        {user && (
           <>
             <div className="lg:flex lg:flex-1 lg:justify-end mx-3">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                strokeWidth="1.5"
-                stroke="currentColor"
-                className="w-6 h-6"
+              <button
+                className="block flex items-center px-1 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900"
+                role="menuitem"
+                onClick={() => { setIsOpen(false); Navigate(`/message`) }}
               >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M8.625 12a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H8.25m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H12m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0h-.375M21 12c0 4.556-4.03 8.25-9 8.25a9.764 9.764 0 01-2.555-.337A5.972 5.972 0 015.41 20.97a5.969 5.969 0 01-.474-.065 4.48 4.48 0 00.978-2.025c.09-.457-.133-.901-.467-1.226C3.93 16.178 3 14.189 3 12c0-4.556 4.03-8.25 9-8.25s9 3.694 9 8.25z"
-                />
-              </svg>
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  strokeWidth="1.5"
+                  stroke="currentColor"
+                  className="w-6 h-6"
+
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M8.625 12a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H8.25m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H12m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0h-.375M21 12c0 4.556-4.03 8.25-9 8.25a9.764 9.764 0 01-2.555-.337A5.972 5.972 0 015.41 20.97a5.969 5.969 0 01-.474-.065 4.48 4.48 0 00.978-2.025c.09-.457-.133-.901-.467-1.226C3.93 16.178 3 14.189 3 12c0-4.556 4.03-8.25 9-8.25s9 3.694 9 8.25z"
+                  />
+                </svg>
+              </button>
             </div>
             <div className="relative inline-block text-left">
               <img
@@ -119,7 +121,7 @@ function HeaderComponent() {
                           role="menuitem"
                           onClick={() => {
                             setIsOpen(false); // Close the dropdown
-                            Navigate(`/profile/${userId}`);
+                            Navigate(`/profile/${user.id}`);
                           }}
                         >
                           <svg
@@ -147,7 +149,7 @@ function HeaderComponent() {
                         <button
                           className="block flex items-center px-1 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900"
                           role="menuitem"
-                          onClick={() => { setIsOpen(false); Navigate(`/artwork/${userId}`) }}
+                          onClick={() => { setIsOpen(false); Navigate(`/artwork/${user.id}`) }}
                         >
                           <svg
                             xmlns="http://www.w3.org/2000/svg"
@@ -192,7 +194,7 @@ function HeaderComponent() {
                           Cart
                         </button>
                       </div>
-                      {isAdmin ? (
+                      {(user && user.role && user.role === "admin") && (
                         <>
                           <div className="mx-3 flex items-center">
                             <button
@@ -219,8 +221,6 @@ function HeaderComponent() {
                             </button>
                           </div>
                         </>
-                      ) : (
-                        <> </>
                       )}
                     </div>
                     <div className="mx-3 flex items-center">

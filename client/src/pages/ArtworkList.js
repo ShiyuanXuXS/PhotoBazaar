@@ -1,11 +1,17 @@
 import React from 'react';
 import ArtworkListComponent from '../components/ArtworkList';
+import HeaderComponent from "../components/Header";
+import FooterComponent from "../components/Footer";
 
 
 function ArtworkList() {
 
     return (
-        <ArtworkListComponent />
+        <>
+            <HeaderComponent />
+            <ArtworkListComponent />
+            <FooterComponent />
+        </>
 
     )
 }

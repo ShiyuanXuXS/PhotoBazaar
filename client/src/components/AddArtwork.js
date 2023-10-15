@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useContext, } from 'react';
 import Axios from 'axios';
-import { AuthContext } from "../Helpers/AuthContext";
 import * as Yup from "yup";
 import UploadImagesBoxComponent from './UploadImagesBox';
 import {
@@ -8,7 +7,6 @@ import {
     DeleteObjectCommand,
     PutObjectCommand,
 } from "@aws-sdk/client-s3";
-import { useNavigate } from 'react-router-dom';
 // window.Buffer = window.Buffer || require("buffer").Buffer;
 
 //S3 config
@@ -25,13 +23,26 @@ const config = {
 const client = new S3Client(config);
 
 function AddArtworkComponent(props) {
+    const url = process.env.REACT_APP_API_URL;
     const [tagList, setTagList] = useState([]);
     const [tagArray, setTagArray] = useState([]);
     const tags = tagArray.map(data => ({ tag_id: data }));
-    const Navigate = useNavigate();
+    const [token, setToken] = useState(localStorage.getItem('accessToken'))
+    const [user, setUser] = useState(null);
 
+    useEffect(() => {
+        if (token) {
+            Axios.get(`${url}/api/users/auth`, { headers: { accessToken: token } })
+                .then(response => {
+                    setToken(response.data.token);
+                    setUser(response.data.user)
+                }).catch(() => {
+                    localStorage.removeItem('token');
+                });
+        }
+    }, []);
 
-    const { userId } = useContext(AuthContext);
+    const userId = user.id;
 
     const [imagesBoxes, setImagesBoxes] = useState([{
         index: 1,
@@ -182,10 +193,25 @@ function AddArtworkComponent(props) {
                             }).then((response) => {
                                 console.log(response);
                                 alert("Artwork saved successfully!");
-                                Navigate(`/artwork/${userId}`);
+                                // Navigate(`/artwork/${userId}`);
                                 // window.location.reload();
-                                // add tag count
+
                                 // add artwork_id to user
+                                console.log(response.data._id);
+                                const my_assets = [{ "artwork_id": response.data._id }];
+                                console.log(my_assets);
+                                Axios.patch(`http://localhost:3001/api/users/my_assets/${userId}`, {
+                                    my_assets: my_assets,
+                                }).then((response) => {
+                                    console.log(response);
+                                })
+                                    .catch((error) => {
+                                        console.error(error);
+                                    });
+
+                                // add tag count
+
+
                             })
                                 .catch((error) => {
                                     console.error(error);

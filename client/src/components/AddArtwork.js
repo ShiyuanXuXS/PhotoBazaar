@@ -32,7 +32,7 @@ function AddArtworkComponent(props) {
 
     useEffect(() => {
         if (token) {
-            Axios.get(`${url}/api/users/auth`, { headers: { accessToken: token } })
+            Axios.get(`http://localhost:3001/api/users/auth`, { headers: { accessToken: token } })
                 .then(response => {
                     setToken(response.data.token);
                     setUser(response.data.user)
@@ -41,8 +41,6 @@ function AddArtworkComponent(props) {
                 });
         }
     }, []);
-
-    const userId = user.id;
 
     const [imagesBoxes, setImagesBoxes] = useState([{
         index: 1,
@@ -140,7 +138,7 @@ function AddArtworkComponent(props) {
                     const date = new Date();
                     for (const data of uploadImg) {
                         const timestamp = date.getTime();
-                        const newFileName = `${timestamp}_${userId}.${data.file.name.split(".").pop()}`; //TODO: replace user1_id with user id
+                        const newFileName = `${timestamp}_${user.id}.${data.file.name.split(".").pop()}`; //TODO: replace user1_id with user id
 
                         const params = {
                             Bucket: config.bucketName,
@@ -183,7 +181,7 @@ function AddArtworkComponent(props) {
 
                             // save artwork to database
                             Axios.post("http://localhost:3001/api/artworks", {
-                                author_id: userId,
+                                author_id: user.id,
                                 title: title,
                                 description: description,
                                 price: parseFloat(price),
@@ -200,14 +198,14 @@ function AddArtworkComponent(props) {
                                 console.log(response.data._id);
                                 const my_assets = [{ "artwork_id": response.data._id }];
                                 console.log(my_assets);
-                                Axios.patch(`http://localhost:3001/api/users/my_assets/${userId}`, {
-                                    my_assets: my_assets,
-                                }).then((response) => {
-                                    console.log(response);
-                                })
-                                    .catch((error) => {
-                                        console.error(error);
-                                    });
+                                // Axios.patch(`http://localhost:3001/api/users/my_assets/${userId}`, {
+                                //     my_assets: my_assets,
+                                // }).then((response) => {
+                                //     console.log(response);
+                                // })
+                                //     .catch((error) => {
+                                //         console.error(error);
+                                //     });
 
                                 // add tag count
 

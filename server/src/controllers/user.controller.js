@@ -4,6 +4,9 @@ const bcrypt = require("bcrypt");
 const { sign, verify } = require("jsonwebtoken");
 const mailgun = require("mailgun.js");
 const formdata = require("form-data");
+const dotenv = require("dotenv");
+dotenv.config()
+const secretKey = process.env.SECRET_KEY || 'importantsecret';
 // const { isAuth, isAdmin, generateToken, baseUrl } = require("../utils.js");
 
 module.exports = {
@@ -233,7 +236,7 @@ module.exports = {
     }
 
     try {
-      const validToken = verify(accessToken, "importantsecret");
+      const validToken = verify(accessToken, secretKey);
       req.user = validToken;
       if (validToken) {
         // return next();

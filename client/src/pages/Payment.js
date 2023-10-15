@@ -29,7 +29,13 @@ function Payment() {
                 throw new Error();
             } else {
                 try {
-                    const response = await axios.post(`${url}/api/purchases/checkPaymentStatus/${purchase_id}`);
+                    const response = await axios.post(
+                        `${url}/api/purchases/checkPaymentStatus/${purchase_id}`,
+                        null,
+                        {
+                        headers: { Authorization: `Bearer ${token}` }
+                        }
+                    );
                     const { message: resMessage } = response.data;
                     switch (response.status) {
                         case 200:   //not paid, show payment form without message

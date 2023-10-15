@@ -215,10 +215,6 @@ module.exports = {
       res.status(201).json({
         message: `You are loggin in as ${existingUser.username}.`,
         token: accessToken,
-        username: existingUser.username,
-        _id: existingUser._id,
-        email: existingUser.email,
-        role: existingUser.role,
       });
     } catch (error) {
       console.log(error);
@@ -244,7 +240,7 @@ module.exports = {
         console.log(user)
         res.status(200).json({
           token: accessToken,
-          user:{id: user.id, username: user.username, role: user.role, nickname: user.nickname}
+          user: { id: user.id, username: user.username, role: user.role, nickname: user.nickname }
         });
       }
     } catch (err) {

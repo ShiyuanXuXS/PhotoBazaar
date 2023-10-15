@@ -7,7 +7,6 @@ function ArtworkListComponent({ userId }) {
     const [artworkList, setArtworkList] = useState([]);
     const [tagList, setTagList] = useState([]);
     const navigate = useNavigate();
-    const [arworkIds, setArtworkIds] = useState([]);
 
     useEffect(() => {
         if (userId !== null && userId !== undefined) {

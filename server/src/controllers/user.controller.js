@@ -210,7 +210,8 @@ module.exports = {
       // generate a token and pass the front-end
       const accessToken = sign(
         { username: existingUser.username, id: existingUser._id },
-        secretKey, { expiresIn: "1d" }
+        secretKey,
+        { expiresIn: "1d" }
       );
       res.status(201).json({
         message: `You are loggin in as ${existingUser.username}.`,
@@ -237,10 +238,15 @@ module.exports = {
       // req.user = validToken;
       if (validToken && validToken.id) {
         const user = await User.findOne({ _id: validToken.id });
-        console.log(user)
+        console.log(user);
         res.status(200).json({
           token: accessToken,
-          user: { id: user.id, username: user.username, role: user.role, nickname: user.nickname }
+          user: {
+            id: user.id,
+            username: user.username,
+            role: user.role,
+            nickname: user.nickname,
+          },
         });
       }
     } catch (err) {
@@ -279,13 +285,36 @@ module.exports = {
           message: "Error from user controller: No such user found",
         });
       }
-    }
-    catch (error) {
+    } catch (error) {
       res.status(500).send({
         message: "Error from user controller: An error occurred",
       });
     }
-  }
+  },
+
+  forgotPassword: async (req, res) => {
+    console.log(
+      "inside user controller forgotpassword:" + req.body.forgotemail
+    );
+    // const user = await User.findOne({ email: req.body.resetemail });
+    // const user = User.findOne({ email: req.body.forgotemail });
+    User.findOne({ email: req.body.forgotemail }).then((result) => {
+      if (result) {
+        console.log("inside user controller forgotpw findone:" + result.email);
+        // console.log(`${process.env.baseUrl}/changepassword/${req.body.token}`);
+
+        console.log(
+          `${process.env.baseUrl}/changepassword/${req.body.forgotemail}`
+        );
+        // console.log(`${user.email}`);
+      } else {
+        res.status(404).send({
+          message: "error from user controller: No such user email found",
+        });
+      }
+    });
+
+    // console.log("inside user controller userfindone:" + user.email);
 
     // if (user) {
     //   const token = sign({ _id: user._id }, process.env.JWT_SECRET, {
@@ -302,6 +331,21 @@ module.exports = {
     //   res.status(404).send({ message: "User not found" });
     // }
   },
+
+  // if (user) {
+  //   const token = sign({ _id: user._id }, process.env.JWT_SECRET, {
+  //     expiresIn: "3h",
+  //   });
+  // user.resetToken = token;
+  // console.log("inside user controller forgotpassword:" + user.resettoken);
+
+  // await user.save();
+  //reset link
+  //   console.log(`${process.env.baseUrl}/changepassword/${token}`);
+  //   console.log(`${user.email}`);
+  // } else {
+  //   res.status(404).send({ message: "User not found" });
+  // }
 };
 
 //register validation

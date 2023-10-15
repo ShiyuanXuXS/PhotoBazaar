@@ -7,7 +7,6 @@ import Home from "./pages/Home";
 import AddArtwork from "./pages/AddArtwork";
 import Message from "./pages/Message";
 import Payment from "./pages/Payment";
-import ChangePwd from "./pages/ChangePwd";
 import { AuthProvider } from "./Helpers/AuthContext";
 
 //fix me: footer cover the register button

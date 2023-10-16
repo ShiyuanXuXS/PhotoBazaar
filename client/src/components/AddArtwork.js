@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext, } from 'react';
+import React, { useState, useEffect } from 'react';
 import Axios from 'axios';
 import * as Yup from "yup";
 import UploadImagesBoxComponent from './UploadImagesBox';
@@ -123,7 +123,6 @@ function AddArtworkComponent(props) {
 
     const saveImage = (img, flag) => {
         const date = new Date();
-        // const timestamp = date.getTime();
         var newFileName = "";
         if (flag == 0) {
             newFileName = `${date.getTime()}_${user.id}.cover.${img.file.name.split(".").pop()}`;

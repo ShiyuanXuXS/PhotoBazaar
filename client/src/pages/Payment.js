@@ -1,22 +1,5 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from 'react-router-dom';
-<<<<<<< Updated upstream
-import axios from "axios";
-import Header from '../components/Header';
-import Footer from '../components/Footer';
-import PayForm from '../components/PayForm'
-
-
-function Payment() {
-    const purchase_id="652226c2f905b8dea4f77130"
-    
-
-    return (
-        <div className="Payment">
-            <Header/>
-            <PayForm purchase_id={purchase_id}/>
-            <Footer/>
-=======
 import { loadStripe } from "@stripe/stripe-js";
 import { Elements } from "@stripe/react-stripe-js";
 import axios from "axios";
@@ -29,7 +12,7 @@ const stripeKey = process.env.REACT_APP_STRIPE_API_KEY;
 const stripePromise = loadStripe(stripeKey);
 
 function Payment() {
-    const purchase_id="652226c2f905b8dea4f77130"
+    const purchase_id = "652226c2f905b8dea4f77130"
     const [message, setMessage] = useState("");
     const [error, setError] = useState("");
     const [clientSecret, setClientSecret] = useState("");
@@ -37,7 +20,7 @@ function Payment() {
     const Navigate = useNavigate();
     useEffect(() => {
         //todo: check if is_paid
-        
+
         const checkPaymentStatus = async () => {
             try {
                 const response = await axios.post(`${url}/api/purchases/checkPaymentStatus/${purchase_id}`);
@@ -55,7 +38,7 @@ function Payment() {
                         setError("undefined error")
                         throw new Error();
                 }
-                
+
             } catch (err) {
                 // order not found
                 const { message: resMessage } = err.response.data;
@@ -71,7 +54,7 @@ function Payment() {
             } catch (err) {
                 return;
             }
-            
+
             // not paid(no message or error), apply payment intent
             try {
                 const response = await axios.post(url + "/api/purchases/create-payment-intent", {
@@ -79,7 +62,7 @@ function Payment() {
                 }, {
                     headers: { "Content-Type": "application/json" }
                 });
-    
+
                 const data = response.data;
                 setClientSecret(data.clientSecret);
             } catch (err) {
@@ -87,15 +70,15 @@ function Payment() {
                 setError(resMessage)
             }
         };
-        
+
         fetchClientSecret();
-        
+
     }, []);
 
     const appearance = {
         theme: 'stripe',
         variables: {
-        colorPrimary: '#9ee656',
+            colorPrimary: '#9ee656',
         },
     };
     const options = {
@@ -134,12 +117,11 @@ function Payment() {
                     </div>
                 )}
             {!error && !message && clientSecret && (
-                    <Elements options={options} stripe={stripePromise}>
-                        <CheckoutForm />
-                    </Elements>
+                <Elements options={options} stripe={stripePromise}>
+                    <CheckoutForm />
+                </Elements>
             )
             }
->>>>>>> Stashed changes
         </div>
     );
 }

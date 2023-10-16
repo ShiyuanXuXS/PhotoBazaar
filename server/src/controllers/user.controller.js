@@ -233,7 +233,6 @@ module.exports = {
 
 
   // crud artwork_id list
-<<<<<<< Updated upstream
   updateMyAssetsById: async (req, res) => {
     const user_id = req.params.id; // Corrected parameter name from _id to id
     const update = [{ "arkwork_id": req.body.my_assets }];
@@ -378,8 +377,6 @@ module.exports = {
   // } else {
   //   res.status(404).send({ message: "User not found" });
   // }
-=======
->>>>>>> Stashed changes
 };
 
 //register validation

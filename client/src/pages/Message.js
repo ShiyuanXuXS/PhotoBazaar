@@ -1,12 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import io from 'socket.io-client';
 import axios from 'axios';
-import { IoIosNotificationsOutline  } from 'react-icons/io';
-<<<<<<< Updated upstream
+import { IoIosNotificationsOutline } from 'react-icons/io';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
-=======
->>>>>>> Stashed changes
 
 function Message() {
     const url = process.env.REACT_APP_API_URL;
@@ -29,7 +26,7 @@ function Message() {
             if (token) {
                 axios.get(`${url}/api/users/auth`, { headers: { accessToken: token } })
                     .then(response => {
-                        const user=response.data.user
+                        const user = response.data.user
                         setCurrentUser(user)
 
                         axios.get(`${url}/api/messages`, {
@@ -41,7 +38,7 @@ function Message() {
                     }).catch((err) => {
                         console.log(err)
                     });
-                }
+            }
         } catch (error) {
             console.log(error)
         }
@@ -54,11 +51,11 @@ function Message() {
         const newSocket = io.connect(url);
         if (currentUser) {
             newSocket.on('connect', () => {
-            newSocket.emit('user_info',! { username: currentUser.username })
-            console.log(currentUser.username + ' Connected to server');
-        });
+                newSocket.emit('user_info', !{ username: currentUser.username })
+                console.log(currentUser.username + ' Connected to server');
+            });
         }
-        
+
 
         newSocket.on('connect_error', (error) => {
             console.error('Connection error:', error);
@@ -94,7 +91,7 @@ function Message() {
     const fetchUserList = async () => {
         setUserList([
             {
-                id:"id1",
+                id: "id1",
                 username: 'user1',
                 nickname: 'nickname1',
                 messages: [
@@ -104,7 +101,7 @@ function Message() {
                 hasMessageUnread: true
             },
             {
-                id:"id2",
+                id: "id2",
                 username: 'user2',
                 nickname: 'nickname2',
                 messages: [
@@ -113,8 +110,8 @@ function Message() {
                 ],
                 hasMessageUnread: true
             }])
-        
-        
+
+
     };
 
     const selectUser = (user) => {
@@ -189,15 +186,8 @@ function Message() {
     }
     return (
         <div>
-<<<<<<< HEAD
-<<<<<<< Updated upstream
-            <Header/>
-=======
->>>>>>> Stashed changes
-=======
             <Header />
             {currentUser && (currentUser.username)}
->>>>>>> 2c3fd82962054691f7af9a00051eea28576c25c5
             <div className="bg-gray-100 h-screen p-4 flex flex-col md:flex-row justify-center items-center">
                 {/* <div>
                     {currentUser === 'user1' && (<p>user1</p>)}
@@ -268,14 +258,14 @@ function Message() {
                                 <div
                                     key={index}
                                     className={`message mb-2 ${message.sender_username === currentUser.username
-                                            ? 'text-right'
-                                            : ''
+                                        ? 'text-right'
+                                        : ''
                                         }`}
                                 >
                                     <span
                                         className={`message-content inline-block p-1 rounded ${message.sender_username === currentUser.username
-                                                ? 'bg-green-500 text-black'
-                                                : 'bg-gray-200 text-black'
+                                            ? 'bg-green-500 text-black'
+                                            : 'bg-gray-200 text-black'
                                             }`}
                                     >
                                         {message.message}
@@ -296,20 +286,17 @@ function Message() {
                             </div>
                             <div className="mt-2">
                                 <button
-                                onClick={sendMessage}
-                                className="bg-blue-500 hover:bg-blue-600 text-white font-bold rounded px-4 py-2"
+                                    onClick={sendMessage}
+                                    className="bg-blue-500 hover:bg-blue-600 text-white font-bold rounded px-4 py-2"
                                 >
-                                Send
+                                    Send
                                 </button>
                             </div>
                         </div>
                     </div>
                 )}
             </div>
-<<<<<<< Updated upstream
-            <Footer/>
-=======
->>>>>>> Stashed changes
+            <Footer />
         </div>
     );
 }

@@ -9,16 +9,10 @@ function ArtworkListComponent({ userId }) {
     const navigate = useNavigate();
     const [arworkIds, setArtworkIds] = useState([]);
 
-<<<<<<< Updated upstream
-=======
-    console.log("user id is:" + userId);
-
->>>>>>> Stashed changes
     useEffect(() => {
         if (userId !== null && userId !== undefined) {
             // If userId is not null, fetch data for a specific user
             // get artwork_id from user_id
-<<<<<<< Updated upstream
             Axios.get(`http://localhost:3001/api/artworks/author/${userId}`)
                 .then((response) => {
                     console.log(userId);
@@ -28,15 +22,6 @@ function ArtworkListComponent({ userId }) {
                 .catch((error) => {
                     console.error(error);
                 });
-=======
-            // Axios.get(`http://localhost:3001/api/artworks/${userId}`)
-            //     .then((response) => {
-            //         setArtworkList(response.data);
-            //     })
-            //     .catch((error) => {
-            //         console.error(error);
-            //     });
->>>>>>> Stashed changes
         } else {
             // If userId is null, fetch data for all users
             Axios.get("http://localhost:3001/api/artworks")
@@ -57,10 +42,6 @@ function ArtworkListComponent({ userId }) {
                 console.error(error);
             });
     }, [userId]);
-<<<<<<< Updated upstream
-    console.log(artworkList);
-=======
->>>>>>> Stashed changes
 
     return (
         <>

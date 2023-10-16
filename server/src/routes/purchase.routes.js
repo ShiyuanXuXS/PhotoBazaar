@@ -4,10 +4,7 @@ const purchaseController = require('../controllers/purchase.controller');
 
 //create payment
 router.post('/create-payment-intent', purchaseController.createPaymentIntent);
-<<<<<<< Updated upstream
 //check payment status
-=======
->>>>>>> Stashed changes
 router.post('/checkPaymentStatus/:id', purchaseController.checkPaymentStatus);
 
 router.post('/', purchaseController.createPurchase);

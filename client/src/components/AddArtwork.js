@@ -9,10 +9,6 @@ import {
     PutObjectCommand,
 } from "@aws-sdk/client-s3";
 import { useNavigate } from 'react-router-dom';
-<<<<<<< HEAD
-=======
-
->>>>>>> 2c3fd82962054691f7af9a00051eea28576c25c5
 // window.Buffer = window.Buffer || require("buffer").Buffer;
 
 //S3 config
@@ -33,7 +29,6 @@ function AddArtworkComponent(props) {
     const [tagList, setTagList] = useState([]);
     const [tagArray, setTagArray] = useState([]);
     const tags = tagArray.map(data => ({ tag_id: data }));
-<<<<<<< Updated upstream
     const [token, setToken] = useState(localStorage.getItem('accessToken'))
     const [user, setUser] = useState(null);
     const navigate = useNavigate();
@@ -50,12 +45,6 @@ function AddArtworkComponent(props) {
                 });
         }
     }, []);
-=======
-    const Navigate = useNavigate();
-
-
-    const { userId } = useContext(AuthContext);
->>>>>>> Stashed changes
 
     const [imagesBoxes, setImagesBoxes] = useState([{
         index: 1,
@@ -169,29 +158,16 @@ function AddArtworkComponent(props) {
             .validate({ title, description, price }, { abortEarly: false })
             .then(() => {
                 //Validate Cover Image
-                const uploadPromises = [];
+                const uploadPromises = []; // Create an array to store promises for image uploads
                 if (uploadImg === null || uploadImg[0] === null ||
                     uploadImg[0] === undefined || uploadImg[0].file.size > 5000000) {
                     alert("Please select a file less than 5MB");
                     return;
                 } else {
                     console.log(uploadImg);
-                    // save cover image to s3 bucket
-                    // Create an array to store promises for image uploads
-<<<<<<< HEAD
-                    const uploadPromises = [];
-                    const date = new Date();
-                    for (const data of uploadImg) {
-                        const timestamp = date.getTime();
-<<<<<<< Updated upstream
-                        const newFileName = `${timestamp}_${user.id}.${data.file.name.split(".").pop()}`; //TODO: replace user1_id with user id
-=======
-                        const newFileName = `${timestamp}_${userId}.${data.file.name.split(".").pop()}`; //TODO: replace user1_id with user id
->>>>>>> Stashed changes
-=======
->>>>>>> 2c3fd82962054691f7af9a00051eea28576c25c5
-
+                    // save cover image to s3 bucket                   
                     uploadPromises.push(saveImage(uploadImg[0], 0));
+                    // save photos to s3 bucket
                     for (let i = 1; i < uploadImg.length; i++) {
                         uploadPromises.push(saveImage(uploadImg[i], 1));
                     }
@@ -199,14 +175,11 @@ function AddArtworkComponent(props) {
                 // Use Promise.all to wait for all image uploads to complete
                 Promise.all(uploadPromises)
                     .then((fileNames) => {
-                        // 'fileNames' will contain an array of successfully uploaded file names
-                        console.log("All images uploaded successfully.", fileNames);
-
+                        console.log("All images uploaded successfully.", fileNames); // 'fileNames' contain an array of successfully uploaded file names
                         // get photos data
                         const photos = [];
-                        const photoFileNames = fileNames.filter((fileName) => fileName.includes("photo"));
+                        const photoFileNames = fileNames.filter((fileName) => fileName.includes("photo")); // exclude cover image
                         for (let i = 1; i < uploadImg.length; i++) {
-
                             photos.push({
                                 photo_name: uploadImg[i].name,
                                 description: uploadImg[i].description,
@@ -214,53 +187,8 @@ function AddArtworkComponent(props) {
                                 upload_time: new Date(),
                                 modify_time: new Date(),
                             });
-
                         }
 
-<<<<<<< HEAD
-                            // save artwork to database
-                            Axios.post("http://localhost:3001/api/artworks", {
-<<<<<<< Updated upstream
-                                author_id: user.id,
-=======
-                                author_id: userId,
->>>>>>> Stashed changes
-                                title: title,
-                                description: description,
-                                price: parseFloat(price),
-                                cover_url: `https://${config.bucketName}.s3.${config.region}.amazonaws.com/${config.dirName}/${fileNames[0]}`,
-                                tags: tags,
-                                photos: photos.slice(1),
-                            }).then((response) => {
-                                console.log(response);
-                                alert("Artwork saved successfully!");
-<<<<<<< Updated upstream
-                                // Navigate(`/artwork/${userId}`);
-                                // window.location.reload();
-
-                                // add artwork_id to user
-                                console.log(response.data._id);
-                                const my_assets = [{ "artwork_id": response.data._id }];
-                                console.log(my_assets);
-                                // Axios.patch(`http://localhost:3001/api/users/my_assets/${userId}`, {
-                                //     my_assets: my_assets,
-                                // }).then((response) => {
-                                //     console.log(response);
-                                // })
-                                //     .catch((error) => {
-                                //         console.error(error);
-                                //     });
-
-                                // add tag count
-
-
-=======
-                                Navigate(`/artwork/${userId}`);
-                                // window.location.reload();
-                                // add tag count
-                                // add artwork_id to user
->>>>>>> Stashed changes
-=======
                         // save artwork to database
                         Axios.post("http://localhost:3001/api/artworks", {
                             author_id: user.id,
@@ -273,15 +201,14 @@ function AddArtworkComponent(props) {
                         }).then((response) => {
                             console.log(response);
                             alert("Artwork saved successfully!");
-                            // navigate(`/artwork/${user.id}`);
+                            navigate(`/artwork/${user.id}`);
                             // window.location.reload();
 
-                            // add artwork_id to user                               
+                            // add artwork_id to user
                             Axios.patch(`http://localhost:3001/api/users/my_assets/${user.id}`, {
                                 my_assets: response.data._id,
                             }).then((response) => {
                                 console.log("after patch," + response);
->>>>>>> 2c3fd82962054691f7af9a00051eea28576c25c5
                             })
                                 .catch((error) => {
                                     console.error(error);

@@ -32,7 +32,7 @@ function UploadImagesBoxComponent(props) {
         };
         // Call the callback function with the data and index
         handleSaveChildrenPhoto(data);
-        console.log(data);
+        // console.log(data);
         // }
         // })
         // .catch((err) => {

@@ -255,30 +255,29 @@ module.exports = {
   },
 
   //Todo: retrive artwork_id list from user_id
+
+
   // crud artwork_id list
   updateMyAssetsById: async (req, res) => {
     const user_id = req.params.id; // Corrected parameter name from _id to id
-    const update = req.body.my_assets;
-    // const update =
-    //   [{ "arkwork_id": "6529b5d22ae3b64352fb739d" }];
+    const update = [{ "arkwork_id": req.body.my_assets }];
 
     try {
       const user = await User.findOne({ _id: user_id });
 
       if (user) {
         if (user.my_assets === null) {
-          user.my_assets = [update]; // Wrap update in an array
-        } else {
-          console.log("======");
-          console.log(update);
+          user.my_assets = update;
           console.log(user.my_assets);
-          user.my_assets = [...user.my_assets, ...update.my_assets];
-          // user.my_assets.push(...update);
+        }
+        else {
+          new_assets = user.my_assets.concat(update);
+          user.my_assets = new_assets;
           console.log(user.my_assets);
         }
 
         // Save the updated user
-        // const updatedUser = await user.save();
+        const updatedUser = await user.save();
         res.status(200).send(updatedUser);
       } else {
         res.status(404).send({

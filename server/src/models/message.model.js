@@ -21,9 +21,11 @@ class Message {
         }
     }
 
-    async findAllByUsers(sender_id, receiver_id) {
+    async findAllByUser(user_id) {
         try {
-            const messages = await this.collection.find({ sender_id, receiver_id }).sort({ send_time: 1 }).toArray();
+            const messages = await this.collection.find({
+                $or: [{ sender_id: user_id }, { receiver_id: user_id }]
+            }).sort({ send_time: 1 }).toArray();
             return messages;
         } catch (error) {
             throw error;
@@ -48,6 +50,14 @@ class Message {
             throw error;
         }
     }
+
+    async  deleteAll() {
+        try {
+            const result = await this.collection.deleteMany({});
+        } catch (error) {
+            throw error;
+        }
+    }
 }
 
-module.exports = Message;
+module.exports = new Message();

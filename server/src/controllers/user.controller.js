@@ -237,7 +237,7 @@ module.exports = {
       // req.user = validToken;
       if (validToken && validToken.id) {
         const user = await User.findOne({ _id: validToken.id });
-        console.log(user)
+        // console.log(user)
         res.status(200).json({
           token: accessToken,
           user: { id: user.id, username: user.username, role: user.role, nickname: user.nickname }

@@ -10,6 +10,9 @@ router.get('/', messageController.getUserMessages)
 
 router.put('/:messageId', messageController.markMessageAsRead)
 
+//for dev only
+router.delete('/', messageController.deleteAllMessages)
+//for dev only
 router.delete('/:messageId', messageController.deleteMessage)
 
 module.exports = router;

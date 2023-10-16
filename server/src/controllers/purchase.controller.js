@@ -31,19 +31,19 @@ class PurchaseController {
                 return res.status(400).json({ message: 'Order not found' });
             }
 
-            if (!purchase) {
+            if ( !purchase) {
                 return res.status(400).json({ message: 'Order not found' });
             }
             if (purchase.buyer_id !== user_id) {
                 return res.status(400).json({ message: "No authorization" });
             }
-            if (purchase.is_paid) {
+            if ( purchase.is_paid) {
                 return res.status(400).json({ message: 'Already paid, please do not pay again' });
             }
             let paymentIntent;
             try {
                 paymentIntent = await stripe.paymentIntents.create({
-                    amount: purchase.transaction_price * 100,
+                    amount: purchase.transaction_price*100,
                     currency: 'cad',
                     automatic_payment_methods: {
                         enabled: true,
@@ -52,9 +52,9 @@ class PurchaseController {
                 const updatedTransactionRef = purchase.transaction_ref || [];
                 updatedTransactionRef.push(paymentIntent.id);
                 await PurchaseModel.updatePurchase(purchase_id, { transaction_ref: updatedTransactionRef });
-                return res.status(200).json({ clientSecret: paymentIntent.client_secret, });
+                return res.status(200).json({clientSecret: paymentIntent.client_secret,});
             } catch (err) {
-                return res.status(500).json({ message: "create payment failed" })
+                return res.status(500).json({message:"create payment failed"})
             }
 
         });
@@ -62,7 +62,7 @@ class PurchaseController {
 
     async checkPaymentStatus(req, res) {
         const { authorization } = req.headers;
-        if (!authorization) { return res.status(400).json({ message: "No authorization" }); }
+        if (!authorization) {return  res.status(404).json({ message: "No authorization" }); }
         const token = authorization.split(' ')[1];
         if (!token) { return res.status(400).json({ message: "No token" }); }
         jwt.verify(token, secretKey, async (err, decoded) => {
@@ -75,7 +75,7 @@ class PurchaseController {
                 const { id } = req.params;
                 const purchase = await PurchaseModel.getPurchaseById(id);
                 if (purchase.buyer_id !== user_id) {
-                    return res.status(400).json({ message: "You are not the buyer" });
+                    return  res.status(400).json({ message: "You are not the buyer" });
                 }
                 const successfulPayments = [];
                 for (const transactionId of purchase.transaction_ref) {
@@ -86,20 +86,20 @@ class PurchaseController {
                 }
 
                 if (successfulPayments.length === 0) {
-                    return res.status(200).json({ message: 'No payments have succeeded.' });
+                    return res.status(200).json({ message:'No payments have succeeded.' });
                 } else {
                     await PurchaseModel.updatePurchase(id, { is_paid: true });
                     if (successfulPayments.length === 1) {
-                        return res.status(201).json({ message: 'Payment succeeded.' });
+                        return res.status(201).json({ message:'Payment succeeded.' });
                     } else {
-                        return res.status(202).json({ message: 'Multiple payments detected. Please contact an administrator for assistance.' });
+                        return res.status(202).json({ message: 'Multiple payments detected. Please contact an administrator for assistance.'});
                     }
 
                 }
 
             } catch (error) {
                 console.error('retrieve error:', error);
-                return res.status(500).json({ message: "retrieve order failed" })
+                return res.status(500).json({message:"retrieve order failed"})
             }
 
 
@@ -111,7 +111,7 @@ class PurchaseController {
     async createPurchase(req, res) {
         const { authorization } = req.headers;
         console.log(req.headers)
-        if (!authorization) { return res.status(400).json({ message: "No authorization" }); }
+        if (!authorization) {return  res.status(400).json({ message: "No authorization" }); }
         const token = authorization.split(' ')[1];
         if (!token) { return res.status(400).json({ message: "No token" }); }
         jwt.verify(token, secretKey, async (err, decoded) => {
@@ -123,7 +123,7 @@ class PurchaseController {
 
             try {
                 const { artwork_id } = req.body;
-                if (!artwork_id) {
+                if (!artwork_id ) {
                     return res.status(400).json({ message: 'Artwork_id needed' });
                 }
                 const artwork = await ArtworkModel.findOne({ _id: artwork_id })
@@ -132,12 +132,12 @@ class PurchaseController {
                     return res.status(400).json({ message: 'Artwork not found' });
                 }
                 const purchaseData = {
-                    seller_id: artwork.author_id,
-                    buyer_id: user_id,
-                    artwork_id: artwork_id,
-                    purchase_time: new Date(),
-                    is_paid: !artwork.price || artwork.price === 0,
-                    transaction_price: artwork.price || 0
+                    seller_id:artwork.author_id,
+                    buyer_id:user_id,
+                    artwork_id:artwork_id,
+                    purchase_time:new Date(),
+                    is_paid:!artwork.price ||artwork.price===0,
+                    transaction_price:artwork.price || 0
                 };
                 const newPurchaseId = await PurchaseModel.createPurchase(purchaseData);
                 return res.status(200).json({ message: 'Add to purchase list', purchaseId: newPurchaseId });
@@ -176,30 +176,6 @@ class PurchaseController {
         }
     }
 
-    async payPurchase(req, res) {
-        //todo: add payment
-        try {
-            const { id } = req.params;
-            const existingPurchase = await PurchaseModel.getPurchaseById(id);
-            if (!existingPurchase) {
-                return res.status(404).json({ message: 'Purchase record not found' });
-            }
-
-            const updatedData = {
-                is_paid: true,
-                pay_time: new Date(),
-                transaction_ref: "TODO: get ref from stripe"
-            };
-            const updatedCount = await PurchaseModel.updatePurchase(id, updatedData);
-            if (updatedCount === 0) {
-                return res.status(404).json({ message: 'Purchase record not found' });
-            }
-            return res.status(200).json({ message: 'Purchase is paid' });
-        } catch (error) {
-            console.error('Payment failed:', error);
-            return res.status(500).json({ message: 'Payment failed' });
-        }
-    }
     // async payPurchase(req, res) {
     //     //todo: add payment
     //     try {

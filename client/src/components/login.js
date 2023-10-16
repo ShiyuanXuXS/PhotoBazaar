@@ -15,6 +15,9 @@ function LoginComponent() {
     Navigate("/forgotpassword");
   };
 
+  const [message, setMessage] = useState("");
+  const [error, setError] = useState("");
+
   // useEffect(() => {
   //   //fixme:
   //   // if (authStatus.status) Navigate("/login");
@@ -28,13 +31,9 @@ function LoginComponent() {
       password,
     })
       .then((response) => {
-        console.log(response);
-        //FIXME: only show message when successfully login
         if (response.data.error) {
-          // alert("fff"); // Display the error message
           alert(response.data.error);
         } else if (response.data.message) {
-          console.log(response.data);
           alert(response.data.message); // Display success message or token
           //set token
           localStorage.setItem("accessToken", response.data.token);
@@ -47,9 +46,8 @@ function LoginComponent() {
         }
       })
       .catch((error) => {
-        // fix me : how to show backend errors, Handle errors
-        // alert(error); // Display the error message
-        alert("login failed", error); // Display the error message
+        const { message: resMessage } = error.response.data;
+        setError(resMessage);
       });
   };
 
@@ -95,6 +93,7 @@ function LoginComponent() {
       <button onClick={navigateToForgot} className="mb-3">
         Forgot password?
       </button>
+      {error && <div>{error}</div>}
     </div>
   );
 }

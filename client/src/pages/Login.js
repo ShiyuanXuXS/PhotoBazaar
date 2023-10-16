@@ -1,13 +1,13 @@
 import React from "react";
 import LoginComponent from "../components/login";
-import Header from '../components/Header';
-import Footer from '../components/Footer';
+import Header from "../components/Header";
+import Footer from "../components/Footer";
 function Login() {
   return (
     <div>
-      <Header/>
+      <Header />
       <LoginComponent />
-      <Footer/>
+      {/* <Footer/> */}
     </div>
   );
 }

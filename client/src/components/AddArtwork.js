@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import Axios from 'axios';
-import { AuthContext } from "../Helpers/AuthContext";
 import * as Yup from "yup";
 import UploadImagesBoxComponent from './UploadImagesBox';
 import {
@@ -24,7 +23,7 @@ const config = {
 
 const client = new S3Client(config);
 
-function AddArtworkComponent(props) {
+function AddArtworkComponent({ isAdd, artwork_id }) {
     const url = process.env.REACT_APP_API_URL;
     const [tagList, setTagList] = useState([]);
     const [tagArray, setTagArray] = useState([]);
@@ -32,7 +31,8 @@ function AddArtworkComponent(props) {
     const [token, setToken] = useState(localStorage.getItem('accessToken'))
     const [user, setUser] = useState(null);
     const navigate = useNavigate();
-
+    const [artworkToUpdate, setArtworkToUpdate] = useState([]);
+    const [imagesBoxes, setImagesBoxes] = useState([]);
 
     useEffect(() => {
         if (token) {
@@ -45,11 +45,6 @@ function AddArtworkComponent(props) {
                 });
         }
     }, []);
-
-    const [imagesBoxes, setImagesBoxes] = useState([{
-        index: 1,
-        status: "show",
-    }]);
 
     const handleAddImagesBox = (event) => {
         event.preventDefault();
@@ -87,6 +82,31 @@ function AddArtworkComponent(props) {
             }
         }
     };
+    useEffect(() => {
+        if (!isAdd) {
+            Axios.get(`http://localhost:3001/api/artworks/${artwork_id}`).then((response) => {
+                setArtworkToUpdate(response.data);
+                console.log(response.data);
+                setTagArray(response.data.tags.map((tag) => tag.tag_id));
+                setImagesBoxes(
+                    Array.from({ length: response.data.photos.length }, (_, index) => ({
+                        index: index + 1,
+                        status: "show",
+                    }))
+                );
+            })
+                .catch((error) => {
+                    console.error(error);
+                });
+        } else {
+            setImagesBoxes([{
+                index: 1,
+                status: "show",
+            }]);
+
+        }
+
+    }, []);
 
     useEffect(() => {
         Axios.get("http://localhost:3001/api/tags").then((response) => {
@@ -264,25 +284,24 @@ function AddArtworkComponent(props) {
             }),
 
     });
-    console.log(tagArray);
-
 
     return (
         <div className="my-4">
             <div className="container mx-auto capitalize">
-                <h1 className="text-2xl font-semibold capitalize">Create new artwork</h1>
+                <h1 className="text-2xl font-semibold capitalize"> {isAdd ? (<>Create new artwork</>) : (<>Edit artwork</>)}</h1>
                 <div className="mt-4">
                     <form>
-                        {/* <div className="mb-4">
+                        {isAdd ? (<></>) : (<><div className="mb-4">
                             <label htmlFor="formArtworkId" className="block font-medium mb-2">artwork Id:</label>
                             <input
                                 type="text"
                                 id="formArtworkId"
                                 name="artworkId"
                                 className="block w-full border border-gray-300 rounded p-2"
-                                disabled
+                                defaultValue={artwork_id}
+                                readOnly
                             />
-                        </div> */}
+                        </div></>)}
 
                         <div className="mb-4">
                             <label htmlFor="formArtworkTitle" className="block font-medium mb-2">title:</label>
@@ -290,6 +309,7 @@ function AddArtworkComponent(props) {
                                 type="text"
                                 id="formArtworkTitle"
                                 name="artworkTitle"
+                                defaultValue={isAdd ? '' : artworkToUpdate.title}
                                 className="block w-full border border-gray-300 rounded p-2"
                                 onChange={(e) => setTitle(e.target.value)}
                             />
@@ -302,6 +322,7 @@ function AddArtworkComponent(props) {
                                 type="text"
                                 id="formArtworkDescription"
                                 name="artworkDescription"
+                                defaultValue={isAdd ? '' : artworkToUpdate.description}
                                 className="block w-full border border-gray-300 rounded p-2"
                                 onChange={(e) => setDescription(e.target.value)}
                             />
@@ -310,11 +331,13 @@ function AddArtworkComponent(props) {
 
                         <div className="mb-4">
                             <label htmlFor="formCoverUrl" className="block font-medium mb-2">cover image:</label>
+                            {isAdd ? (<></>) : (<><img src={artworkToUpdate.cover_url} alt="cover image" className="w-1/3 my-3 border-2" /></>)}
                             <input
                                 type="file"
                                 id="formCoverUrl"
                                 name="coverUrl"
                                 accept=".jpg, .png, .jpeg"
+                                multiple={false}
                                 className="block w-full border border-gray-300 rounded p-2"
                                 onChange={handleSaveCoverImage}
                             />
@@ -356,6 +379,7 @@ function AddArtworkComponent(props) {
                                 className="block w-full border border-gray-300 rounded p-2"
                                 min="0"
                                 step="any"
+                                defaultValue={isAdd ? '' : artworkToUpdate.price}
                                 onChange={(e) => setPrice(e.target.value)}
                             />
                             <p className="text-gray-500 text-sm">Required, must be equal or higher than 0.</p>
@@ -384,6 +408,8 @@ function AddArtworkComponent(props) {
                                         key={index}
                                         index={imagesBox.index}
                                         status={imagesBox.status}
+                                        isAdd={isAdd}
+                                        artworkToUpdate={artworkToUpdate} // Pass the artworkToUpdate array as a prop
                                         handleShowImagesBox={(index) => handleShowImagesBox(index)}
                                         handleSaveChildrenPhoto={handleSaveChildrenPhoto}
                                     />

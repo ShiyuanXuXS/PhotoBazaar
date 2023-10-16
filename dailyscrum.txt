@@ -87,6 +87,12 @@ Shiyuan
 2. To do
 - Research implementation of payment function
 
+Chang Liu
+1. Done
+integrate the verification email function for reset password using mailgun
+2. to do
+integrate the verification email function for register new user
+
 
 
 2023/10/13
@@ -113,3 +119,8 @@ Shiyuan
 2. To do
 - test payment function with a payment page
 - renew header to show different menu based on login status and role
+
+2023/10/15
+Chang Liu
+1. in progress
+investigate new method for sending verification email since maigun needs to upgrade to memberships

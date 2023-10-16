@@ -75,6 +75,25 @@ class TagController {
             res.status(500).json({ message: 'Error deleting tag' });
         }
     }
+
+    // update tag count after artwork is uploaded
+    async updateTagCount(req, res) {
+        try {
+            const { id } = req.params;
+            const existingTag = await tagModel.getTagById(id);
+            if (!existingTag) {
+                return res.status(404).json({ message: 'Tag not found' });
+            }
+            const updatedCount = await tagModel.updateTagCount(id);
+            if (updatedCount === 0) {
+                return res.status(404).json({ message: 'Tag not found' });
+            }
+            res.status(200).json({ message: 'Tag updated' });
+        } catch (error) {
+            console.error('Error updating tag:', error);
+            res.status(500).json({ message: 'Error updating tag' });
+        }
+    }
 }
 
 module.exports = new TagController();

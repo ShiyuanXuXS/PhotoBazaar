@@ -7,6 +7,8 @@ import {
     DeleteObjectCommand,
     PutObjectCommand,
 } from "@aws-sdk/client-s3";
+import { useNavigate } from 'react-router-dom';
+
 // window.Buffer = window.Buffer || require("buffer").Buffer;
 
 //S3 config
@@ -29,10 +31,12 @@ function AddArtworkComponent(props) {
     const tags = tagArray.map(data => ({ tag_id: data }));
     const [token, setToken] = useState(localStorage.getItem('accessToken'))
     const [user, setUser] = useState(null);
+    const navigate = useNavigate();
+
 
     useEffect(() => {
         if (token) {
-            Axios.get(`${url}/api/users/auth`, { headers: { accessToken: token } })
+            Axios.get(`http://localhost:3001/api/users/auth`, { headers: { accessToken: token } })
                 .then(response => {
                     setToken(response.data.token);
                     setUser(response.data.user)
@@ -41,8 +45,6 @@ function AddArtworkComponent(props) {
                 });
         }
     }, []);
-
-    const userId = user.id;
 
     const [imagesBoxes, setImagesBoxes] = useState([{
         index: 1,
@@ -95,8 +97,6 @@ function AddArtworkComponent(props) {
             });
     }, []);
 
-    // const [author_id, setAuthor_id] = useState('652226c2f905b8dea4f7712d'); //TODO: replace 1 with user id
-    // const author_id = '652226c2f905b8dea4f7712d';
     const [title, setTitle] = useState('');
     const [description, setDescription] = useState('');
     const [price, setPrice] = useState();
@@ -120,6 +120,37 @@ function AddArtworkComponent(props) {
         const newUploadImg = [...updatedUploadImages, data];
         setUploadImg(newUploadImg);
     }
+
+    const saveImage = (img, flag) => {
+        const date = new Date();
+        // const timestamp = date.getTime();
+        var newFileName = "";
+        if (flag == 0) {
+            newFileName = `${date.getTime()}_${user.id}.cover.${img.file.name.split(".").pop()}`;
+        } else {
+            newFileName = `${date.getTime()}_${user.id}.photo.${img.file.name.split(".").pop()}`;
+        }
+
+        const params = {
+            Bucket: config.bucketName,
+            Key: "artwork/" + newFileName,
+            Body: img.file,
+        };
+        // Create a promise for each image upload
+        const uploadPromise = client
+            .send(new PutObjectCommand(params))
+            .then((data) => {
+                console.log("Image uploaded successfully:", data);
+                // setNewFileNames([...newFileNames, newFileName]);
+                return newFileName;
+            })
+            .catch((error) => {
+                console.error("Error uploading image:", error);
+                return null;
+            });
+        return uploadPromise;
+
+    }
     const saveArtwork = (event) => {
         event.preventDefault();
 
@@ -128,6 +159,7 @@ function AddArtworkComponent(props) {
             .validate({ title, description, price }, { abortEarly: false })
             .then(() => {
                 //Validate Cover Image
+                const uploadPromises = [];
                 if (uploadImg === null || uploadImg[0] === null ||
                     uploadImg[0] === undefined || uploadImg[0].file.size > 5000000) {
                     alert("Please select a file less than 5MB");
@@ -136,91 +168,79 @@ function AddArtworkComponent(props) {
                     console.log(uploadImg);
                     // save cover image to s3 bucket
                     // Create an array to store promises for image uploads
-                    const uploadPromises = [];
-                    const date = new Date();
-                    for (const data of uploadImg) {
-                        const timestamp = date.getTime();
-                        const newFileName = `${timestamp}_${userId}.${data.file.name.split(".").pop()}`; //TODO: replace user1_id with user id
 
-                        const params = {
-                            Bucket: config.bucketName,
-                            Key: "artwork/" + newFileName,
-                            Body: data.file,
-                        };
-                        // Create a promise for each image upload
-                        const uploadPromise = client
-                            .send(new PutObjectCommand(params))
-                            .then((data) => {
-                                console.log("Image uploaded successfully:", data);
-                                // setNewFileNames([...newFileNames, newFileName]);
-                                return newFileName;
-                            })
-                            .catch((error) => {
-                                console.error("Error uploading image:", error);
-                                return null;
-                            });
-                        uploadPromises.push(uploadPromise);
+                    uploadPromises.push(saveImage(uploadImg[0], 0));
+                    for (let i = 1; i < uploadImg.length; i++) {
+                        uploadPromises.push(saveImage(uploadImg[i], 1));
                     }
-                    // Use Promise.all to wait for all image uploads to complete
-                    Promise.all(uploadPromises)
-                        .then((fileNames) => {
-                            // 'fileNames' will contain an array of successfully uploaded file names
-                            console.log("All images uploaded successfully.", fileNames);
+                }
+                // Use Promise.all to wait for all image uploads to complete
+                Promise.all(uploadPromises)
+                    .then((fileNames) => {
+                        // 'fileNames' will contain an array of successfully uploaded file names
+                        console.log("All images uploaded successfully.", fileNames);
 
-                            // get photos data
-                            const photos = uploadImg.map((data, index) => {
-                                return {
-                                    photo_name: data.name,
-                                    description: data.description,
-                                    file_url: `https://${config.bucketName}.s3.${config.region}.amazonaws.com/${config.dirName}/${fileNames[index]}`,
-                                    upload_time: date,
-                                    modify_time: date,
-                                }
+                        // get photos data
+                        const photos = [];
+                        const photoFileNames = fileNames.filter((fileName) => fileName.includes("photo"));
+                        for (let i = 1; i < uploadImg.length; i++) {
+
+                            photos.push({
+                                photo_name: uploadImg[i].name,
+                                description: uploadImg[i].description,
+                                file_url: `https://${config.bucketName}.s3.${config.region}.amazonaws.com/${config.dirName}/${photoFileNames[i - 1]}`,
+                                upload_time: new Date(),
+                                modify_time: new Date(),
                             });
 
-                            console.log(photos);
-                            console.log(photos.slice(1));
+                        }
 
-                            // save artwork to database
-                            Axios.post("http://localhost:3001/api/artworks", {
-                                author_id: userId,
-                                title: title,
-                                description: description,
-                                price: parseFloat(price),
-                                cover_url: `https://${config.bucketName}.s3.${config.region}.amazonaws.com/${config.dirName}/${fileNames[0]}`,
-                                tags: tags,
-                                photos: photos.slice(1),
+                        // save artwork to database
+                        Axios.post("http://localhost:3001/api/artworks", {
+                            author_id: user.id,
+                            title: title,
+                            description: description,
+                            price: parseFloat(price),
+                            cover_url: `https://${config.bucketName}.s3.${config.region}.amazonaws.com/${config.dirName}/${fileNames[0]}`,
+                            tags: tags,
+                            photos: photos,
+                        }).then((response) => {
+                            console.log(response);
+                            alert("Artwork saved successfully!");
+                            // navigate(`/artwork/${user.id}`);
+                            // window.location.reload();
+
+                            // add artwork_id to user                               
+                            Axios.patch(`http://localhost:3001/api/users/my_assets/${user.id}`, {
+                                my_assets: response.data._id,
                             }).then((response) => {
-                                console.log(response);
-                                alert("Artwork saved successfully!");
-                                // Navigate(`/artwork/${userId}`);
-                                // window.location.reload();
-
-                                // add artwork_id to user
-                                console.log(response.data._id);
-                                const my_assets = [{ "artwork_id": response.data._id }];
-                                console.log(my_assets);
-                                Axios.patch(`http://localhost:3001/api/users/my_assets/${userId}`, {
-                                    my_assets: my_assets,
-                                }).then((response) => {
-                                    console.log(response);
-                                })
-                                    .catch((error) => {
-                                        console.error(error);
-                                    });
-
-                                // add tag count
-
-
+                                console.log("after patch," + response);
                             })
                                 .catch((error) => {
                                     console.error(error);
                                 });
+
+                            // add tag count
+                            tagArray.forEach((tag) => {
+                                Axios.patch(`http://localhost:3001/api/tags/updateTagCount/${tag}`, {
+                                    increseBy: 1,
+                                }).then((response) => {
+                                    console.log("after patch," + response);
+                                })
+                                    .catch((error) => {
+                                        console.error(error);
+                                    });
+                            }
+                            )
                         })
-                        .catch((uploadErrors) => {
-                            console.error("Error uploading images:", uploadErrors);
-                        });
-                }
+                            .catch((error) => {
+                                console.error(error);
+                            });
+                    })
+                    .catch((uploadErrors) => {
+                        console.error("Error uploading images:", uploadErrors);
+                    });
+
             })
             .catch((validationErrors) => {
                 console.error("Validation errors:", validationErrors);
@@ -250,6 +270,8 @@ function AddArtworkComponent(props) {
             }),
 
     });
+    console.log(tagArray);
+
 
     return (
         <div className="my-4">

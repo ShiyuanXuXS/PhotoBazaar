@@ -7,15 +7,15 @@ import Home from "./pages/Home";
 import AddArtwork from "./pages/AddArtwork";
 import Message from "./pages/Message";
 import Payment from "./pages/Payment";
-import ChangePwd from "./pages/ChangePwd";
-import { AuthProvider } from './Helpers/AuthContext';
+import { AuthProvider } from "./Helpers/AuthContext";
+import ChangePassword from "./pages/ChangePassword";
+import ForgotPassword from "./pages/ForgotPassword";
 //fix me: footer cover the register button
 import Artwork from "./pages/ArtworkList";
 import MyArtwork from "./pages/MyArtwork";
 import "./App.css";
 
 function App() {
-
   return (
     <AuthProvider>
       <div className="page-container">
@@ -29,8 +29,10 @@ function App() {
             <Route path="/payment" element={<Payment />} />
             <Route path="/artwork" element={<Artwork />} />
             <Route path="/addArtwork" element={<AddArtwork />} />
-            <Route path="/changepwd" element={<ChangePwd />} />
+            {/* <Route path="/changepwd" element={<ChangePwd />} /> */}
             <Route path="/artwork/:userId" element={<MyArtwork />} />
+            <Route path="/forgotpassword" element={<ForgotPassword />} />
+            <Route path="/changepassword/:email" element={<ChangePassword />} />
           </Routes>
         </Router>
       </div>

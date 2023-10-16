@@ -35,6 +35,15 @@ class TagModel {
     const result = await this.collection.deleteOne(filter);
     return result.deletedCount;
   }
+
+  // updateTagCount(id) {
+  async updateTagCount(id) {
+    const filter = { _id: new ObjectId(id) };
+    const tag = await this.collection.findOne(filter);
+    const newCount = tag.count + 1;
+    const result = await this.collection.updateOne(filter, { $set: { count: newCount } });
+    return result.modifiedCount;
+  }
 }
 
 module.exports = new TagModel();

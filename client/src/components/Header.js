@@ -16,7 +16,7 @@ function HeaderComponent() {
 
   useEffect(() => {
     if (token) {
-      axios.get(`${url}/api/users/auth`, { headers: { accessToken: token } })
+      axios.get(`http://localhost:3001/api/users/auth`, { headers: { accessToken: token } })
         .then(response => {
           setToken(response.data.token);
           setUser(response.data.user)
@@ -31,6 +31,8 @@ function HeaderComponent() {
     Navigate("/login");
   };
 
+  // console.log(token);
+  // console.log(user);
   return (
     <header className="bg-white">
       <nav

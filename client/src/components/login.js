@@ -89,7 +89,12 @@ function LoginComponent() {
         >
           Login
         </button>
+        {/* forgot password */}
       </form>
+      {/* fix me: change to link text */}
+      <button onClick={navigateToForgot} className="mb-3">
+        Forgot password?
+      </button>
     </div>
   );
 }

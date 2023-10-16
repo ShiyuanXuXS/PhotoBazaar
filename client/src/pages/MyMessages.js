@@ -2,17 +2,10 @@ import React, { useState, useEffect } from 'react';
 import io from 'socket.io-client';
 import axios from 'axios';
 import { IoIosNotificationsOutline  } from 'react-icons/io';
-<<<<<<< Updated upstream
 import Header from '../components/Header';
 import Footer from '../components/Footer';
-=======
->>>>>>> Stashed changes
 
 function Message() {
-    const url = process.env.REACT_APP_API_URL;
-    const token = localStorage.getItem('accessToken')
-
-
     const [userList, setUserList] = useState([]);//users to chat with 
     const [selectedUser, setSelectedUser] = useState(null);//user chatting with
 
@@ -23,42 +16,16 @@ function Message() {
     const [currentUser, setCurrentUser] = useState(null);//user logged in
 
     useEffect(() => {
-        // fetchUserList();
-        // setCurrentUser('user1');
-        try {
-            if (token) {
-                axios.get(`${url}/api/users/auth`, { headers: { accessToken: token } })
-                    .then(response => {
-                        const user=response.data.user
-                        setCurrentUser(user)
-
-                        axios.get(`${url}/api/messages`, {
-                            headers: { Authorization: `Bearer ${token}` }
-                        })
-                            .then(res => {
-                                setUserList(res.data);
-                            });
-                    }).catch((err) => {
-                        console.log(err)
-                    });
-                }
-        } catch (error) {
-            console.log(error)
-        }
-
+        fetchUserList();
+        setCurrentUser('user1');
     }, [])
-
-
     useEffect(() => {
 
-        const newSocket = io.connect(url);
-        if (currentUser) {
-            newSocket.on('connect', () => {
-            newSocket.emit('user_info',! { username: currentUser.username })
-            console.log(currentUser.username + ' Connected to server');
+        const newSocket = io.connect('http://localhost:3001');
+        newSocket.on('connect', () => {
+            newSocket.emit('user_info', { username: currentUser })
+            console.log(currentUser + ' Connected to server');
         });
-        }
-        
 
         newSocket.on('connect_error', (error) => {
             console.error('Connection error:', error);
@@ -94,7 +61,6 @@ function Message() {
     const fetchUserList = async () => {
         setUserList([
             {
-                id:"id1",
                 username: 'user1',
                 nickname: 'nickname1',
                 messages: [
@@ -104,7 +70,6 @@ function Message() {
                 hasMessageUnread: true
             },
             {
-                id:"id2",
                 username: 'user2',
                 nickname: 'nickname2',
                 messages: [
@@ -113,8 +78,9 @@ function Message() {
                 ],
                 hasMessageUnread: true
             }])
+        //todo: get contacted users
         
-        
+        //todo: get messages from each user
     };
 
     const selectUser = (user) => {
@@ -125,7 +91,7 @@ function Message() {
         if (!socket || !selectedUser || !newMessage) return;
 
         const message = {
-            sender_username: currentUser.username,
+            sender_username: currentUser,
             receiver_username: selectedUser.username,
             message: newMessage,
         }
@@ -189,24 +155,16 @@ function Message() {
     }
     return (
         <div>
-<<<<<<< HEAD
-<<<<<<< Updated upstream
             <Header/>
-=======
->>>>>>> Stashed changes
-=======
-            <Header />
-            {currentUser && (currentUser.username)}
->>>>>>> 2c3fd82962054691f7af9a00051eea28576c25c5
             <div className="bg-gray-100 h-screen p-4 flex flex-col md:flex-row justify-center items-center">
-                {/* <div>
+                <div>
                     {currentUser === 'user1' && (<p>user1</p>)}
                     {currentUser === 'user2' && (<p>user2</p>)}
                     <button onClick={() => {
                         setCurrentUser(currentUser === 'user1' ? 'user2' : 'user1')
                     }}>Switch User</button>
 
-                </div> */}
+                </div>
                 <div className="user-container bg-white p-4 rounded-lg shadow-lg md:w-1/2  flex-grow self-stretch mx-2 my-2">
                     <div className="user-list font-bold text-lg mb-4">
                         {userList.map((user) => (
@@ -267,13 +225,13 @@ function Message() {
                             {selectedUser.messages.map((message, index) => (
                                 <div
                                     key={index}
-                                    className={`message mb-2 ${message.sender_username === currentUser.username
+                                    className={`message mb-2 ${message.sender_username === currentUser
                                             ? 'text-right'
                                             : ''
                                         }`}
                                 >
                                     <span
-                                        className={`message-content inline-block p-1 rounded ${message.sender_username === currentUser.username
+                                        className={`message-content inline-block p-1 rounded ${message.sender_username === currentUser
                                                 ? 'bg-green-500 text-black'
                                                 : 'bg-gray-200 text-black'
                                             }`}
@@ -306,10 +264,7 @@ function Message() {
                     </div>
                 )}
             </div>
-<<<<<<< Updated upstream
             <Footer/>
-=======
->>>>>>> Stashed changes
         </div>
     );
 }

@@ -11,6 +11,7 @@ const stripePromise = loadStripe(stripeKey);
 
 function Payment(props) {
     const purchase_id = props.purchase_id;
+    // console.log(purchase_id)
     const [message, setMessage] = useState("");
     const [error, setError] = useState("");
     const [clientSecret, setClientSecret] = useState("");
@@ -18,7 +19,7 @@ function Payment(props) {
     const Navigate = useNavigate();
     useEffect(() => {
         const token = localStorage.getItem('accessToken');
-        console.log(token);
+        // console.log(token);
         // check if is_paid
         const checkPaymentStatus = async () => {
             if (!token) {
@@ -35,6 +36,7 @@ function Payment(props) {
                         }
                     );
                     const { message: resMessage } = response.data;
+                    console.log(response.status)
                     switch (response.status) {
                         case 200:   //not paid, show payment form without message
                             break;
@@ -72,7 +74,7 @@ function Payment(props) {
                 const response = await axios.post(url + "/api/purchases/create-payment-intent", {
                     purchase_id: purchase_id
                 }, {
-                    headers: { "Content-Type": "application/json" }
+                    headers: { Authorization: `Bearer ${token}` }
                 });
     
                 const data = response.data;

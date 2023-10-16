@@ -96,7 +96,7 @@ const insertExampleData = async () => {
     sender_id: "user1_id",
     receiver_id: "user2_id",
     send_time: "2023-10-04T15:30:00Z",
-    isread: false,
+    is_read: false,
     message: "Helllo!"
   }
   await db.createCollection("messages")

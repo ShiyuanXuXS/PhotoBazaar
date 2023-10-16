@@ -39,8 +39,8 @@ function HeaderComponent() {
     Navigate("/login");
   };
 
-  console.log(token);
-  console.log(user);
+  // console.log(token);
+  // console.log(user);
   return (
 <<<<<<< Updated upstream
     <header className="bg-white">

@@ -1,6 +1,5 @@
 const { Server } = require("socket.io");
 const Message = require("../models/message.model");
-const messageModel = new Message();
 
 module.exports = (server) => {
   const io = new Server(server, {
@@ -30,7 +29,7 @@ module.exports = (server) => {
       console.log(`receive private-message sender_username: ${data.sender_username},receiver_username: ${data.receiver_username},message: ${data.message}`);
   
       try {
-        const insertedId = await messageModel.save(sender_id, receiver_id, message);
+        const insertedId = await Message.save(sender_id, receiver_id, message);
         console.log("message inserted:" + insertedId)
         const receiverSocket = userSockets[data.receiver_username];
         if (receiverSocket) {

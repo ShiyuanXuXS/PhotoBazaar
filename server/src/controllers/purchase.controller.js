@@ -6,7 +6,7 @@ dotenv.config()
 >>>>>>> Stashed changes
 const stripe = require('stripe')(process.env.STRIPE_API_KEY);
 const jwt = require('jsonwebtoken')
-const secretKey = process.env.SECRET_KEY || 'default-secret-key';
+const secretKey = process.env.SECRET_KEY || 'importantsecret';
 
 const PurchaseModel = require('../models/purchase.model');
 const ArtworkModel = require('../models/artwork.model');
@@ -20,7 +20,7 @@ class PurchaseController {
         const { authorization } = req.headers;
         if (!authorization) {return  res.status(400).json({ message: "No authorization" }); }
         const token = authorization.split(' ')[1];
-        if (!token) { res.status(400).json({ message: "No token" }); }
+        if (!token) { return res.status(400).json({ message: "No token" }); }
         const { purchase_id } = req.body;
         jwt.verify(token, secretKey, async (err, decoded) => {
             if (err) {
@@ -57,9 +57,9 @@ class PurchaseController {
                 const updatedTransactionRef = purchase.transaction_ref || [];
                 updatedTransactionRef.push(paymentIntent.id);
                 await PurchaseModel.updatePurchase(purchase_id, { transaction_ref: updatedTransactionRef });
-                res.status(200).json({clientSecret: paymentIntent.client_secret,});
+                return res.status(200).json({clientSecret: paymentIntent.client_secret,});
             } catch (err) {
-                res.status(500).json({message:"create payment failed"})
+                return res.status(500).json({message:"create payment failed"})
             }
 =======
         const { purchase_id } = req.body;
@@ -105,7 +105,7 @@ class PurchaseController {
         const { authorization } = req.headers;
         if (!authorization) {return  res.status(400).json({ message: "No authorization" }); }
         const token = authorization.split(' ')[1];
-        if (!token) { res.status(400).json({ message: "No token" }); }
+        if (!token) { return res.status(400).json({ message: "No token" }); }
         jwt.verify(token, secretKey, async (err, decoded) => {
             if (err) {
                 return res.status(400).json({ error: "Token is invalid" });
@@ -116,7 +116,7 @@ class PurchaseController {
                 const { id } = req.params;
                 const purchase = await PurchaseModel.getPurchaseById(id);            
                 if (purchase.buyer_id !== user_id) {
-                    return  res.status(400).json({ message: "No authorization" });
+                    return  res.status(400).json({ message: "You are not the buyer" });
                 }
                 const successfulPayments = [];
                 for (const transactionId of purchase.transaction_ref) {
@@ -181,9 +181,10 @@ class PurchaseController {
 
     async createPurchase(req, res) {
         const { authorization } = req.headers;
+        console.log(req.headers)
         if (!authorization) {return  res.status(400).json({ message: "No authorization" }); }
         const token = authorization.split(' ')[1];
-        if (!token) { res.status(400).json({ message: "No token" }); }
+        if (!token) { return res.status(400).json({ message: "No token" }); }
         jwt.verify(token, secretKey, async (err, decoded) => {
             if (err) {
                 return res.status(400).json({ error: "Token is invalid" });
@@ -210,10 +211,10 @@ class PurchaseController {
                     transaction_price:artwork.price || 0
                 };
                 const newPurchaseId = await PurchaseModel.createPurchase(purchaseData);
-                res.status(200).json({ message: 'Add to purchase list', purchaseId: newPurchaseId });
+                return res.status(200).json({ message: 'Add to purchase list', purchaseId: newPurchaseId });
             } catch (error) {
                 console.error('An error occurred while creating purchase record:', error);
-                res.status(500).json({ message: 'Failed to create purchase record' });
+                return res.status(500).json({ message: 'Failed to create purchase record' });
             }
         });
 
@@ -224,10 +225,10 @@ class PurchaseController {
         //todo: auth
         try {
             const purchases = await PurchaseModel.getAllPurchases();
-            res.status(200).json(purchases);
+            return res.status(200).json(purchases);
         } catch (error) {
             console.error('An error occurred while retrieving purchase history:', error);
-            res.status(500).json({ message: 'An error occurred while retrieving purchase history' });
+            return res.status(500).json({ message: 'An error occurred while retrieving purchase history' });
         }
     }
 
@@ -239,10 +240,10 @@ class PurchaseController {
             if (!purchase) {
                 return res.status(404).json({ message: 'Purchase record not found' });
             }
-            res.status(200).json(purchase);
+            return res.status(200).json(purchase);
         } catch (error) {
             console.error('An error occurred while getting purchase records by ID:', error);
-            res.status(500).json({ message: 'An error occurred while getting purchase records by ID' });
+            return res.status(500).json({ message: 'An error occurred while getting purchase records by ID' });
         }
     }
 
@@ -264,10 +265,10 @@ class PurchaseController {
             if (updatedCount === 0) {
                 return res.status(404).json({ message: 'Purchase record not found' });
             }
-            res.status(200).json({ message: 'Purchase is paid' });
+            return res.status(200).json({ message: 'Purchase is paid' });
         } catch (error) {
             console.error('Payment failed:', error);
-            res.status(500).json({ message: 'Payment failed' });
+            return res.status(500).json({ message: 'Payment failed' });
         }
     }
 
@@ -279,10 +280,10 @@ class PurchaseController {
             if (deletedCount === 0) {
                 return res.status(404).json({ message: 'Purchase record not found' });
             }
-            res.status(200).json({ message: 'Purchase history has been deleted' });
+            return res.status(200).json({ message: 'Purchase history has been deleted' });
         } catch (error) {
             console.error('An error occurred while deleting purchase history:', error);
-            res.status(500).json({ message: 'Failed to delete purchase history' });
+            return res.status(500).json({ message: 'Failed to delete purchase history' });
         }
     }
 }

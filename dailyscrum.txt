@@ -138,3 +138,17 @@ Xiaoxing Pan
 
 
 
+
+
+
+
+
+2023/10/14
+Shiyuan
+1. Done
+- tested payment function
+- updated header
+2. To do
+- Fixed the bug caused by multiple payment attempts in the Stripe backend
+- renew header to show different menu based on login status and role
+- Send and receive messages using logged in users

@@ -35,4 +35,6 @@ router.patch("/my_assets/:id", userController.updateMyAssetsById);
 // forgot password and send mailgun
 router.post("/forgotpassword", userController.forgotPassword);
 
+router.put("/changepassword/:email", userController.updateUserByEmail);
+
 module.exports = router;

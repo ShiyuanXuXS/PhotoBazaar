@@ -29,8 +29,8 @@ function ChangepasswordComponent() {
           setError(resMessage);
         } else {
           const { message: resMessage } = response.data;
-          setError(resMessage);
-          console.log("inside changepw compoment");
+          setMessage(resMessage);
+          navigate("/login");
         }
       })
       .catch((error) => {

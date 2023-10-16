@@ -131,7 +131,6 @@ module.exports = {
   //update user password by email
   updateUserByEmail: async (req, res) => {
     const user_email = req.params.email;
-    // console.log(req.body.password);
     if (req.body.password != req.body.confirmPassword) {
       return res
         .status(400)
@@ -266,36 +265,30 @@ module.exports = {
     console.log(
       "inside user controller forgotpassword:" + req.body.forgotemail
     );
-    // const user = await User.findOne({ email: req.body.resetemail });
-    // const user = User.findOne({ email: req.body.forgotemail });
-    User.findOne({ email: req.body.forgotemail }).then((result) => {
+    await User.findOne({ email: req.body.forgotemail }).then((result) => {
       if (result) {
-        console.log("inside user controller forgotpw findone:" + result.email);
-        // console.log(`${process.env.baseUrl}/changepassword/${req.body.token}`);
-
         console.log(
           `${process.env.baseUrl}/changepassword/${req.body.forgotemail}`
         );
-        //smtp
+        //smtp start
         const nodemailer = require("nodemailer");
 
         var transport = nodemailer.createTransport({
           service: "gmail",
-
           auth: {
-            user: "pekinglc@gmail.com",
+            user: `${process.env.GMAIL}`,
             pass: "omuc elme ehux hvpj",
           },
         });
 
         const mailoptions = {
-          from: "pekinglc@gmail.com",
-          to: "dpl200002@hotmail.com",
+          from: `${process.env.GMAIL}`,
+          to: `${req.body.forgotemail}`,
           subject: "Hello!",
           text: "This is a test of Mailtrap and Nodemailer. ",
           html: `
              <p>Please Click the following link to reset your password:</p>
-             <a href="http://localhost:3000/changepassword/dpl200002@hotmail.com"}>Reset Password</a>
+             <a href="http://localhost:3000/changepassword/${req.body.forgotemail}">Reset Password</a>
              `,
         };
 
@@ -306,73 +299,14 @@ module.exports = {
             console.log(info);
           }
         });
-        //maigun
-        // const mg = new mailgun(formdata);
-        // const client = mg.client({
-        //   username: "api",
-        //   key: process.env.MAILGUN_API_KEY,
-        // });
-        // const messageData = {
-        //   from: process.env.MAILGUN_SERVEREMAIL,
-        //   // to: [`${user_email}`],
-        //   to: [process.env.MAILGUN_CLIENTEMAIL],
-        //   subject: "Hello",
-        //   text: "aaa",
-        //   html: `
-        //      <p>Please Click the following link to reset your password:</p>
-        //      <a href="${process.env.REACT_APP_URL}/changepassword/${req.body.forgotemail}"}>Reset Password</a>
-        //      `,
-        // };
-        // client.messages
-        //   .create(process.env.MAILGUN_DOMIAN, messageData)
-        //   .then((res) => {
-        //     console.log(res);
-        //   })
-        //   .catch((err) => {
-        //     console.error(err);
-        //   });
-        //maigun end
-
-        // console.log(`${user.email}`);
+        // smtp end
       } else {
         res.status(404).send({
-          message: "error from user controller: No such user email found",
+          message: "No such user email found",
         });
       }
     });
-
-    // console.log("inside user controller userfindone:" + user.email);
-
-    // if (user) {
-    //   const token = sign({ _id: user._id }, process.env.JWT_SECRET, {
-    //     expiresIn: "3h",
-    //   });
-    // user.resetToken = token;
-    // console.log("inside user controller forgotpassword:" + user.resettoken);
-
-    // await user.save();
-    //reset link
-    //   console.log(`${process.env.baseUrl}/changepassword/${token}`);
-    //   console.log(`${user.email}`);
-    // } else {
-    //   res.status(404).send({ message: "User not found" });
-    // }
   },
-
-  // if (user) {
-  //   const token = sign({ _id: user._id }, process.env.JWT_SECRET, {
-  //     expiresIn: "3h",
-  //   });
-  // user.resetToken = token;
-  // console.log("inside user controller forgotpassword:" + user.resettoken);
-
-  // await user.save();
-  //reset link
-  //   console.log(`${process.env.baseUrl}/changepassword/${token}`);
-  //   console.log(`${user.email}`);
-  // } else {
-  //   res.status(404).send({ message: "User not found" });
-  // }
 };
 
 //register validation

@@ -9,7 +9,6 @@ function ChangepasswordComponent() {
   const [confirmPassword, setConfirmpw] = useState("");
   // const { token } = useParams();
   const { email } = useParams();
-  console.log("inside  changepw compoment:" + email);
   const { authStatus, setAuthStatus } = useContext(AuthContext);
   const navigateToChange = () => {
     navigate("/changepassword");

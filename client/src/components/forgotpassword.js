@@ -12,18 +12,16 @@ function ForgotpasswordComponent() {
     navigate("/changepassword");
   };
 
+  const [message, setMessage] = useState("");
+  const [error, setError] = useState("");
+
   const submitHandler = async (e) => {
     e.preventDefault();
-    // console.log(
-    //   "inside forgotpw component submithandler forgotemail:" + forgotemail
-    // );
+
     Axios.post("http://localhost:3001/api/users/forgotpassword", {
       forgotemail: forgotemail,
-      // token: localStorage.getItem("accessToken"),
     })
       .then((response) => {
-        console.log(response);
-        //FIXME: only show message when successfully login
         if (response.data.error) {
           // alert("fff"); // Display the error message
           alert(response.data.error);
@@ -32,9 +30,8 @@ function ForgotpasswordComponent() {
         }
       })
       .catch((error) => {
-        // fix me : how to show backend errors, Handle errors
-        // alert(error); // Display the error message
-        alert("login failed"); // Display the error message
+        const { message: resMessage } = error.response.data;
+        setError(resMessage);
       });
   };
 
@@ -64,6 +61,8 @@ function ForgotpasswordComponent() {
           Submit
         </button>
       </form>
+      {error && <div className="text-red-500 mb-8">{error}</div>}
+      {message && <div className="text-green-500 mb-8">{message}</div>}
     </div>
   );
 }

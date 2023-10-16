@@ -93,7 +93,8 @@ function LoginComponent() {
       <button onClick={navigateToForgot} className="mb-3">
         Forgot password?
       </button>
-      {error && <div>{error}</div>}
+      {error && <div className="text-red-500 mb-8">{error}</div>}
+      {message && <div className="text-green-500 mb-8">{message}</div>}
     </div>
   );
 }

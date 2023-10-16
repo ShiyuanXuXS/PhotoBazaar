@@ -8,10 +8,9 @@ function ForgotPassword() {
     <div>
       <Header />
       <ForgotpasswordComponent />
-      <Footer />
+      {/* <Footer /> */}
     </div>
   );
-  // return <div>forgot password</div>;
 }
-//fix me:can not have multiple default module
+
 export default ForgotPassword;

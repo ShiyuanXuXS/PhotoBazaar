@@ -29,7 +29,6 @@ function App() {
             <Route path="/payment" element={<Payment />} />
             <Route path="/artwork" element={<Artwork />} />
             <Route path="/addArtwork" element={<AddArtwork />} />
-            {/* <Route path="/changepwd" element={<ChangePwd />} /> */}
             <Route path="/artwork/:userId" element={<MyArtwork />} />
             <Route path="/forgotpassword" element={<ForgotPassword />} />
             <Route path="/changepassword/:email" element={<ChangePassword />} />

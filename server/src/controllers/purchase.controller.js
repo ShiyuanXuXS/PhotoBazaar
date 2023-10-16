@@ -177,30 +177,30 @@ class PurchaseController {
         }
     }
 
-    async payPurchase(req, res) {
-        //todo: add payment
-        try {
-            const { id } = req.params;
-            const existingPurchase = await PurchaseModel.getPurchaseById(id);
-            if (!existingPurchase) {
-                return res.status(404).json({ message: 'Purchase record not found' });
-            }
+    // async payPurchase(req, res) {
+    //     //todo: add payment
+    //     try {
+    //         const { id } = req.params;
+    //         const existingPurchase = await PurchaseModel.getPurchaseById(id);
+    //         if (!existingPurchase) {
+    //             return res.status(404).json({ message: 'Purchase record not found' });
+    //         }
             
-          const updatedData = {
-            is_paid: true,
-                pay_time: new Date(),
-                transaction_ref:"TODO: get ref from stripe" 
-            };
-            const updatedCount = await PurchaseModel.updatePurchase(id, updatedData);
-            if (updatedCount === 0) {
-                return res.status(404).json({ message: 'Purchase record not found' });
-            }
-            return res.status(200).json({ message: 'Purchase is paid' });
-        } catch (error) {
-            console.error('Payment failed:', error);
-            return res.status(500).json({ message: 'Payment failed' });
-        }
-    }
+    //       const updatedData = {
+    //         is_paid: true,
+    //             pay_time: new Date(),
+    //             transaction_ref:"TODO: get ref from stripe" 
+    //         };
+    //         const updatedCount = await PurchaseModel.updatePurchase(id, updatedData);
+    //         if (updatedCount === 0) {
+    //             return res.status(404).json({ message: 'Purchase record not found' });
+    //         }
+    //         return res.status(200).json({ message: 'Purchase is paid' });
+    //     } catch (error) {
+    //         console.error('Payment failed:', error);
+    //         return res.status(500).json({ message: 'Payment failed' });
+    //     }
+    // }
 
     async deletePurchase(req, res) {
         //todo: auth

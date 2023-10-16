@@ -1,5 +1,6 @@
-import React, { useState, useEffect, useContext, } from 'react';
+import React, { useState, useEffect } from 'react';
 import Axios from 'axios';
+import { AuthContext } from "../Helpers/AuthContext";
 import * as Yup from "yup";
 import UploadImagesBoxComponent from './UploadImagesBox';
 import {
@@ -8,7 +9,6 @@ import {
     PutObjectCommand,
 } from "@aws-sdk/client-s3";
 import { useNavigate } from 'react-router-dom';
-
 // window.Buffer = window.Buffer || require("buffer").Buffer;
 
 //S3 config
@@ -123,7 +123,6 @@ function AddArtworkComponent(props) {
 
     const saveImage = (img, flag) => {
         const date = new Date();
-        // const timestamp = date.getTime();
         var newFileName = "";
         if (flag == 0) {
             newFileName = `${date.getTime()}_${user.id}.cover.${img.file.name.split(".").pop()}`;
@@ -159,17 +158,16 @@ function AddArtworkComponent(props) {
             .validate({ title, description, price }, { abortEarly: false })
             .then(() => {
                 //Validate Cover Image
-                const uploadPromises = [];
+                const uploadPromises = []; // Create an array to store promises for image uploads
                 if (uploadImg === null || uploadImg[0] === null ||
                     uploadImg[0] === undefined || uploadImg[0].file.size > 5000000) {
                     alert("Please select a file less than 5MB");
                     return;
                 } else {
                     console.log(uploadImg);
-                    // save cover image to s3 bucket
-                    // Create an array to store promises for image uploads
-
+                    // save cover image to s3 bucket                   
                     uploadPromises.push(saveImage(uploadImg[0], 0));
+                    // save photos to s3 bucket
                     for (let i = 1; i < uploadImg.length; i++) {
                         uploadPromises.push(saveImage(uploadImg[i], 1));
                     }
@@ -177,14 +175,11 @@ function AddArtworkComponent(props) {
                 // Use Promise.all to wait for all image uploads to complete
                 Promise.all(uploadPromises)
                     .then((fileNames) => {
-                        // 'fileNames' will contain an array of successfully uploaded file names
-                        console.log("All images uploaded successfully.", fileNames);
-
+                        console.log("All images uploaded successfully.", fileNames); // 'fileNames' contain an array of successfully uploaded file names
                         // get photos data
                         const photos = [];
-                        const photoFileNames = fileNames.filter((fileName) => fileName.includes("photo"));
+                        const photoFileNames = fileNames.filter((fileName) => fileName.includes("photo")); // exclude cover image
                         for (let i = 1; i < uploadImg.length; i++) {
-
                             photos.push({
                                 photo_name: uploadImg[i].name,
                                 description: uploadImg[i].description,
@@ -192,7 +187,6 @@ function AddArtworkComponent(props) {
                                 upload_time: new Date(),
                                 modify_time: new Date(),
                             });
-
                         }
 
                         // save artwork to database
@@ -207,10 +201,10 @@ function AddArtworkComponent(props) {
                         }).then((response) => {
                             console.log(response);
                             alert("Artwork saved successfully!");
-                            // navigate(`/artwork/${user.id}`);
+                            navigate(`/artwork/${user.id}`);
                             // window.location.reload();
 
-                            // add artwork_id to user                               
+                            // add artwork_id to user
                             Axios.patch(`http://localhost:3001/api/users/my_assets/${user.id}`, {
                                 my_assets: response.data._id,
                             }).then((response) => {

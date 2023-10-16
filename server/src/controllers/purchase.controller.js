@@ -45,6 +45,8 @@ class PurchaseController {
                 paymentIntent = await stripe.paymentIntents.create({
                     amount: purchase.transaction_price*100,
                     currency: 'cad',
+                    description:  purchase_id,
+                    metadata:{purchase_id:purchase_id},
                     automatic_payment_methods: {
                         enabled: true,
                     },
@@ -78,18 +80,20 @@ class PurchaseController {
                     return  res.status(400).json({ message: "You are not the buyer" });
                 }
                 const successfulPayments = [];
-                for (const transactionId of purchase.transaction_ref) {
-                    const paymentIntent = await stripe.paymentIntents.retrieve(transactionId);
-                    if (paymentIntent.status === 'succeeded') {
-                        successfulPayments.push(transactionId);
-                    }
-                }
 
-                if (successfulPayments.length === 0) {
+                let paymentCount = 0;
+                const paymentIntentsSearch = await stripe.paymentIntents.search({
+                    query: 'metadata[\'purchase_id\']:\''+id+'\'',
+                });
+                const paymentIntents = paymentIntentsSearch.data
+                for (const paymentIntent of paymentIntents) {
+                    if(paymentIntent.status==='succeeded'){paymentCount++}
+                }
+                if (paymentCount === 0) {
                     return res.status(200).json({ message:'No payments have succeeded.' });
                 } else {
                     await PurchaseModel.updatePurchase(id, { is_paid: true });
-                    if (successfulPayments.length === 1) {
+                    if (paymentCount === 1) {
                         return res.status(201).json({ message:'Payment succeeded.' });
                     } else {
                         return res.status(202).json({ message: 'Multiple payments detected. Please contact an administrator for assistance.'});
@@ -101,10 +105,7 @@ class PurchaseController {
                 console.error('retrieve error:', error);
                 return res.status(500).json({message:"retrieve order failed"})
             }
-
-
         });
-        // console.log(token)
 
     }
 

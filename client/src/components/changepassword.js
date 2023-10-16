@@ -14,41 +14,28 @@ function ChangepasswordComponent() {
     navigate("/changepassword");
   };
 
-  //   useEffect(() => {
-  //     if (userInfo) {
-  //       navigate("/");
-  //     }
-  //   }, [navigate, userInfo]);
+  const [message, setMessage] = useState("");
+  const [error, setError] = useState("");
 
   const submitHandler = async (e) => {
     e.preventDefault();
-    Axios.put(
-      `http://localhost:3001/api/users/changepassword/${email}`,
-      {
-        password,
-        confirmPassword,
-        // token,
-      }
-      // {
-      //   headers: { accessToken: localStorage.getItem("accessToken") },
-      // }
-    )
+    Axios.put(`http://localhost:3001/api/users/changepassword/${email}`, {
+      password,
+      confirmPassword,
+    })
       .then((response) => {
-        console.log(response);
-        //FIXME: only show message when successfully login
         if (response.data.error) {
-          alert("fff"); // Display the error message
-          // alert(response.data.error);
+          const { message: resMessage } = error.response.data;
+          setError(resMessage);
         } else {
-          alert(response.data.message); // Display success message or token
-
+          const { message: resMessage } = response.data;
+          setError(resMessage);
           console.log("inside changepw compoment");
         }
       })
       .catch((error) => {
-        // fix me : how to show backend errors, Handle errors
-        // alert(error); // Display the error message
-        alert("login failed"); // Display the error message
+        const { message: resMessage } = error.response.data;
+        setError(resMessage);
       });
   };
 
@@ -89,6 +76,8 @@ function ChangepasswordComponent() {
           Submit
         </button>
       </form>
+      {error && <div className="text-red-500 mb-8">{error}</div>}
+      {message && <div className="text-green-500 mb-8">{message}</div>}
     </div>
   );
 }

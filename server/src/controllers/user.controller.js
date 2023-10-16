@@ -140,25 +140,27 @@ module.exports = {
     const update = { password: hash };
 
     // find the user by user email, and generate new token
-    const user = await User.findOne({ email: user_email });
-    const token = sign({ _id: user._id }, process.env.JWT_SECRET, {
-      expiresIn: "3h",
-    });
+    // const user = await User.findOne({ email: user_email });
+    // const token = sign({ _id: user._id }, process.env.JWT_SECRET, {
+    //   expiresIn: "3h",
+    // });
 
     //find the user and update the password
     await User.findOneAndUpdate({ email: user_email }, update, { new: true })
       .then((result) => {
         if (result) {
-          console.log("inside update");
+          console.log("inside update usercontroller" + result);
           res
             .status(200)
-            .send({ message: "user password updated successfully" });
+            // .send({ message: "user password updated successfully" });
+            .json({ message: "user password updated successfully" });
         } else {
           res.status(404).json({ message: "user not found" });
         }
       })
       .catch((err) => {
-        res.status(400).json(err);
+        console.log("retrieve error:", err);
+        res.status(400).json({ err });
       });
   },
 

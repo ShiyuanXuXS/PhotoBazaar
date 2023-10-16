@@ -172,15 +172,13 @@ module.exports = {
       if (!existingUser) {
         return res
           .status(400)
-          .json({ error: `User email ${user.email} doesn't exists.` });
+          .json({ message: `User email ${user.email} doesn't exists.` });
       }
 
       // compare the password
       const match = await bcrypt.compare(user.password, existingUser.password);
       if (!match) {
-        return res
-          .status(400)
-          .json({ error: "Wrong Username And Password Combination" });
+        return res.status(400).json({ message: "Wrong Username or password" });
       }
       // generate a token and pass the front-end
       const accessToken = sign(
@@ -231,11 +229,10 @@ module.exports = {
 
   //Todo: retrive artwork_id list from user_id
 
-
   // crud artwork_id list
   updateMyAssetsById: async (req, res) => {
     const user_id = req.params.id; // Corrected parameter name from _id to id
-    const update = [{ "arkwork_id": req.body.my_assets }];
+    const update = [{ arkwork_id: req.body.my_assets }];
 
     try {
       const user = await User.findOne({ _id: user_id });
@@ -244,8 +241,7 @@ module.exports = {
         if (user.my_assets === null) {
           user.my_assets = update;
           console.log(user.my_assets);
-        }
-        else {
+        } else {
           new_assets = user.my_assets.concat(update);
           user.my_assets = new_assets;
           console.log(user.my_assets);

@@ -102,9 +102,10 @@ Shiyuan
 - checkout form
 2. To do
 - Payment data storage, retrieve and update
-
-
-
+Chang Liu
+1. in progress
+investigate new method for sending verification email since maigun needs to upgrade to memberships
+2023/10/15
 
 
 2023/10/14
@@ -120,7 +121,4 @@ Shiyuan
 - test payment function with a payment page
 - renew header to show different menu based on login status and role
 
-2023/10/15
-Chang Liu
-1. in progress
-investigate new method for sending verification email since maigun needs to upgrade to memberships
+

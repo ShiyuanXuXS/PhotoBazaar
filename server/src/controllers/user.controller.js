@@ -5,9 +5,11 @@ const { sign, verify } = require("jsonwebtoken");
 const mailgun = require("mailgun.js");
 const formdata = require("form-data");
 const dotenv = require("dotenv");
+const SmtpMailer = require("@techamica/smtpserver-node");
 dotenv.config();
 const secretKey = process.env.SECRET_KEY || "importantsecret";
 // const { isAuth, isAdmin, generateToken, baseUrl } = require("../utils.js");
+const nodemailer = require("nodemailer");
 
 module.exports = {
   //find all the users
@@ -149,33 +151,6 @@ module.exports = {
       .then((result) => {
         if (result) {
           console.log("inside update");
-          //maigun
-          const mg = new mailgun(formdata);
-          const client = mg.client({
-            username: "api",
-            key: process.env.MAILGUN_API_KEY,
-          });
-          const messageData = {
-            from: process.env.MAILGUN_SERVEREMAIL,
-            // to: [`${user_email}`],
-            to: [process.env.MAILGUN_CLIENTEMAIL],
-            subject: "Hello",
-            text: "aaa",
-            html: `
-             <p>Please Click the following link to reset your password:</p>
-             <a href="${baseUrl()}/reset-password/${token}"}>Reset Password</a>
-             `,
-          };
-          client.messages
-            .create(process.env.MAILGUN_DOMIAN, messageData)
-            .then((res) => {
-              console.log(res);
-            })
-            .catch((err) => {
-              console.error(err);
-            });
-          //maigun end
-
           res
             .status(200)
             .send({ message: "user password updated successfully" });
@@ -306,6 +281,63 @@ module.exports = {
         console.log(
           `${process.env.baseUrl}/changepassword/${req.body.forgotemail}`
         );
+        //smtp
+        const nodemailer = require("nodemailer");
+
+        var transport = nodemailer.createTransport({
+          service: "gmail",
+
+          auth: {
+            user: "pekinglc@gmail.com",
+            pass: "omuc elme ehux hvpj",
+          },
+        });
+
+        const mailoptions = {
+          from: "pekinglc@gmail.com",
+          to: "dpl200002@hotmail.com",
+          subject: "Hello!",
+          text: "This is a test of Mailtrap and Nodemailer. ",
+          html: `
+             <p>Please Click the following link to reset your password:</p>
+             <a href="http://localhost:3000/changepassword/dpl200002@hotmail.com"}>Reset Password</a>
+             `,
+        };
+
+        transport.sendMail(mailoptions, (err, info) => {
+          if (err) {
+            console.log(err);
+          } else {
+            console.log(info);
+          }
+        });
+        //maigun
+        // const mg = new mailgun(formdata);
+        // const client = mg.client({
+        //   username: "api",
+        //   key: process.env.MAILGUN_API_KEY,
+        // });
+        // const messageData = {
+        //   from: process.env.MAILGUN_SERVEREMAIL,
+        //   // to: [`${user_email}`],
+        //   to: [process.env.MAILGUN_CLIENTEMAIL],
+        //   subject: "Hello",
+        //   text: "aaa",
+        //   html: `
+        //      <p>Please Click the following link to reset your password:</p>
+        //      <a href="${process.env.REACT_APP_URL}/changepassword/${req.body.forgotemail}"}>Reset Password</a>
+        //      `,
+        // };
+        // client.messages
+        //   .create(process.env.MAILGUN_DOMIAN, messageData)
+        //   .then((res) => {
+        //     console.log(res);
+        //   })
+        //   .catch((err) => {
+        //     console.error(err);
+        //   });
+        //maigun end
+
         // console.log(`${user.email}`);
       } else {
         res.status(404).send({

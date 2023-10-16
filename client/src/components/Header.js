@@ -5,15 +5,11 @@ import axios from 'axios';
 
 
 function HeaderComponent() {
-<<<<<<< Updated upstream
-  const url = process.env.REACT_APP_API_URL;
-=======
   const { loginStatus, role, userId, setRole, setUserId, setLoginStatus } =
     useContext(AuthContext);
   // const isAdmin = role.includes("admin");
   const { setAuthStatus, authStatus } = useContext(AuthContext);
   const [show, setShow] = useState(false);
->>>>>>> Stashed changes
   const Navigate = useNavigate();
   const myRef = useRef(null);
   const [isOpen, setIsOpen] = useState(false);
@@ -42,48 +38,6 @@ function HeaderComponent() {
   // console.log(token);
   // console.log(user);
   return (
-<<<<<<< Updated upstream
-    <header className="bg-white">
-      <nav
-        className="mx-auto flex w-full items-center justify-between p-6 lg:px-8"
-        aria-label="Global"
-      >
-        <div className="flex lg:flex-1">
-          <button onClick={() => Navigate("/")} className="-m-1.5 p-1.5">
-            <span className="sr-only">Photobazarr</span>
-            <img className="h-8 w-auto" src="./logo2.png" alt="photobazarr" />
-          </button>
-        </div>
-        {/* shows up when user haven't login in or sign up */}
-        {!user && (
-          <>
-            <div className="lg:flex lg:flex-1 lg:justify-end">
-              <button
-                href="#"
-                className="text-sm font-semibold leading-6 text-gray-900"
-                onClick={() => Navigate("/login")}
-              >
-                Sign in <span aria-hidden="true"></span>
-              </button>
-              <button
-                className="mx-3 text-sm bg-sky-500 font-semibold rounded-lg px-2 py-1.5 text-base leading-6 text-white hover:bg-sky-600"
-                onClick={() => Navigate("/register")}
-              >
-                Join Us
-              </button>
-            </div>
-          </>
-        )}
-        {/* shows up when user have loged in */}
-        {user && (
-          <>
-            <div className="lg:flex lg:flex-1 lg:justify-end mx-3">
-              <button
-                className="block flex items-center px-1 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900"
-                role="menuitem"
-                onClick={() => { setIsOpen(false); Navigate(`/message`) }}
-              >
-=======
     <AuthContext.Provider value={{ authStatus, setAuthStatus }}>
       <header className="bg-white">
         <nav
@@ -120,7 +74,6 @@ function HeaderComponent() {
           {authStatus.status && (
             <>
               <div className="lg:flex lg:flex-1 lg:justify-end mx-3">
->>>>>>> Stashed changes
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   fill="none"
@@ -128,10 +81,6 @@ function HeaderComponent() {
                   strokeWidth="1.5"
                   stroke="currentColor"
                   className="w-6 h-6"
-<<<<<<< Updated upstream
-
-=======
->>>>>>> Stashed changes
                 >
                   <path
                     strokeLinecap="round"

@@ -9,6 +9,7 @@ router.get("/", artworkController.getAllArtworks);
 router.post("/", artworkController.createArtwork);
 
 // Retrieve a single artwork with artwork_id
+<<<<<<< Updated upstream
 router.get("/:id([0-9a-fA-F]{24})", artworkController.findArtworkById);
 
 // Retrieve a single artwork with author_id
@@ -17,6 +18,13 @@ router.get("/author/:id([0-9a-fA-F]{24})", artworkController.findArtworkByAuthor
 // Delete a artwork with artwork_id
 router.delete("/:id([0-9a-fA-F]{24})", artworkController.deleteArtworkById);
 
+=======
+router.get("/:id(\\w{24})", artworkController.findArtworkById);
+
+// Delete a artwork with artwork_id
+router.delete("/:id(\\w{24})", artworkController.deleteArtworkById);
+
+>>>>>>> Stashed changes
 // Update a artwork with artwork_id
 router.patch("/:id", artworkController.updateArtworkById);
 

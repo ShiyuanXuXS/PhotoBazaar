@@ -1,6 +1,9 @@
 const dotenv = require("dotenv");
 dotenv.config()
+<<<<<<< Updated upstream
 
+=======
+>>>>>>> Stashed changes
 const stripe = require('stripe')(process.env.STRIPE_API_KEY);
 const jwt = require('jsonwebtoken')
 const secretKey = process.env.SECRET_KEY || 'default-secret-key';
@@ -12,6 +15,7 @@ class PurchaseController {
 
 
     async createPaymentIntent(req, res) {
+<<<<<<< Updated upstream
         
         const { authorization } = req.headers;
         if (!authorization) {return  res.status(400).json({ message: "No authorization" }); }
@@ -57,11 +61,47 @@ class PurchaseController {
             } catch (err) {
                 res.status(500).json({message:"create payment failed"})
             }
+=======
+        const { purchase_id } = req.body;
+        console.log(purchase_id);
+        let purchase;
+        try {
+            purchase = await PurchaseModel.getPurchaseById(purchase_id);
+        } catch (err) {
+            return res.status(400).json({ message: 'Order not found' });
+        }
+        
+        if ( !purchase) {
+            return res.status(400).json({ message: 'Order not found' });
+        }
+        if ( purchase.is_paid) {
+            return res.status(400).json({ message: 'Already paid, please do not pay again' });
+        }
+        let paymentIntent;
+        try {
+            paymentIntent = await stripe.paymentIntents.create({
+            amount: purchase.transaction_price*100,
+            currency: 'cad',
+            automatic_payment_methods: {
+                enabled: true,
+            },
+            });
+            const updatedTransactionRef = purchase.transaction_ref || [];
+            updatedTransactionRef.push(paymentIntent.id);
+            await PurchaseModel.updatePurchase(purchase_id, { transaction_ref: updatedTransactionRef });
+            res.status(200).json({clientSecret: paymentIntent.client_secret,});
+        } catch (err) {
+            res.status(500).json({message:"create payment failed"})
+        }
+         console.log(paymentIntent)
+        
+>>>>>>> Stashed changes
 
         });
     }
 
     async checkPaymentStatus(req, res) {
+<<<<<<< Updated upstream
         const { authorization } = req.headers;
         if (!authorization) {return  res.status(400).json({ message: "No authorization" }); }
         const token = authorization.split(' ')[1];
@@ -107,6 +147,36 @@ class PurchaseController {
         });
         // console.log(token)
         
+=======
+        try {
+            const { id } = req.params;
+            const purchase = await PurchaseModel.getPurchaseById(id);            
+
+            const successfulPayments = [];
+            for (const transactionId of purchase.transaction_ref) {
+                const paymentIntent = await stripe.paymentIntents.retrieve(transactionId);
+                if (paymentIntent.status === 'succeeded') {
+                    successfulPayments.push(transactionId);
+                }
+            }
+
+            if (successfulPayments.length === 0) {
+                return res.status(200).json({ message:'No payments have succeeded.' });
+            } else {
+                await PurchaseModel.updatePurchase(id, { is_paid: true });
+                if (successfulPayments.length === 1) {
+                    return res.status(201).json({ message:'Payment succeeded.' });
+                } else {
+                    return res.status(202).json({ message: 'Multiple payments detected. Please contact an administrator for assistance.'});
+                } 
+                
+            }
+            
+        } catch (error) {
+          console.error('retrieve error:', error);
+          return res.status(500).json({message:"retrieve order failed"})
+        }
+>>>>>>> Stashed changes
       }
 
     async createPurchase(req, res) {

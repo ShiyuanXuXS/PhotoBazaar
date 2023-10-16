@@ -231,6 +231,7 @@ module.exports = {
 
   //Todo: retrive artwork_id list from user_id
   // crud artwork_id list
+<<<<<<< Updated upstream
   updateMyAssetsById: async (req, res) => {
     const user_id = req.params.id; // Corrected parameter name from _id to id
     const update = req.body.my_assets;
@@ -378,6 +379,8 @@ module.exports = {
   // } else {
   //   res.status(404).send({ message: "User not found" });
   // }
+=======
+>>>>>>> Stashed changes
 };
 
 //register validation

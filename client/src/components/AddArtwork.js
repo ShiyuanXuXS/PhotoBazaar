@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useContext, } from 'react';
 import Axios from 'axios';
+import { AuthContext } from "../Helpers/AuthContext";
 import * as Yup from "yup";
 import UploadImagesBoxComponent from './UploadImagesBox';
 import {
@@ -7,6 +8,7 @@ import {
     DeleteObjectCommand,
     PutObjectCommand,
 } from "@aws-sdk/client-s3";
+import { useNavigate } from 'react-router-dom';
 // window.Buffer = window.Buffer || require("buffer").Buffer;
 
 //S3 config
@@ -27,6 +29,7 @@ function AddArtworkComponent(props) {
     const [tagList, setTagList] = useState([]);
     const [tagArray, setTagArray] = useState([]);
     const tags = tagArray.map(data => ({ tag_id: data }));
+<<<<<<< Updated upstream
     const [token, setToken] = useState(localStorage.getItem('accessToken'))
     const [user, setUser] = useState(null);
 
@@ -41,6 +44,12 @@ function AddArtworkComponent(props) {
                 });
         }
     }, []);
+=======
+    const Navigate = useNavigate();
+
+
+    const { userId } = useContext(AuthContext);
+>>>>>>> Stashed changes
 
     const [imagesBoxes, setImagesBoxes] = useState([{
         index: 1,
@@ -138,7 +147,11 @@ function AddArtworkComponent(props) {
                     const date = new Date();
                     for (const data of uploadImg) {
                         const timestamp = date.getTime();
+<<<<<<< Updated upstream
                         const newFileName = `${timestamp}_${user.id}.${data.file.name.split(".").pop()}`; //TODO: replace user1_id with user id
+=======
+                        const newFileName = `${timestamp}_${userId}.${data.file.name.split(".").pop()}`; //TODO: replace user1_id with user id
+>>>>>>> Stashed changes
 
                         const params = {
                             Bucket: config.bucketName,
@@ -181,7 +194,11 @@ function AddArtworkComponent(props) {
 
                             // save artwork to database
                             Axios.post("http://localhost:3001/api/artworks", {
+<<<<<<< Updated upstream
                                 author_id: user.id,
+=======
+                                author_id: userId,
+>>>>>>> Stashed changes
                                 title: title,
                                 description: description,
                                 price: parseFloat(price),
@@ -191,6 +208,7 @@ function AddArtworkComponent(props) {
                             }).then((response) => {
                                 console.log(response);
                                 alert("Artwork saved successfully!");
+<<<<<<< Updated upstream
                                 // Navigate(`/artwork/${userId}`);
                                 // window.location.reload();
 
@@ -210,6 +228,12 @@ function AddArtworkComponent(props) {
                                 // add tag count
 
 
+=======
+                                Navigate(`/artwork/${userId}`);
+                                // window.location.reload();
+                                // add tag count
+                                // add artwork_id to user
+>>>>>>> Stashed changes
                             })
                                 .catch((error) => {
                                     console.error(error);

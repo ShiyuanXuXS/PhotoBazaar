@@ -90,8 +90,11 @@ function AddArtworkComponent({ isAdd, artwork_id }) {
         if (!isAdd) {
             Axios.get(`http://localhost:3001/api/artworks/${artwork_id}`).then((response) => {
                 setArtworkToUpdate(response.data);
-                console.log(response.data);
+                // console.log(response.data);
                 setTagArray(response.data.tags.map((tag) => tag.tag_id));
+                setTitle(response.data.title);
+                setDescription(response.data.description);
+                setPrice(response.data.price);
             })
                 .catch((error) => {
                     console.error(error);
@@ -133,9 +136,7 @@ function AddArtworkComponent({ isAdd, artwork_id }) {
         const newUploadImg = [...updatedUploadImages, data];
         setUploadImg(newUploadImg);
     }
-    console.log(title, description, price);
-    console.log(uploadImg);
-    console.log(tagArray);
+
     const saveImage = (img, flag) => {
         const date = new Date();
         var newFileName = "";
@@ -285,20 +286,24 @@ function AddArtworkComponent({ isAdd, artwork_id }) {
 
     });
 
+
     const updateArtwork = (event) => {
         event.preventDefault();
+
         //Validate
         validationSchema
             .validate({ title, description, price }, { abortEarly: false })
             .then(() => {
                 //Validate Cover Image
                 const uploadPromises = [];
+                const changeCover = false;
                 if (uploadImg.length > 1) {
                     console.log(uploadImg[1].file.name);
                     if (uploadImg[1].file.size > 5000000 || uploadImg[1] === undefined) {
                         alert("Please select a file less than 5MB");
                         return;
                     } else {
+                        changeCover = true;
                         // delete old cover image from s3 bucket
                         const parts = artworkToUpdate.cover_url.split(".com/");
                         const deleteFileName = parts.pop();
@@ -326,7 +331,7 @@ function AddArtworkComponent({ isAdd, artwork_id }) {
                             title: title,
                             description: description,
                             price: parseFloat(price),
-                            cover_url: uploadImg[1].file === null ? artworkToUpdate.cover_url : `https://${config.bucketName}.s3.${config.region}.amazonaws.com/${config.dirName}/${fileNames[0]}`,
+                            cover_url: !changeCover ? artworkToUpdate.cover_url : `https://${config.bucketName}.s3.${config.region}.amazonaws.com/${config.dirName}/${fileNames[0]}`,
 
                         }).then((response) => {
                             console.log(response);
@@ -336,7 +341,39 @@ function AddArtworkComponent({ isAdd, artwork_id }) {
                             .catch((error) => {
                                 console.error(error);
                             });
-                        // update tag count
+                        // update tag count  fixme:500
+                        // compare old tag array and new tag array
+                        // const oldTagArray = artworkToUpdate.tags.map((tag) => tag.tag_id);
+                        // // find tags that are in old tag array but not in new tag array, decrease count
+                        // const decreaseTagArray = oldTagArray.filter((tag) => !tagArray.includes(tag));
+                        // console.log(decreaseTagArray);
+                        // if (decreaseTagArray.length > 0) {
+                        //     decreaseTagArray.forEach((tag) => {
+                        //         Axios.patch(`http://localhost:3001/api/tags/updateTagCountDecrease/${tag}`, {
+                        //             decreaseBy: 1,
+                        //         }).then((response) => {
+                        //             console.log("after patch," + response);
+                        //         })
+                        //             .catch((error) => {
+                        //                 console.error(error);
+                        //             });
+                        //     })
+                        // }
+                        // // find tags that are in new tag array but not in old tag array, increase count
+                        // const increaseTagArray = tagArray.filter((tag) => !oldTagArray.includes(tag));
+                        // console.log(increaseTagArray);
+                        // if (increaseTagArray.length > 0) {
+                        //     increaseTagArray.forEach((tag) => {
+                        //         Axios.patch(`http://localhost:3001/api/tags/updateTagCountIncrease/${tag}`, {
+                        //             increaseBy: 1,
+                        //         }).then((response) => {
+                        //             console.log("after patch," + response);
+                        //         })
+                        //             .catch((error) => {
+                        //                 console.error(error);
+                        //             });
+                        //     })
+                        // }
                     })
                     .catch((uploadErrors) => {
                         console.error("Error uploading images:", uploadErrors);

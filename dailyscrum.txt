@@ -152,4 +152,9 @@ Chang liu
 - change all alerts in front end to messages in page
 2. To do
 -  My profile
+Xiaoxing Pan
+1.  Done
+- update artwork main info 
+2. To do
+- show photos of a artwork and update
 

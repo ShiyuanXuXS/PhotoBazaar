@@ -37,4 +37,8 @@ router.post("/forgotpassword", userController.forgotPassword);
 
 router.put("/changepassword/:email", userController.updateUserByEmail);
 
+
+//search users
+router.get("/search/:searchString", userController.searchUsers);
+
 module.exports = router;

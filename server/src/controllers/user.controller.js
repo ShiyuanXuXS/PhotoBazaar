@@ -313,6 +313,32 @@ module.exports = {
       }
     });
   },
+
+
+
+
+
+
+  searchUsers: async (req, res) => {
+    const searchString = req.params.searchString;
+
+    // regular expression for case-insensitive search
+    const searchRegex = new RegExp(searchString, 'i');
+
+    try {
+      const matchingUsers = await User.find({
+        $or: [
+          { username: { $regex: searchRegex } },
+          { nickname: { $regex: searchRegex } },
+        ],
+      }, { _id:0, id: '$_id', username: 1, nickname: 1 });
+
+      res.status(200).json(matchingUsers);
+    } catch (error) {
+      console.log(error);
+      res.status(500).json({ message: "Internal Server Error" });
+    }
+  }
 };
 
 //register validation

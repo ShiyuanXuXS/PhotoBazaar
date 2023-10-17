@@ -12,19 +12,16 @@ module.exports = (server) => {
   const userSockets = {};
 
   io.on('connection', async (socket) => {
-    console.log('A user connected');
+    // console.log('A user connected');
     socket.on('user_info', (userInfo) => {
-      // if (userInfo.username in userSockets) {
-        userSockets[userInfo.id]=socket
-      // }
+      userSockets[userInfo.id] = socket;
       console.log(`${userInfo.username}(id: ${userInfo.id}) Connected to server, socket_id: ${socket.id}`);
-      // console.log(userSockets['user1']?userSockets['user1'].id:"no user1")
-      // console.log(userSockets['user2']?userSockets['user2'].id:"no user2")
+      
     })
   
     socket.on("private-message", async (data) => {
-      const sender_id = data.sender_id; //todo: auth & find userid by username
-      const receiver_id = data.receiver_id; //todo: find userid by username
+      const sender_id = data.sender_id; //todo: auth
+      const receiver_id = data.receiver_id; 
       const message = data.message;
       console.log(`receive private-message sender_id: ${data.sender_id},receiver_id: ${data.receiver_id},message: ${data.message}`);
   

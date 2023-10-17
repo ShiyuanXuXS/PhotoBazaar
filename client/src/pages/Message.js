@@ -84,33 +84,6 @@ function Message() {
 
     }, [currentUser]);
 
-
-    const fetchUserList = async () => {
-        setUserList([
-            {
-                id: "id1",
-                username: 'user1',
-                nickname: 'nickname1',
-                messages: [
-                    { sender_username: 'user1', receiver_username: 'user2', message: 'hello, I am user1', isread: false },
-                    { sender_username: 'user2', receiver_username: 'user1', message: 'hello, I am user2', isread: false }
-                ],
-                hasMessageUnread: true
-            },
-            {
-                id: "id2",
-                username: 'user2',
-                nickname: 'nickname2',
-                messages: [
-                    { sender_username: 'user2', receiver_username: 'user1', message: 'bonjour, je suis user2', isread: false },
-                    { sender_username: 'user1', receiver_username: 'user2', message: 'bonjour, je suis user1', isread: false }
-                ],
-                hasMessageUnread: true
-            }])
-
-
-    };
-
     const selectUser = (user) => {
         setSelectedUser(user);
     };
@@ -163,19 +136,38 @@ function Message() {
                 messages: []
             }
         ])
+        if (!token || !searchUserBy) {
+            return;
+        }
+            try {
+                
+            
+            axios.get(`${url}/api/users/search/${searchUserBy}`, { headers: { accessToken: token } })
+                .then(response => {
+                    const users = response.data;
+                    
+                    const usersWithMessages = users.map(user => ({ ...user, messages: [] }));
+                    setUserListFromSearch(usersWithMessages);
+                    console.log(userListFromSearch)
+                })
+                .catch(err=>
+                console.log(err)
+                )
+            } catch (err) {
+                console.log(err)
+            }
+        
 
     }
+
     const selectUserFromSearch = (selectedResult) => {
         const existingUser = userList.find((user) => user.username === selectedResult.username);
 
         if (existingUser) {
             selectUser(existingUser);
         } else {
-            const newUser = {
-                username: selectedResult.username,
-                nickname: selectedResult.nickname,
-                messages: []
-            };
+            // console.log(selectedResult)
+            const newUser = selectedResult;
             setUserList([...userList, newUser]);
             selectUser(newUser);
         }

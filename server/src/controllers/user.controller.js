@@ -82,14 +82,18 @@ module.exports = {
   addUser: async (req, res) => {
     try {
       const user = req.body;
-      const existingUseremail = await User.findOne({
-        where: { email: user.email },
-      });
+      const existingUseremail = await User.findOne({ email: user.email });
 
       if (existingUseremail !== null) {
         return res
           .status(400)
           .json({ message: `User email ${user.email} already exists.` });
+      }
+
+      if (req.body.password != req.body.confirmPassword) {
+        return res
+          .status(400)
+          .send({ message: "confirm password mush be the same" });
       }
 
       if (validateDataAdd(req, res)) {

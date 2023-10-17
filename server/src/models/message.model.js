@@ -11,7 +11,9 @@ class Message {
         const messageData = {
             sender_id: sender_id,
             receiver_id: receiver_id,
-            message: message
+            message: message,
+            send_time: new Date(),
+            is_read: false,
         }
         try {
             const result = await this.collection.insertOne(messageData);
@@ -35,7 +37,7 @@ class Message {
     async markAsRead(messageId) {
         try {
             const filter = { _id: new ObjectID(messageId) };
-            const update = { $set: { isread: true } };
+            const update = { $set: { is_read: true } };
             await this.collection.updateOne(filter, update);
         } catch (error) {
             throw error;

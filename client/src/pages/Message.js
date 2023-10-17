@@ -20,8 +20,6 @@ function Message() {
     const [currentUser, setCurrentUser] = useState(null);//user logged in
 
     useEffect(() => {
-        // fetchUserList();
-        // setCurrentUser('user1');
         try {
             if (token) {
                 axios.get(`${url}/api/users/auth`, { headers: { accessToken: token } })
@@ -47,15 +45,14 @@ function Message() {
 
 
     useEffect(() => {
+        if (!currentUser) { return };
 
         const newSocket = io.connect(url);
-        if (currentUser) {
-            newSocket.on('connect', () => {
-                newSocket.emit('user_info', !{ username: currentUser.username })
-                console.log(currentUser.username + ' Connected to server');
-            });
-        }
-
+        
+        newSocket.on('connect', () => {
+            newSocket.emit('user_info', { id:currentUser.id,username: currentUser.username })
+            console.log(currentUser.username + ' Connected to server');
+        });
 
         newSocket.on('connect_error', (error) => {
             console.error('Connection error:', error);
@@ -65,7 +62,7 @@ function Message() {
 
             setUserList((prevUserList) => {
                 return prevUserList.map((user) => {
-                    if (user.username === message.sender_username) {
+                    if (user.id === message.sender_id) {
                         return {
                             ...user,
                             messages: [...user.messages, message],
@@ -122,8 +119,8 @@ function Message() {
         if (!socket || !selectedUser || !newMessage) return;
 
         const message = {
-            sender_username: currentUser.username,
-            receiver_username: selectedUser.username,
+            sender_id: currentUser.id,
+            receiver_id: selectedUser.id,
             message: newMessage,
         }
         socket.emit('private-message', message);
@@ -187,17 +184,11 @@ function Message() {
     return (
         <div>
             <Header />
-            {currentUser && (currentUser.username)}
-            <div className="bg-gray-100 h-screen p-4 flex flex-col md:flex-row justify-center items-center">
-                {/* <div>
-                    {currentUser === 'user1' && (<p>user1</p>)}
-                    {currentUser === 'user2' && (<p>user2</p>)}
-                    <button onClick={() => {
-                        setCurrentUser(currentUser === 'user1' ? 'user2' : 'user1')
-                    }}>Switch User</button>
-
-                </div> */}
-                <div className="user-container bg-white p-4 rounded-lg shadow-lg md:w-1/2  flex-grow self-stretch mx-2 my-2">
+            {/* {currentUser && (currentUser.username)} */}
+            <div className="message-container bg-gray-100 h-screen p-4 flex flex-col md:flex-row justify-center items-center"
+                style={{ backgroundImage: 'url("./images/bg_seashore.jpg")' , backgroundSize: 'cover'}}>
+                
+                <div className="user-container bg-white p-4 rounded-lg shadow-lg md:w-1/3 self-stretch mx-6 my-2" style={{ maxHeight: '80vh', overflowY: 'auto' }}>
                     <div className="user-list font-bold text-lg mb-4">
                         {userList.map((user) => (
                             <div
@@ -247,7 +238,7 @@ function Message() {
                 </div>
 
                 {selectedUser && (
-                    <div className="user-container bg-white p-4 rounded-lg shadow-lg md:w-1/2  flex-grow self-stretch mx-2 my-2" >
+                    <div className="chat-container bg-white p-4 rounded-lg shadow-lg md:w-1/3 self-stretch mx-6 my-2" style={{ maxHeight: '80vh', overflowY: 'auto' }}>
 
                         <div className="chat-header bg-gray-100 text-blue-500  p-1 rounded font-bold text-lg" >
                             {`Chat with ${selectedUser.nickname}`}
@@ -257,13 +248,13 @@ function Message() {
                             {selectedUser.messages.map((message, index) => (
                                 <div
                                     key={index}
-                                    className={`message mb-2 ${message.sender_username === currentUser.username
+                                    className={`message mb-2 ${message.sender_id === currentUser.id
                                         ? 'text-right'
                                         : ''
                                         }`}
                                 >
                                     <span
-                                        className={`message-content inline-block p-1 rounded ${message.sender_username === currentUser.username
+                                        className={`message-content inline-block p-1 rounded ${message.sender_id === currentUser.id
                                             ? 'bg-green-500 text-black'
                                             : 'bg-gray-200 text-black'
                                             }`}

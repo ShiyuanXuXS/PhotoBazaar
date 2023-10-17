@@ -45,6 +45,12 @@ function HeaderComponent() {
             <img className="h-8 w-auto" src="./logo2.png" alt="photobazarr" />
           </button>
         </div>
+        <h1 className="text-4xl font-extrabold text-gray-800 font-serif">
+          PhotoBazaar
+        </h1>
+        <p className="text-lg font-semibold text-gray-600 mx-5">
+          Your Photos, Our Marketplace
+        </p>
         {/* shows up when user haven't login in or sign up */}
         {!user && (
           <>

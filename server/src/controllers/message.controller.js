@@ -122,10 +122,13 @@ class MessageController {
                                     username: user.username,
                                     nickname: user.nickname,
                                     messages: [{
-                                        sender_username: message.sender_id === user_id ? decoded.username:user.username,
+                                        sender_id:message.sender_id === user_id ? decoded.id:user._id,
+                                        sender_username: message.sender_id === user_id ? decoded.username : user.username,
+                                        receiver_username: message.receiver_id === user_id ? decoded.id:user._id ,
                                         receiver_username: message.receiver_id === user_id ? decoded.username:user.username ,
                                         message: message.message,
-                                        is_read:message.is_read
+                                        is_read: message.is_read,
+                                        send_time:message.send_time
                                     }],
                                     hasMessageUnread: !message.is_read,
                                 });
@@ -138,16 +141,19 @@ class MessageController {
                         console.log("push a message");
                         const userToUpdate = userMessages.find((user) => user.id === message.sender_id || user.id === message.receiver_id);
                         userToUpdate.messages.push({
-                            sender_username: message.sender_id === user_id ? decoded.username:userToUpdate.username,
+                            sender_id: message.sender_id === user_id ? decoded.id:userToUpdate._id,
+                            sender_username: message.sender_id === user_id ? decoded.username : userToUpdate.username,
+                            receiver_id: message.receiver_id === user_id ? decoded.id:userToUpdate.id ,
                             receiver_username: message.receiver_id === user_id ? decoded.username:userToUpdate.username ,
                             message: message.message,
-                            is_read:message.is_read
+                            is_read: message.is_read,
+                            send_time:message.send_time
                         });
                         userToUpdate.hasMessageUnread = userToUpdate.hasMessageUnread || !message.is_read;
                     }
                 }
     
-                console.log(userMessages);
+                // console.log(userMessages);
                 return res.status(200).json(userMessages);
             } catch (error) {
                 return res.status(500).json({ error: 'Failed to retrieve messages' });

@@ -32,9 +32,9 @@ function LoginComponent() {
     })
       .then((response) => {
         if (response.data.error) {
-          alert(response.data.error);
+          setError(response.data.error);
         } else if (response.data.message) {
-          alert(response.data.message); // Display success message or token
+          setMessage(response.data.message);
           //set token
           localStorage.setItem("accessToken", response.data.token);
           // setUserEmail(response.data.email);

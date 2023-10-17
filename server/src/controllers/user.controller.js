@@ -283,7 +283,7 @@ module.exports = {
           service: "gmail",
           auth: {
             user: `${process.env.GMAIL}`,
-            pass: "omuc elme ehux hvpj",
+            pass: `${process.env.GMAIL_PASSWORD}`,
           },
         });
 

@@ -122,13 +122,42 @@ module.exports = {
             tags: tags.map(tag => ({ tag_id: tag.tag_id })),
             title,
         };
-        await Artwork.findOneAndUpdate({ _id: artwork_id }, update, { new: true })
+
+        Artwork.findOneAndUpdate({ _id: artwork_id }, update, { new: true })
             .then((result) => {
                 if (result) {
                     res.status(200).send({ message: "Artwork updated successfully" });
                 } else {
                     res.status(404).json({ message: 'Artwork not found' });
                 }
+            })
+            .catch((err) => {
+                res.status(400).json(err);
+            });
+    },
+    updateArtworkMainInfoById: async (req, res) => {
+        const artwork_id = req.params.id;
+        const { cover_url, description, price, title } = req.body;
+
+        Artwork.findOne({ _id: artwork_id })
+            .then((result) => {
+                if (result) {
+                    result.cover_url = cover_url;
+                    result.description = description;
+                    result.price = price;
+                    result.title = title;
+
+                    result.save()
+                        .then((result) => {
+                            res.status(200).send({ message: "Artwork updated successfully" });
+                        })
+                        .catch((err) => {
+                            res.status(400).json(err);
+                        });
+                } else {
+                    res.status(404).json({ message: 'Artwork not found' });
+                }
+
             })
             .catch((err) => {
                 res.status(400).json(err);

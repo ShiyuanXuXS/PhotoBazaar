@@ -7,7 +7,9 @@ router.get('/', tagController.getAllTags);
 router.get('/:id', tagController.getTagById);
 router.put('/:id', tagController.updateTag);
 router.delete('/:id', tagController.deleteTag);
-// update tag count after artwork is uploaded
-router.patch('/updateTagCount/:id', tagController.updateTagCount);
+// increase tag count after artwork is uploaded
+router.patch('/updateTagCountIncrease/:id', tagController.increaseTagCount);
+// decrease tag count after artwork is deleted
+router.patch('/updateTagCountDecrease/:id', tagController.decreaseTagCount);
 
 module.exports = router;

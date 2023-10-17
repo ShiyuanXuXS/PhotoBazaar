@@ -20,4 +20,7 @@ router.delete("/:id([0-9a-fA-F]{24})", artworkController.deleteArtworkById);
 // Update a artwork with artwork_id
 router.patch("/:id", artworkController.updateArtworkById);
 
+// Update a artwork with artwork_id
+router.patch("/mainInfo/:id", artworkController.updateArtworkMainInfoById);
+
 module.exports = router;

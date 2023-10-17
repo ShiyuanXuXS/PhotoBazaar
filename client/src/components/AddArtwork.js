@@ -8,7 +8,7 @@ import {
     PutObjectCommand,
 } from "@aws-sdk/client-s3";
 import { useNavigate } from 'react-router-dom';
-// window.Buffer = window.Buffer || require("buffer").Buffer;
+export default AddArtworkComponent;
 
 //S3 config
 const config = {
@@ -32,7 +32,11 @@ function AddArtworkComponent({ isAdd, artwork_id }) {
     const [user, setUser] = useState(null);
     const navigate = useNavigate();
     const [artworkToUpdate, setArtworkToUpdate] = useState([]);
-    const [imagesBoxes, setImagesBoxes] = useState([]);
+    const [imagesBoxes, setImagesBoxes] = useState(
+        [{
+            index: 1,
+            status: "show",
+        }]);
 
     useEffect(() => {
         if (token) {
@@ -88,22 +92,10 @@ function AddArtworkComponent({ isAdd, artwork_id }) {
                 setArtworkToUpdate(response.data);
                 console.log(response.data);
                 setTagArray(response.data.tags.map((tag) => tag.tag_id));
-                setImagesBoxes(
-                    Array.from({ length: response.data.photos.length }, (_, index) => ({
-                        index: index + 1,
-                        status: "show",
-                    }))
-                );
             })
                 .catch((error) => {
                     console.error(error);
                 });
-        } else {
-            setImagesBoxes([{
-                index: 1,
-                status: "show",
-            }]);
-
         }
 
     }, []);
@@ -121,6 +113,7 @@ function AddArtworkComponent({ isAdd, artwork_id }) {
     const [description, setDescription] = useState('');
     const [price, setPrice] = useState();
     const [uploadImg, setUploadImg] = useState([]);
+    let index = 0;
 
     const handleSaveCoverImage = (event) => {
         event.preventDefault();
@@ -140,14 +133,18 @@ function AddArtworkComponent({ isAdd, artwork_id }) {
         const newUploadImg = [...updatedUploadImages, data];
         setUploadImg(newUploadImg);
     }
-
+    console.log(title, description, price);
+    console.log(uploadImg);
+    console.log(tagArray);
     const saveImage = (img, flag) => {
         const date = new Date();
         var newFileName = "";
+
         if (flag == 0) {
-            newFileName = `${date.getTime()}_${user.id}.cover.${img.file.name.split(".").pop()}`;
+            newFileName = `${new Date().getTime()}_${user.id}.cover.${img.file.name.split(".").pop()}`;
         } else {
-            newFileName = `${date.getTime()}_${user.id}.photo.${img.file.name.split(".").pop()}`;
+
+            newFileName = `${new Date().getTime()}.${index++}_${user.id}.photo.${img.file.name.split(".").pop()}`;
         }
 
         const params = {
@@ -198,16 +195,19 @@ function AddArtworkComponent({ isAdd, artwork_id }) {
                         console.log("All images uploaded successfully.", fileNames); // 'fileNames' contain an array of successfully uploaded file names
                         // get photos data
                         const photos = [];
-                        const photoFileNames = fileNames.filter((fileName) => fileName.includes("photo")); // exclude cover image
-                        for (let i = 1; i < uploadImg.length; i++) {
+                        // const photoFileNames = fileNames.filter((fileName) => fileName.includes("photo")); // exclude cover image
+                        // console.log(photoFileNames);
+                        for (let i = 0; i < uploadImg.length; i++) {
                             photos.push({
                                 photo_name: uploadImg[i].name,
                                 description: uploadImg[i].description,
-                                file_url: `https://${config.bucketName}.s3.${config.region}.amazonaws.com/${config.dirName}/${photoFileNames[i - 1]}`,
+                                file_url: `https://${config.bucketName}.s3.${config.region}.amazonaws.com/${config.dirName}/${fileNames[i]}`,
                                 upload_time: new Date(),
                                 modify_time: new Date(),
                             });
                         }
+                        console.log(photos);
+                        console.log(photos.slice(1));
 
                         // save artwork to database
                         Axios.post("http://localhost:3001/api/artworks", {
@@ -217,11 +217,12 @@ function AddArtworkComponent({ isAdd, artwork_id }) {
                             price: parseFloat(price),
                             cover_url: `https://${config.bucketName}.s3.${config.region}.amazonaws.com/${config.dirName}/${fileNames[0]}`,
                             tags: tags,
-                            photos: photos,
+                            photos: photos.slice(1),
                         }).then((response) => {
                             console.log(response);
                             alert("Artwork saved successfully!");
                             navigate(`/artwork/${user.id}`);
+                            index = 0;
                             // window.location.reload();
 
                             // add artwork_id to user
@@ -236,7 +237,7 @@ function AddArtworkComponent({ isAdd, artwork_id }) {
 
                             // add tag count
                             tagArray.forEach((tag) => {
-                                Axios.patch(`http://localhost:3001/api/tags/updateTagCount/${tag}`, {
+                                Axios.patch(`http://localhost:3001/api/tags/updateTagCountIncrease/${tag}`, {
                                     increseBy: 1,
                                 }).then((response) => {
                                     console.log("after patch," + response);
@@ -244,8 +245,7 @@ function AddArtworkComponent({ isAdd, artwork_id }) {
                                     .catch((error) => {
                                         console.error(error);
                                     });
-                            }
-                            )
+                            })
                         })
                             .catch((error) => {
                                 console.error(error);
@@ -284,6 +284,73 @@ function AddArtworkComponent({ isAdd, artwork_id }) {
             }),
 
     });
+
+    const updateArtwork = (event) => {
+        event.preventDefault();
+        //Validate
+        validationSchema
+            .validate({ title, description, price }, { abortEarly: false })
+            .then(() => {
+                //Validate Cover Image
+                const uploadPromises = [];
+                if (uploadImg.length > 1) {
+                    console.log(uploadImg[1].file.name);
+                    if (uploadImg[1].file.size > 5000000 || uploadImg[1] === undefined) {
+                        alert("Please select a file less than 5MB");
+                        return;
+                    } else {
+                        // delete old cover image from s3 bucket
+                        const parts = artworkToUpdate.cover_url.split(".com/");
+                        const deleteFileName = parts.pop();
+
+                        const params = {
+                            Bucket: config.bucketName,
+                            Key: deleteFileName, // Specify the path to the file you want to delete
+                        };
+
+                        client
+                            .send(new DeleteObjectCommand(params))
+                            .then((data) => console.log(data))
+                            .catch((error) => console.log(error));
+
+                        // save cover image to s3 bucket                  
+                        uploadPromises.push(saveImage(uploadImg[1], 0));
+                    }
+                }
+                Promise.all(uploadPromises)
+                    .then((fileNames) => {
+                        console.log("All images uploaded successfully.", fileNames); // 'fileNames' contain an array of successfully uploaded file names
+
+                        // patch artwork to database
+                        Axios.patch(`http://localhost:3001/api/artworks/mainInfo/${artworkToUpdate._id}`, {
+                            title: title,
+                            description: description,
+                            price: parseFloat(price),
+                            cover_url: uploadImg[1].file === null ? artworkToUpdate.cover_url : `https://${config.bucketName}.s3.${config.region}.amazonaws.com/${config.dirName}/${fileNames[0]}`,
+
+                        }).then((response) => {
+                            console.log(response);
+                            alert("Artwork updated successfully!");
+                            // navigate(`/artwork/${user.id}`);
+                        })
+                            .catch((error) => {
+                                console.error(error);
+                            });
+                        // update tag count
+                    })
+                    .catch((uploadErrors) => {
+                        console.error("Error uploading images:", uploadErrors);
+                    });
+
+            })
+            .catch((validationErrors) => {
+                console.error("Validation errors:", validationErrors);
+            });
+
+
+    };
+
+
 
     return (
         <div className="my-4">
@@ -384,46 +451,52 @@ function AddArtworkComponent({ isAdd, artwork_id }) {
                             />
                             <p className="text-gray-500 text-sm">Required, must be equal or higher than 0.</p>
                         </div>
-                        <div className='flex items-center mb-4'>
-                            <div className='text-xl font-bold capitalize'>Photo</div>
-                            <button className={"items-center px-1 bg-blue"} onClick={handleAddImagesBox} disabled={imagesBoxes.length >= 8}>
-                                <svg
-                                    xmlns="http://www.w3.org/2000/svg"
-                                    fill="none"
-                                    viewBox="0 0 24 24"
-                                    strokeWidth={3}
-                                    stroke={imagesBoxes.length >= 8 ? 'gray' : 'blue'}
-                                    className="w-6 h-6"
-                                >
-                                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v6m3-3H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                </svg>
-                            </button>
-                        </div>
-                        <p className="text-gray-500 text-sm">Required, maximum 8 photos.</p>
+                        {isAdd ? (<>
+                            <div className='flex items-center mb-4'>
+                                <div className='text-xl font-bold capitalize'>Photo</div>
+                                <button className={"items-center px-1 bg-blue"} onClick={handleAddImagesBox} disabled={imagesBoxes.length >= 8}>
+                                    <svg
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        fill="none"
+                                        viewBox="0 0 24 24"
+                                        strokeWidth={3}
+                                        stroke={imagesBoxes.length >= 8 ? 'gray' : 'blue'}
+                                        className="w-6 h-6"
+                                    >
+                                        <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v6m3-3H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                    </svg>
+                                </button>
+                            </div>
+                            <p className="text-gray-500 text-sm">Required, maximum 8 photos.</p>
 
-                        <div className="flex flex-wrap">
-                            {imagesBoxes.map((imagesBox, index) => (
-                                <div key={index} className="w-1/4"> {/* w-1/4 means each element takes 25% width */}
-                                    <UploadImagesBoxComponent
-                                        key={index}
-                                        index={imagesBox.index}
-                                        status={imagesBox.status}
-                                        isAdd={isAdd}
-                                        artworkToUpdate={artworkToUpdate} // Pass the artworkToUpdate array as a prop
-                                        handleShowImagesBox={(index) => handleShowImagesBox(index)}
-                                        handleSaveChildrenPhoto={handleSaveChildrenPhoto}
-                                    />
-                                </div>
-                            ))}
-                        </div>
+                            <div className="flex flex-wrap">
+                                {imagesBoxes.map((imagesBox, index) => (
+                                    <div key={index} className="w-1/4"> {/* w-1/4 means each element takes 25% width */}
+                                        <UploadImagesBoxComponent
+                                            key={index}
+                                            index={imagesBox.index}
+                                            status={imagesBox.status}
+                                            handleShowImagesBox={(index) => handleShowImagesBox(index)}
+                                            handleSaveChildrenPhoto={handleSaveChildrenPhoto}
+                                        />
+                                    </div>
+                                ))}
+                            </div></>) : (<></>)}
+
 
                         <div className="flex items-center mt-4 font-bold">
-                            <button
+                            {isAdd ? (<><button
                                 onClick={(e) => saveArtwork(e)}
                                 className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 mr-4"
                             >
                                 Save
-                            </button>
+                            </button></>) : (<><button
+                                onClick={(e) => updateArtwork(e)}
+                                className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 mr-4"
+                            >
+                                Update
+                            </button></>)}
+
                             <button
                                 className="bg-yellow-500 text-white px-4 py-2 rounded-lg hover:bg-yellow-600"
                                 variant="warning"
@@ -438,5 +511,3 @@ function AddArtworkComponent({ isAdd, artwork_id }) {
 
     )
 }
-
-export default AddArtworkComponent;

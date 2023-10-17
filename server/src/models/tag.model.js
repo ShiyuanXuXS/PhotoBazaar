@@ -36,11 +36,20 @@ class TagModel {
     return result.deletedCount;
   }
 
-  // updateTagCount(id) {
-  async updateTagCount(id) {
+  // increaseTagCount(id) {
+  async increaseTagCount(id) {
     const filter = { _id: new ObjectId(id) };
     const tag = await this.collection.findOne(filter);
     const newCount = tag.count + 1;
+    const result = await this.collection.updateOne(filter, { $set: { count: newCount } });
+    return result.modifiedCount;
+  }
+
+  // decreaseTagCount(id) {
+  async decreaseTagCount(id) {
+    const filter = { _id: new ObjectId(id) };
+    const tag = await this.collection.findOne(filter);
+    const newCount = tag.count - 1;
     const result = await this.collection.updateOne(filter, { $set: { count: newCount } });
     return result.modifiedCount;
   }

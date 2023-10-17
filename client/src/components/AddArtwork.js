@@ -383,8 +383,6 @@ function AddArtworkComponent({ isAdd, artwork_id }) {
             .catch((validationErrors) => {
                 console.error("Validation errors:", validationErrors);
             });
-
-
     };
 
 
@@ -392,7 +390,7 @@ function AddArtworkComponent({ isAdd, artwork_id }) {
     return (
         <div className="my-4">
             <div className="container mx-auto capitalize">
-                <h1 className="text-2xl font-semibold capitalize"> {isAdd ? (<>Create new artwork</>) : (<>Edit artwork</>)}</h1>
+                <div className="text-2xl font-semibold capitalize"> {isAdd ? (<>Create new artwork</>) : (<>Edit artwork</>)}</div>
                 <div className="mt-4">
                     <form>
                         {isAdd ? (<></>) : (<><div className="mb-4">
@@ -537,6 +535,7 @@ function AddArtworkComponent({ isAdd, artwork_id }) {
                             <button
                                 className="bg-yellow-500 text-white px-4 py-2 rounded-lg hover:bg-yellow-600"
                                 variant="warning"
+                                onClick={() => navigate(`/artwork/${user.id}`)}
                             >
                                 Cancel
                             </button>

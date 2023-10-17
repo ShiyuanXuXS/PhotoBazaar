@@ -1,10 +1,6 @@
 import React, { useEffect, useState } from "react";
 import Axios from "axios";
-// import "bootstrap/dist/css/bootstrap.min.css";
 import * as Yup from "yup";
-// import Container from "react-bootstrap/Container";
-// import Form from "react-bootstrap/Form";
-// import Button from "react-bootstrap/Button";
 
 function SignupComponent() {
   const [username, setUserName] = useState("");
@@ -30,37 +26,40 @@ function SignupComponent() {
 
   const validationSchema = Yup.object().shape({
     username: Yup.string()
-      .min(4, "User name must be at least 2 characters")
-      .max(20, "User name must not exceed 20 characters")
-      .matches(/^[a-z0-9]+$/, "Must contain only lowercase letters and numbers")
-      .test("unique-username", "User name already exists", (value) => {
+      .min(4, "User name must be at least 2 characters.\n") //fix me, how to output \n
+      .max(20, "User name must not exceed 20 characters.\n")
+      .matches(
+        /^[a-z0-9]+$/,
+        "Must contain only lowercase letters and numbers.\n"
+      )
+      .test("unique-username", "User name already exists.\n", (value) => {
         // Check if the username exists
         return !userNameExists.includes(value);
       })
       .required("User name is required"),
     password: Yup.string()
-      .min(4, "Password must be at least 2 characters")
-      .max(100, "Password must not exceed 100 characters")
-      .matches(/[a-z]/, "Must contain at least one lowercase letter")
-      .matches(/[A-Z]/, "Must contain at least one uppercase letter")
+      .min(4, "Password must be at least 2 characters.\n")
+      .max(100, "Password must not exceed 100 characters.\n")
+      .matches(/[a-z]/, "Must contain at least one lowercase letter.\n")
+      .matches(/[A-Z]/, "Must contain at least one uppercase letter.\n")
       .matches(
         /[0-9!@#$%^&*(),.?":{}|<>]/,
-        "Must contain at least one number or special character"
+        "Must contain at least one number or special character.\n"
       )
-      .required("Password is required"),
+      .required("Password is required."),
     confirmPassword: Yup.string()
       .oneOf(
         [Yup.ref("password"), null],
-        "password and confirm password not the same"
+        "password and confirm password not the same.\n"
       )
-      .required("Confirm password is required"),
+      .required("Confirm password is required."),
     email: Yup.string()
       .email("Invalid email format")
-      .test("unique-email", "Email already exists", (value) => {
+      .test("unique-email", "Email already exists.", (value) => {
         // Check if the username exists in itemNameExists
         return !emailExists.includes(value);
       })
-      .required("Seller email is required"),
+      .required("Seller email is required."),
   });
 
   const addUser = (e) => {

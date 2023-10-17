@@ -1,7 +1,6 @@
 //message.model.js
 const db = require('./db');
-const { ObjectID } = require('mongodb');
-
+const { ObjectId } = require('mongodb');
 class Message {
     constructor() {
         this.collection = db.collection('messages');
@@ -36,17 +35,19 @@ class Message {
 
     async markAsRead(messageId) {
         try {
-            const filter = { _id: new ObjectID(messageId) };
+            console.log(`message is read:${messageId}`)
+            const filter = {_id: new ObjectId(messageId)}
             const update = { $set: { is_read: true } };
             await this.collection.updateOne(filter, update);
         } catch (error) {
+            console.log(error)
             throw error;
         }
     }
 
     async delete(messageId) {
         try {
-            const filter = { _id: new ObjectID(messageId) };
+            const filter = { _id: new ObjectId(messageId) };
             await this.collection.deleteOne(filter);
         } catch (error) {
             throw error;

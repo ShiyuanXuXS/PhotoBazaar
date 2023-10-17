@@ -8,7 +8,7 @@ router.post('/', messageController.createMessage)
 
 router.get('/', messageController.getUserMessages)
 
-router.put('/:messageId', messageController.markMessageAsRead)
+router.patch('/:messageId', messageController.markMessageAsRead)
 
 //for dev only
 router.delete('/', messageController.deleteAllMessages)

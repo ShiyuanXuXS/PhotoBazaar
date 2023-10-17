@@ -31,8 +31,10 @@ module.exports = (server) => {
         const receiverSocket = userSockets[data.receiver_id];
         if (receiverSocket) {
           // console.log(receiverSocket.id)
-          receiverSocket.emit('sendback', data);
-          console.log(`send to ${data.receiver_id}: private-message sender_id: ${data.sender_id},receiver_username: ${data.receiver_id},message: ${data.message}`);
+          const sendback = data;
+          sendback.id = insertedId;
+          receiverSocket.emit('sendback', sendback);
+          // console.log(`send to ${data.receiver_id}: private-message sender_id: ${data.sender_id},receiver_id: ${data.receiver_id},message: ${data.message}`);
         }
       } catch (error) {
         console.error('Failed to save message to database:', error);

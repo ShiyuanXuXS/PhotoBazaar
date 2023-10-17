@@ -59,10 +59,13 @@ function Message() {
         });
 
         newSocket.on("sendback", function (message) {
-
+            // console.log(message)
             setUserList((prevUserList) => {
                 return prevUserList.map((user) => {
                     if (user.id === message.sender_id) {
+                        if ((currentUser.id !== user.id)) {
+                            user.hasMessageUnread = true;
+                        }
                         return {
                             ...user,
                             messages: [...user.messages, message],
@@ -87,6 +90,26 @@ function Message() {
     const selectUser = (user) => {
         setSelectedUser(user);
     };
+
+    useEffect(() => {
+        if (!selectedUser) return;
+        
+        selectedUser.hasMessageUnread = false;
+        console.log(selectedUser);
+
+        selectedUser.messages.forEach(async (message) => {
+            if (!message.is_read && message.receiver_id === currentUser.id) {
+                message.is_read = true;
+                try {
+                    console.log(`message is read: ${message.id}`)
+                  axios.patch(`${url}/api/messages/${message.id}`, null,{ headers: { accessToken: token } });
+                } catch (error) {
+                  console.error(`Error patch message: ${message.id}`);
+                }
+            }
+        });
+        setUserList([...userList]);
+    },[selectedUser])
 
     const sendMessage = () => {
         if (!socket || !selectedUser || !newMessage) return;
@@ -124,35 +147,33 @@ function Message() {
     }, [userList])
     const searchUsers = () => {
         //todo: search users from api/users
-        setUserListFromSearch([
-            {
-                username: 'user1',
-                nickname: 'nickname1',
-                messages: []
-            },
-            {
-                username: 'new user',
-                nickname: 'new user from search',
-                messages: []
-            }
-        ])
+        // setUserListFromSearch([
+        //     {
+        //         username: 'user1',
+        //         nickname: 'nickname1',
+        //         messages: []
+        //     },
+        //     {
+        //         username: 'new user',
+        //         nickname: 'new user from search',
+        //         messages: []
+        //     }
+        // ])
         if (!token || !searchUserBy) {
             return;
         }
             try {
-                
-            
-            axios.get(`${url}/api/users/search/${searchUserBy}`, { headers: { accessToken: token } })
-                .then(response => {
-                    const users = response.data;
-                    
-                    const usersWithMessages = users.map(user => ({ ...user, messages: [] }));
-                    setUserListFromSearch(usersWithMessages);
-                    console.log(userListFromSearch)
-                })
-                .catch(err=>
-                console.log(err)
-                )
+                axios.get(`${url}/api/users/search/${searchUserBy}`, { headers: { accessToken: token } })
+                    .then(response => {
+                        const users = response.data;
+                        
+                        const usersWithMessages = users.map(user => ({ ...user, messages: [] }));
+                        setUserListFromSearch(usersWithMessages);
+                        console.log(userListFromSearch)
+                    })
+                    .catch(err=>
+                    console.log(err)
+                    )
             } catch (err) {
                 console.log(err)
             }

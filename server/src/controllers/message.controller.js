@@ -18,67 +18,6 @@ class MessageController {
             return res.status(500).json({ error: 'Failed to create message' });
         }
     }
-
-    // async getUserMessages(req, res) {
-    //     const { authorization } = req.headers;
-    //     if (!authorization) { return res.status(400).json({ message: "No authorization" }); }
-    //     const token = authorization.split(' ')[1];
-    //     if (!token) { return res.status(400).json({ message: "No token" }); }
-    //     jwt.verify(token, secretKey, async (err, decoded) => {
-    //         if (err) {
-    //             return res.status(400).json({ error: "Token is invalid" });
-    //         }
-    //         const user_id = decoded.id;
-    //         try {
-    //             const messages = await Message.findAllByUser(user_id);
-    //             let userMessages = [];
-    //             messages.forEach(async (message) => {
-    //                 const foundUser = userMessages.some((userMessage) =>userMessage.id === message.sender_id || userMessage.id === message.receiver_id);
-    //                 //user not in userMessages, create a new user
-    //                 if (!foundUser) {
-    //                     const id = (message.sender_id === user_id) ? message.receiver_id : message.sender_id;
-                        
-    //                     try {
-    //                         const user = await UserModel.findOne({ _id: id }); 
-    //                         console.log(user.username)  //在这里能够打印user.username，说明已经查到了user
-    //                         if (user) {
-    //                             console.log("create a user")
-    //                             userMessages.push({
-    //                                 id: user.id,
-    //                                 username: user.username,
-    //                                 nickname: user.nickname,
-    //                                 messages: [
-    //                                 message,
-    //                                 ],
-    //                                 hasMessageUnread: !message.is_read,
-    //                             });
-    //                             console.log(userMessages)//在这里userMessages有一个元素，新的user是可以放进usermessages的
-                            
-    //                         }
-    //                     } catch(err) {
-    //                         // console.log(err)
-    //                     }
-    //                 } else {
-    //                     console.log("push a message")   //第二条message应该在这里处理，但是这条语句执行不到
-    //                     // sender_id or receiver_id exists in userMessages
-    //                     const userToUpdate = userMessages.find((user) => user.id === message.sender_id || user.id === message.receiver_id);
-    //                     userToUpdate.messages.push(message);
-    //                     userToUpdate.hasMessageUnread = userToUpdate.hasMessageUnread || !message.is_read;
-    //                 }
-                    
-    //             });
-                
-    //             console.log(userMessages)//这里userMessages应该是有一个元素，这个元素的messages字段里面有两个元素。但结果是空数组。为什么？
-    //             return res.status(200).json(userMessages);
-    //         } catch (error) {
-    //             return res.status(500).json({ error: 'Failed to retrieve messages' });
-    //         }
-
-    //     });
-
-
-       
-    // }
     
     
     
@@ -99,10 +38,10 @@ class MessageController {
             if (err) {
                 return res.status(400).json({ error: "Token is invalid" });
             }
-            const user_id = decoded.id;
-            const username = decoded.username;
+            const owner_id = decoded.id;
+            const ownerName = decoded.username;
             try {
-                const messages = await Message.findAllByUser(user_id);
+                const messages = await Message.findAllByUser(owner_id);
                 // console.log(messages)
                 let userMessages = [];
     
@@ -110,7 +49,7 @@ class MessageController {
                     const foundUser = userMessages.some((userMessage) => userMessage.id === message.sender_id || userMessage.id === message.receiver_id);
     
                     if (!foundUser) {
-                        const id = (message.sender_id === user_id) ? message.receiver_id : message.sender_id;
+                        const id = (message.sender_id === owner_id) ? message.receiver_id : message.sender_id;
     
                         try {
                             const user = await UserModel.findOne({ _id: id });
@@ -122,15 +61,16 @@ class MessageController {
                                     username: user.username,
                                     nickname: user.nickname,
                                     messages: [{
-                                        sender_id:message.sender_id === user_id ? decoded.id:user._id,
-                                        sender_username: message.sender_id === user_id ? decoded.username : user.username,
-                                        receiver_username: message.receiver_id === user_id ? decoded.id:user._id ,
-                                        receiver_username: message.receiver_id === user_id ? decoded.username:user.username ,
+                                        id:message._id,
+                                        sender_id:message.sender_id,
+                                        sender_username: message.sender_id === owner_id ? ownerName : user.username,
+                                        receiver_id: message.receiver_id,
+                                        receiver_username: message.receiver_id === owner_id ? ownerName:user.username ,
                                         message: message.message,
-                                        is_read: message.is_read,
+                                        is_read: message.receiver_id===owner_id?message.is_read:true,
                                         send_time:message.send_time
                                     }],
-                                    hasMessageUnread: !message.is_read,
+                                    hasMessageUnread: message.receiver_id===owner_id?!message.is_read:false,
                                 });
                                 console.log(userMessages);
                             }
@@ -141,15 +81,16 @@ class MessageController {
                         console.log("push a message");
                         const userToUpdate = userMessages.find((user) => user.id === message.sender_id || user.id === message.receiver_id);
                         userToUpdate.messages.push({
-                            sender_id: message.sender_id === user_id ? decoded.id:userToUpdate._id,
-                            sender_username: message.sender_id === user_id ? decoded.username : userToUpdate.username,
-                            receiver_id: message.receiver_id === user_id ? decoded.id:userToUpdate.id ,
-                            receiver_username: message.receiver_id === user_id ? decoded.username:userToUpdate.username ,
+                            id:message._id,
+                            sender_id:message.sender_id,
+                            sender_username: message.sender_id === owner_id ? ownerName : userToUpdate.username,
+                            receiver_id: message.receiver_id,
+                            receiver_username: message.receiver_id === owner_id ? ownerName:userToUpdate.username ,
                             message: message.message,
-                            is_read: message.is_read,
+                            is_read: message.receiver_id===owner_id?message.is_read:true,
                             send_time:message.send_time
                         });
-                        userToUpdate.hasMessageUnread = userToUpdate.hasMessageUnread || !message.is_read;
+                        userToUpdate.hasMessageUnread = userToUpdate.hasMessageUnread || (message.receiver_id === owner_id && !message.is_read);
                     }
                 }
     
@@ -171,6 +112,7 @@ class MessageController {
         const { messageId } = req.params;
 
         try {
+           
             await Message.markAsRead(messageId);
             return res.status(200).json({ message: 'Message marked as read' });
         } catch (error) {

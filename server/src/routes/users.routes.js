@@ -34,9 +34,10 @@ router.patch("/my_assets/:id", userController.updateMyAssetsById);
 
 // forgot password and send mailgun
 router.post("/forgotpassword", userController.forgotPassword);
-
+//update user password
 router.put("/changepassword/:email", userController.updateUserByEmail);
-
+//update user name
+router.put("/changeusername/:email", userController.updateUsernameByEmail);
 //search users
 router.get("/search/:searchString", userController.searchUsers);
 

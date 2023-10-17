@@ -165,6 +165,27 @@ module.exports = {
       });
   },
 
+  //update user name by email
+  updateUsernameByEmail: async (req, res) => {
+    const user_email = req.params.email;
+    console.log("inside update username usercontroller" + user_email);
+
+    const update = { username: req.body.username };
+
+    await User.findOneAndUpdate({ email: user_email }, update, { new: true })
+      .then((result) => {
+        if (result) {
+          res.status(200).json({ message: "user name updated successfully" });
+        } else {
+          res.status(404).json({ message: "user not found" });
+        }
+      })
+      .catch((err) => {
+        console.log("retrieve error:", err);
+        res.status(400).json({ err });
+      });
+  },
+
   //authentication:user login
   authUser: async (req, res) => {
     try {

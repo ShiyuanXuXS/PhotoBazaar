@@ -136,7 +136,7 @@ Xiaoxing Pan
 3. Challenge
 
 
-2023/10/14
+2023/10/16
 Shiyuan
 1. Done
 - tested payment function
@@ -146,7 +146,6 @@ Shiyuan
 - renew header to show different menu based on login status and role
 - Send and receive messages using logged in users
 
-2023/10/16
 Chang liu
 1. Done
 - finished the login /register/ forgot password integration into project

@@ -70,12 +70,9 @@ module.exports = {
 
   //find user information for profile
   userProfile: async (req, res) => {
-    const id = req.params._id;
-    const basicInfo = await User.findOne(id, {
-      attributes: { exclude: ["password"] },
-    });
-
-    res.json({ basicInfo: basicInfo });
+    const id = req.params.id;
+    const basicInfo = await User.findOne({ _id: id });
+    res.status(200).json({ user: basicInfo });
   },
 
   //add a user
@@ -191,9 +188,12 @@ module.exports = {
         secretKey,
         { expiresIn: "1d" }
       );
+      console.log("inside user controller user id:" + existingUser._id);
       res.status(201).json({
         message: `You are loggin in as ${existingUser.username}.`,
         token: accessToken,
+        user: existingUser,
+        userId: existingUser._id,
       });
     } catch (error) {
       console.log(error);
@@ -205,6 +205,8 @@ module.exports = {
 
   //decode token and return user's information
   validateToken: async (req, res) => {
+    console.log("inside user controller validate token:");
+
     const accessToken = req.header("accessToken");
 
     if (!accessToken) {
@@ -226,6 +228,7 @@ module.exports = {
             nickname: user.nickname,
           },
         });
+        console.log("inside user controller validate token:" + user.email);
       }
     } catch (err) {
       res.status(500).json({ error: "User not found" });
@@ -314,31 +317,29 @@ module.exports = {
     });
   },
 
-
-
-
-
-
   searchUsers: async (req, res) => {
     const searchString = req.params.searchString;
 
     // regular expression for case-insensitive search
-    const searchRegex = new RegExp(searchString, 'i');
+    const searchRegex = new RegExp(searchString, "i");
 
     try {
-      const matchingUsers = await User.find({
-        $or: [
-          { username: { $regex: searchRegex } },
-          { nickname: { $regex: searchRegex } },
-        ],
-      }, { _id:0, id: '$_id', username: 1, nickname: 1 });
+      const matchingUsers = await User.find(
+        {
+          $or: [
+            { username: { $regex: searchRegex } },
+            { nickname: { $regex: searchRegex } },
+          ],
+        },
+        { _id: 0, id: "$_id", username: 1, nickname: 1 }
+      );
 
       res.status(200).json(matchingUsers);
     } catch (error) {
       console.log(error);
       res.status(500).json({ message: "Internal Server Error" });
     }
-  }
+  },
 };
 
 //register validation

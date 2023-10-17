@@ -8,8 +8,7 @@ function LoginComponent() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const { setLoginStatus, setRole, setUserId } = useContext(AuthContext);
-
-  // const { authStatus, setAuthStatus } = useContext(AuthContext);
+  const { loginStatus, role, userId } = useContext(AuthContext);
   const Navigate = useNavigate("");
   const navigateToForgot = () => {
     Navigate("/forgotpassword");
@@ -20,8 +19,9 @@ function LoginComponent() {
 
   // useEffect(() => {
   //   //fixme:
-  //   // if (authStatus.status) Navigate("/login");
   //   if (loginStatus) Navigate("/");
+  //   else Navigate("/login");
+  //   // if (loginStatus) Navigate("/");
   // });
   //user login
   const authUser = (e) => {
@@ -37,6 +37,10 @@ function LoginComponent() {
           setMessage(response.data.message);
           //set token
           localStorage.setItem("accessToken", response.data.token);
+          localStorage.setItem("userId", response.data.user._id);
+          localStorage.setItem("user", response.data.user);
+          console.log("inside login:" + localStorage.getItem("user"));
+
           // setUserEmail(response.data.email);
           // setUsername(response.data.username);
           setUserId(response.data._id);

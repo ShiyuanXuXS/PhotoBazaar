@@ -17,6 +17,7 @@ import "./App.css";
 import UpdateArtwork from "./pages/UpdateArtwork";
 import ArtworkDetails from "./pages/ArtworkDetails";
 import MyAssets from "./pages/MyAssets";
+import Admincenter from "./pages/Admincenter";
 
 function App() {
   return (

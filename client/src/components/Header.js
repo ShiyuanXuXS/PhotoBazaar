@@ -8,10 +8,7 @@ function HeaderComponent() {
   const Navigate = useNavigate();
   const myRef = useRef(null);
   const [isOpen, setIsOpen] = useState(false);
-
-  // const [token, setToken] = useToken();
   const [token, setToken] = useState(localStorage.getItem("accessToken"));
-  // const [user, setUser] = useState(null);
   const [user, setUser] = useState(localStorage.getItem("user"));
 
   useEffect(() => {
@@ -32,8 +29,10 @@ function HeaderComponent() {
   }, []);
 
   const handleLogout = () => {
-    localStorage.removeItem("accessToken");
-    Navigate("/login");
+    localStorage.clear();
+    setUser(null);
+    setToken(null);
+    Navigate("/");
   };
 
   return (

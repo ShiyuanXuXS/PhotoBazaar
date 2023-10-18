@@ -11,6 +11,7 @@ function AdmincenterCompoment() {
   const [userList, setUserList] = useState([]);
   const [artworkList, setArtworkList] = useState([]);
   const [tagList, setTagList] = useState([]);
+  const [tagDescription, settagDescription] = useState([]);
   const [user, setUser] = useState(localStorage.getItem("user"));
   let { id } = useParams();
 
@@ -76,6 +77,56 @@ function AdmincenterCompoment() {
         setError(resMessage);
       });
   };
+
+  //delete artwork by id
+  const deleteArtworkById = (event, artworkid) => {
+    event.preventDefault();
+    //delete artwork
+    axios
+      .delete(`http://localhost:3001/api/artworks/${artworkid}`)
+      .then((response) => {
+        window.location.reload();
+        const { message: resMessage } = response.data;
+        setMessage(resMessage);
+      })
+      .catch((error) => {
+        console.error(error);
+      });
+  };
+
+  //delete tag by id
+  const deleteTagById = (event, tagid) => {
+    event.preventDefault();
+    //delete artwork
+    axios
+      .delete(`http://localhost:3001/api/tags/${tagid}`)
+      .then((response) => {
+        window.location.reload();
+
+        const { message: resMessage } = response.data;
+        setMessage(resMessage);
+      })
+      .catch((error) => {
+        console.error(error);
+      });
+  };
+  //update tag by id
+  const updateTagById = (event, tagid) => {
+    event.preventDefault();
+    //delete artwork
+    axios
+      .put(`http://localhost:3001/api/tags/${tagid}`)
+      .then((response) => {
+        window.location.reload();
+
+        const { message: resMessage } = response.data;
+        setMessage(resMessage);
+      })
+      .catch((error) => {
+        console.error(error);
+      });
+  };
+  //todo: update tag description by id
 
   return (
     <div>
@@ -144,7 +195,10 @@ function AdmincenterCompoment() {
             title
           </th>
           <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider ">
-            delete
+            View
+          </th>
+          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider ">
+            Delete
           </th>
         </thead>
         <tbody className="bg-white divide-y divide-gray-200">
@@ -155,16 +209,30 @@ function AdmincenterCompoment() {
                   <div className="table-cell ">{artwork._id}</div>
                   <div className="table-cell ">{artwork.description}</div>
                   <div className="table-cell ">{artwork.title}</div>
-
+                  {/* view button */}
                   <div className="table-cell ">
                     <button
                       type="submit"
                       className={`font-serif capitalize p-1 text-sm inline ml-2 rounded-lg bg-sky-600 text-white mt-2`}
                       onClick={() => {
-                        Navigate(`/details/${artwork._id}`);
+                        Navigate(`/details/${artwork._id}`, {
+                          state: { page: "myAssets" }, //fix me: page attribute
+                        });
                       }}
                     >
                       view
+                    </button>
+                  </div>
+                  {/* delete button */}
+                  <div className="table-cell ">
+                    <button
+                      type="submit"
+                      className={`font-serif capitalize p-1 text-sm inline ml-2 rounded-lg bg-sky-600 text-white mt-2`}
+                      onClick={(event) => {
+                        deleteArtworkById(event, artwork._id);
+                      }}
+                    >
+                      Delete
                     </button>
                   </div>
                 </div>
@@ -175,7 +243,69 @@ function AdmincenterCompoment() {
           )}
         </tbody>
       </table>
-      {/* //end artworklist */}
+      {/* end artworklist */}
+      {/*tag list */}
+      {error && <div className="text-red-500 mb-8">{error}</div>}
+      {message && <div className="text-green-500 mb-8">{message}</div>}
+      <table className="min-w-full divide-y divide-gray-200 overflow-x-auto">
+        <thead scope="col" className="bg-gray-50">
+          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+            Tag Id
+          </th>
+          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider ">
+            description
+          </th>
+          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+            Count
+          </th>
+          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider ">
+            Edit Description
+          </th>
+          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider ">
+            Delete
+          </th>
+        </thead>
+        <tbody className="bg-white divide-y divide-gray-200">
+          {tagList.length > 0 ? (
+            <>
+              {tagList.map((tag, index) => (
+                <div key={index} class="table-row">
+                  <div className="table-cell ">{tag._id}</div>
+                  <div className="table-cell ">{tag.tag}</div>
+                  <div className="table-cell ">{tag.count}</div>
+                  {/* view button */}
+                  <div className="table-cell ">
+                    <button
+                      type="submit"
+                      className={`font-serif capitalize p-1 text-sm inline ml-2 rounded-lg bg-sky-600 text-white mt-2`}
+                      onClick={(event) => {
+                        updateTagById(event, tag._id);
+                      }}
+                    >
+                      Edit
+                    </button>
+                  </div>
+                  {/* delete button */}
+                  <div className="table-cell ">
+                    <button
+                      type="submit"
+                      className={`font-serif capitalize p-1 text-sm inline ml-2 rounded-lg bg-sky-600 text-white mt-2`}
+                      onClick={(event) => {
+                        deleteTagById(event, tag._id);
+                      }}
+                    >
+                      Delete
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </>
+          ) : (
+            <p>No tags!</p>
+          )}
+        </tbody>
+      </table>
+      {/* end tag list */}
     </div>
   );
 }

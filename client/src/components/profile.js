@@ -274,15 +274,7 @@ function ProfileComponent() {
                       <div className="table-cell ">{user.username}</div>
                       <div className="table-cell ">{user.email}</div>
                       <div className="table-cell ">{user.role}</div>
-                      {/* edit button */}
-                      {/* <div className="table-cell ">
-                        <button
-                          type="submit"
-                          className={`font-serif capitalize p-1 text-sm inline ml-2 rounded-lg bg-sky-600 text-white mt-2`}
-                        >
-                          Edit
-                        </button>
-                      </div> */}
+
                       {/* disable button */}
                       <div className="table-cell ">
                         <button

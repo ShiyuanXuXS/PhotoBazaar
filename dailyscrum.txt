@@ -145,7 +145,6 @@ Shiyuan
 - Fixed the bug caused by multiple payment attempts in the Stripe backend
 - renew header to show different menu based on login status and role
 - Send and receive messages using logged in users
-
 Chang liu
 1. Done
 - finished the login /register/ forgot password integration into project
@@ -164,4 +163,12 @@ Chang Liu
 - finished the user profile page
 2. To do
 - finished the admin page
+Xiaoxing Pan
+1.  Done
+- update/add photos in a artwork
+- artwork detail page, show all the photoes
+2. To do
+- show asset page, show inside photo, remove artwork from my_asset, download photos from my_asset
+- cart
+
 

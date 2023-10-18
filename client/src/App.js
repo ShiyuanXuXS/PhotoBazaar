@@ -16,6 +16,7 @@ import MyArtwork from "./pages/MyArtwork";
 import "./App.css";
 import UpdateArtwork from "./pages/UpdateArtwork";
 import ArtworkDetails from "./pages/ArtworkDetails";
+import MyAssets from "./pages/MyAssets";
 
 function App() {
   return (
@@ -34,9 +35,9 @@ function App() {
             <Route path="/updateArtworkMainInfo/:artworkId" element={<UpdateArtwork />} />
             <Route path="/details/:artworkId" element={<ArtworkDetails />} />
             <Route path="/artwork/:userId" element={<MyArtwork />} />
+            <Route path="/asset/:userId" element={<MyAssets />} />
             <Route path="/forgotpassword" element={<ForgotPassword />} />
             <Route path="/changepassword/:email" element={<ChangePassword />} />
-
           </Routes>
         </Router>
       </div>

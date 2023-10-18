@@ -3,9 +3,9 @@ import Header from '../components/Header';
 import Footer from '../components/Footer';
 function Home() {
   return <div>
-    <Header/>
+    <Header />
     This is homepage!
-    <Footer/>
+    <Footer fixBottom={true} />
   </div>;
 }
 

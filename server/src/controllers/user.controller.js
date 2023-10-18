@@ -250,10 +250,8 @@ module.exports = {
     }
   },
 
-  //Todo: retrive artwork_id list from user_id
-
-  // crud artwork_id list
-  updateMyAssetsById: async (req, res) => {
+  // add a asset to my_assets
+  addMyAssetsById: async (req, res) => {
     const user_id = req.params.id;
     const update = [{ arkwork_id: req.body.my_assets }];
 

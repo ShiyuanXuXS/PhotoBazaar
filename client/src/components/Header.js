@@ -45,7 +45,7 @@ function HeaderComponent() {
         <div className="flex lg:flex-1">
           <button onClick={() => Navigate("/")} className="-m-1.5 p-1.5">
             <span className="sr-only">Photobazarr</span>
-            <img className="h-8 w-auto" src="./logo2.png" alt="photobazarr" />
+            <img className="h-8 w-auto" src="https://photobazarr.s3.ca-central-1.amazonaws.com/logo2.png" alt="photobazarr" />
           </button>
         </div>
         <h1 className="text-4xl font-extrabold text-gray-800 font-serif">
@@ -215,6 +215,7 @@ function HeaderComponent() {
                           className="block flex items-center px-1 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900"
                           role="menuitem"
                           onClick={() => {
+                            Navigate(`/cart/${user.id}`)
                             setIsOpen(false);
                           }}
                         >

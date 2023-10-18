@@ -17,4 +17,7 @@ router.get('/:id', purchaseController.getPurchaseById);
 
 router.delete('/:id', purchaseController.deletePurchase);
 
+// get all unpaid purchase records by buyerId
+router.get('/unpaid/:buyerId', purchaseController.getUnpaidPurchasesByBuyerId);
+
 module.exports = router;

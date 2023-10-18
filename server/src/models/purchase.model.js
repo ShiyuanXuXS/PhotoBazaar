@@ -1,9 +1,9 @@
 const { ObjectId } = require('mongodb');
-const db = require('./db'); 
+const db = require('./db');
 
 class PurchaseModel {
   constructor() {
-    this.collection = db.collection('purchases'); 
+    this.collection = db.collection('purchases');
   }
 
   async createPurchase(purchaseData) {
@@ -30,6 +30,12 @@ class PurchaseModel {
     const filter = { _id: new ObjectId(id) };
     const result = await this.collection.deleteOne(filter);
     return result.deletedCount;
+  }
+
+  async getUnpaidPurchasesByBuyerId(buyerId) {
+    const filter = { buyer_id: buyerId, is_paid: false };
+    const purchases = await this.collection.find(filter).toArray();
+    return purchases;
   }
 }
 

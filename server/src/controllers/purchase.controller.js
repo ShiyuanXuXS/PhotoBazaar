@@ -31,22 +31,22 @@ class PurchaseController {
                 return res.status(400).json({ message: 'Order not found' });
             }
 
-            if ( !purchase) {
+            if (!purchase) {
                 return res.status(400).json({ message: 'Order not found' });
             }
             if (purchase.buyer_id !== user_id) {
                 return res.status(400).json({ message: "No authorization" });
             }
-            if ( purchase.is_paid) {
+            if (purchase.is_paid) {
                 return res.status(400).json({ message: 'Already paid, please do not pay again' });
             }
             let paymentIntent;
             try {
                 paymentIntent = await stripe.paymentIntents.create({
-                    amount: purchase.transaction_price*100,
+                    amount: purchase.transaction_price * 100,
                     currency: 'cad',
-                    description:  purchase_id,
-                    metadata:{purchase_id:purchase_id},
+                    description: purchase_id,
+                    metadata: { purchase_id: purchase_id },
                     automatic_payment_methods: {
                         enabled: true,
                     },
@@ -54,9 +54,9 @@ class PurchaseController {
                 const updatedTransactionRef = purchase.transaction_ref || [];
                 updatedTransactionRef.push(paymentIntent.id);
                 await PurchaseModel.updatePurchase(purchase_id, { transaction_ref: updatedTransactionRef });
-                return res.status(200).json({clientSecret: paymentIntent.client_secret,});
+                return res.status(200).json({ clientSecret: paymentIntent.client_secret, });
             } catch (err) {
-                return res.status(500).json({message:"create payment failed"})
+                return res.status(500).json({ message: "create payment failed" })
             }
 
         });
@@ -64,7 +64,7 @@ class PurchaseController {
 
     async checkPaymentStatus(req, res) {
         const { authorization } = req.headers;
-        if (!authorization) {return  res.status(404).json({ message: "No authorization" }); }
+        if (!authorization) { return res.status(404).json({ message: "No authorization" }); }
         const token = authorization.split(' ')[1];
         if (!token) { return res.status(400).json({ message: "No token" }); }
         jwt.verify(token, secretKey, async (err, decoded) => {
@@ -77,33 +77,33 @@ class PurchaseController {
                 const { id } = req.params;
                 const purchase = await PurchaseModel.getPurchaseById(id);
                 if (purchase.buyer_id !== user_id) {
-                    return  res.status(400).json({ message: "You are not the buyer" });
+                    return res.status(400).json({ message: "You are not the buyer" });
                 }
                 const successfulPayments = [];
 
                 let paymentCount = 0;
                 const paymentIntentsSearch = await stripe.paymentIntents.search({
-                    query: 'metadata[\'purchase_id\']:\''+id+'\'',
+                    query: 'metadata[\'purchase_id\']:\'' + id + '\'',
                 });
                 const paymentIntents = paymentIntentsSearch.data
                 for (const paymentIntent of paymentIntents) {
-                    if(paymentIntent.status==='succeeded'){paymentCount++}
+                    if (paymentIntent.status === 'succeeded') { paymentCount++ }
                 }
                 if (paymentCount === 0) {
-                    return res.status(200).json({ message:'No payments have succeeded.' });
+                    return res.status(200).json({ message: 'No payments have succeeded.' });
                 } else {
                     await PurchaseModel.updatePurchase(id, { is_paid: true });
                     if (paymentCount === 1) {
-                        return res.status(201).json({ message:'Payment succeeded.' });
+                        return res.status(201).json({ message: 'Payment succeeded.' });
                     } else {
-                        return res.status(202).json({ message: 'Multiple payments detected. Please contact an administrator for assistance.'});
+                        return res.status(202).json({ message: 'Multiple payments detected. Please contact an administrator for assistance.' });
                     }
 
                 }
 
             } catch (error) {
                 console.error('retrieve error:', error);
-                return res.status(500).json({message:"retrieve order failed"})
+                return res.status(500).json({ message: "retrieve order failed" })
             }
         });
 
@@ -112,7 +112,7 @@ class PurchaseController {
     async createPurchase(req, res) {
         const { authorization } = req.headers;
         console.log(req.headers)
-        if (!authorization) {return  res.status(400).json({ message: "No authorization" }); }
+        if (!authorization) { return res.status(400).json({ message: "No authorization" }); }
         const token = authorization.split(' ')[1];
         if (!token) { return res.status(400).json({ message: "No token" }); }
         jwt.verify(token, secretKey, async (err, decoded) => {
@@ -124,7 +124,7 @@ class PurchaseController {
 
             try {
                 const { artwork_id } = req.body;
-                if (!artwork_id ) {
+                if (!artwork_id) {
                     return res.status(400).json({ message: 'Artwork_id needed' });
                 }
                 const artwork = await ArtworkModel.findOne({ _id: artwork_id })
@@ -133,12 +133,12 @@ class PurchaseController {
                     return res.status(400).json({ message: 'Artwork not found' });
                 }
                 const purchaseData = {
-                    seller_id:artwork.author_id,
-                    buyer_id:user_id,
-                    artwork_id:artwork_id,
-                    purchase_time:new Date(),
-                    is_paid:!artwork.price ||artwork.price===0,
-                    transaction_price:artwork.price || 0
+                    seller_id: artwork.author_id,
+                    buyer_id: user_id,
+                    artwork_id: artwork_id,
+                    purchase_time: new Date(),
+                    is_paid: !artwork.price || artwork.price === 0,
+                    transaction_price: artwork.price || 0
                 };
                 const newPurchaseId = await PurchaseModel.createPurchase(purchaseData);
                 return res.status(200).json({ message: 'Add to purchase list', purchaseId: newPurchaseId });
@@ -185,7 +185,7 @@ class PurchaseController {
     //         if (!existingPurchase) {
     //             return res.status(404).json({ message: 'Purchase record not found' });
     //         }
-            
+
     //       const updatedData = {
     //         is_paid: true,
     //             pay_time: new Date(),
@@ -214,6 +214,19 @@ class PurchaseController {
         } catch (error) {
             console.error('An error occurred while deleting purchase history:', error);
             return res.status(500).json({ message: 'Failed to delete purchase history' });
+        }
+    }
+
+    // get all unpaid purchase records
+    async getUnpaidPurchasesByBuyerId(req, res) {
+        try {
+            const { buyerId } = req.params;
+            const purchases = await PurchaseModel.getUnpaidPurchasesByBuyerId(buyerId);
+            return res.status(200).json(purchases);
+        }
+        catch (error) {
+            console.error('An error occurred while retrieving unpaid purchase history:', error);
+            return res.status(500).json({ message: 'An error occurred while retrieving unpaid purchase history' });
         }
     }
 }

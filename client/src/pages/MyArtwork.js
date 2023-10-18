@@ -4,7 +4,6 @@ import { useParams } from 'react-router-dom';
 import HeaderComponent from "../components/Header";
 import FooterComponent from "../components/Footer";
 
-
 function MyArtwork() {
     let { userId } = useParams();
 

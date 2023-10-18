@@ -379,9 +379,9 @@ function AddArtworkComponent({ isAdd, artwork_id }) {
 
     return (
         <div className="editArtworkBox m-5 p-5 capitalize">
-            <div className="text-2xl font-semibold capitalize"> {isAdd ? (<>Create artwork</>) : (<>Edit artwork</>)}</div>
+            <div className="text-2xl font-bold subpixel-antialiased"> {isAdd ? (<>Create artwork</>) : (<>Edit artwork</>)}</div>
             <div className='mainInfoBox'>
-                <div className='text-xl font-bold capitalize mt-5 mb-4'>General Information</div>
+                <div className='text-xl font-semibold capitalize mt-5 mb-4'>General Information</div>
                 <div className='generalInfoBox flex items-center'>
                     <form>
                         <div>

@@ -10,7 +10,7 @@ function ArtworkList() {
         <>
             <HeaderComponent />
             <ArtworkListComponent />
-            <FooterComponent />
+            <FooterComponent fixBottom={true} />
         </>
 
     )

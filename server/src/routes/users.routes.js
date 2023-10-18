@@ -30,7 +30,7 @@ router.post("/auth", userController.authUser);
 router.put("/:email", userController.updateUserByEmail); // should be patch?
 
 // Update my_assets with user id
-router.patch("/my_assets/:id", userController.updateMyAssetsById);
+router.patch("/my_assets/:id", userController.addMyAssetsById);
 
 // forgot password and send mailgun
 router.post("/forgotpassword", userController.forgotPassword);

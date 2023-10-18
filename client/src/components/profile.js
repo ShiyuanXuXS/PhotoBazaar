@@ -63,12 +63,12 @@ function ProfileComponent() {
       });
   };
 
-  //delete an existing user by email
-  const deleteUser = (event, email) => {
+  //disable an existing user by email
+  const disableUser = (event, email) => {
     event.preventDefault();
     console.log("inside delete user function front end" + email);
     axios
-      .delete(`http://localhost:3001/api/users/deleteuser/${email}`)
+      .get(`http://localhost:3001/api/users/disableuser/${email}`)
       .then((response) => {
         if (response.data.error) {
           const { message: resMessage } = error.response.data;
@@ -256,13 +256,15 @@ function ProfileComponent() {
         </>
       ) : (
         <>
+          {error && <div className="text-red-500 mb-8">{error}</div>}
+          {message && <div className="text-green-500 mb-8">{message}</div>}
           <table className="w-full text-sm text-left text-gray-500 dark:text-gray-400">
             <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400 ">
               <div className="table-cell text-left w-1/100">User Name</div>
               <div className="table-cell text-left px-6 py-3 ">User Email</div>
               <div className="table-cell text-left px-6 py-3">User role</div>
-              <div className="table-cell text-left ">edit</div>
-              <div className="table-cell text-left ">delete</div>
+              {/* <div className="table-cell text-left ">edit</div> */}
+              <div className="table-cell text-left ">Disable</div>
             </thead>
             <div className="table-row-group">
               {userList.length > 0 ? (
@@ -272,21 +274,23 @@ function ProfileComponent() {
                       <div className="table-cell ">{user.username}</div>
                       <div className="table-cell ">{user.email}</div>
                       <div className="table-cell ">{user.role}</div>
-                      <div className="table-cell ">
+                      {/* edit button */}
+                      {/* <div className="table-cell ">
                         <button
                           type="submit"
                           className={`font-serif capitalize p-1 text-sm inline ml-2 rounded-lg bg-sky-600 text-white mt-2`}
                         >
                           Edit
                         </button>
-                      </div>
+                      </div> */}
+                      {/* disable button */}
                       <div className="table-cell ">
                         <button
                           type="submit"
                           className={`font-serif capitalize p-1 text-sm inline ml-2 rounded-lg bg-sky-600 text-white mt-2`}
-                          onClick={(event) => deleteUser(event, user.email)}
+                          onClick={(event) => disableUser(event, user.email)}
                         >
-                          Delete
+                          Disable
                         </button>
                       </div>
                     </div>
@@ -297,6 +301,8 @@ function ProfileComponent() {
               )}
             </div>
           </table>
+
+          {/* search artworkid */}
         </>
       )}
     </>

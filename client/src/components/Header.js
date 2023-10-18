@@ -242,6 +242,7 @@ function HeaderComponent() {
                               role="menuitem"
                               onClick={() => {
                                 setIsOpen(false);
+                                Navigate(`/admincenter/${user.id}`);
                               }}
                             >
                               <svg

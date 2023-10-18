@@ -129,6 +129,42 @@ module.exports = {
       });
   },
 
+  // disable use by email
+  disableUserByEmail: async (req, res) => {
+    const user_email = req.params.email;
+
+    const update = { role: "disable" };
+    await User.findOneAndUpdate({ email: user_email }, update, { new: true })
+      .then((result) => {
+        if (result) {
+          res.status(200).send({ message: "user disabled successfully" });
+        } else {
+          res.status(404).send({ message: "No user found to disable" });
+        }
+      })
+      .catch((err) => {
+        res.status(400).json(err);
+      });
+  },
+
+  // enabled use by email
+  enableUserByEmail: async (req, res) => {
+    const user_email = req.params.email;
+
+    const update = { role: "user" };
+    await User.findOneAndUpdate({ email: user_email }, update, { new: true })
+      .then((result) => {
+        if (result) {
+          res.status(200).send({ message: "user enabled successfully" });
+        } else {
+          res.status(404).send({ message: "No user found to disable" });
+        }
+      })
+      .catch((err) => {
+        res.status(400).json(err);
+      });
+  },
+
   //update user password by email
   updateUserByEmail: async (req, res) => {
     const user_email = req.params.email;

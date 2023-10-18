@@ -40,6 +40,12 @@ router.put("/changepassword/:email", userController.updateUserByEmail);
 router.put("/changeusername/:email", userController.updateUsernameByEmail);
 //delete user by email
 router.delete("/deleteuser/:email", userController.deleteUserByEmail);
+
+//disable user by email
+router.get("/disableuser/:email", userController.disableUserByEmail);
+
+//enable user by email
+router.get("/enable/:email", userController.enableUserByEmail);
 //search users
 router.get("/search/:searchString", userController.searchUsers);
 

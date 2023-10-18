@@ -177,6 +177,12 @@ Shiyuan Xu
 - finished messages functionality
 2. To do 
 - Debug payment
-- Admin payment record
+- Debug messages
 
+2023/10/18
+1. Done
+- Payment Debug
+- Messages Debug
+2. To do
+- Admin payment record
 

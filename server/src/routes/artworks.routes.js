@@ -23,4 +23,14 @@ router.patch("/:id", artworkController.updateArtworkById);
 // Update a artwork with artwork_id
 router.patch("/mainInfo/:id", artworkController.updateArtworkMainInfoById);
 
+// update a photo with photo_id in one artwork
+router.patch("/:artworkId/editPhoto/:photoId", artworkController.updatePhotoById);
+
+// delete a photo with photo_id in one artwork
+router.delete("/:artworkId/deletePhoto/:photoId", artworkController.deletePhotoById);
+
+// add a photo in one artwork.photos
+router.post("/:artworkId/addPhoto", artworkController.addPhoto);
+
+
 module.exports = router;

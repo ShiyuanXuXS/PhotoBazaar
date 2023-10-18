@@ -162,5 +162,95 @@ module.exports = {
             .catch((err) => {
                 res.status(400).json(err);
             });
+    },
+    updatePhotoById: async (req, res) => {
+        try {
+            const artwork_id = req.params.artworkId;
+            const photo_id = req.params.photoId;
+            console.log(artwork_id, photo_id);
+            const { photo_name, description, upload_time, modify_time, file_url } = req.body;
+
+            const artwork = await Artwork.findOne({ _id: artwork_id });
+
+            if (!artwork) {
+                return res.status(404).json({ message: 'Artwork not found' });
+            }
+
+            // Find the index of the photo within the `photos` array
+            const photoIndex = artwork.photos.findIndex(photo => photo._id.toString() === photo_id);
+
+            if (photoIndex === -1) {
+                return res.status(404).json({ message: 'Photo not found' });
+            }
+            // Update the photo properties
+            artwork.photos[photoIndex].photo_name = photo_name;
+            artwork.photos[photoIndex].description = description;
+            artwork.photos[photoIndex].upload_time = upload_time;
+            artwork.photos[photoIndex].modify_time = modify_time;
+            artwork.photos[photoIndex].file_url = file_url;
+
+            const result = await artwork.save();
+
+            console.log("Photo After Update:", result);
+            res.status(200).send({ message: "Photo updated successfully" });
+        } catch (err) {
+            console.error(err);
+            res.status(400).json({ message: "Failed to update the photo" });
+        }
+    },
+    deletePhotoById: async (req, res) => {
+        try {
+            const artwork_id = req.params.artworkId;
+            const photo_id = req.params.photoId;
+            console.log(artwork_id, photo_id);
+
+            const artwork = await Artwork.findOne({ _id: artwork_id });
+            if (!artwork) {
+                return res.status(404).json({ message: 'Artwork not found' });
+            }
+
+            // Find the index of the photo within the `photos` array
+            const photoIndex = artwork.photos.findIndex(photo => photo._id.toString() === photo_id);
+
+            if (photoIndex === -1) {
+                return res.status(404).json({ message: 'Photo not found' });
+            }
+            // Delete the photo
+            artwork.photos.splice(photoIndex, 1);
+            await artwork.save();
+            res.status(200).send({ message: "Photo delete successfully" });
+        } catch (err) {
+            console.error(err);
+            res.status(400).json({ message: "Failed to update the photo" });
+        }
+    },
+    addPhoto: async (req, res) => {
+        try {
+            const artwork_id = req.params.artworkId;
+            const { photo_name, description, upload_time, modify_time, file_url } = req.body;
+
+            const artwork = await Artwork.findOne({ _id: artwork_id });
+            if (!artwork) {
+                return res.status(404).json({ message: 'Artwork not found' });
+            }
+
+            // Add the new photo
+            artwork.photos.push({
+                photo_name,
+                description,
+                upload_time,
+                modify_time,
+                file_url,
+            });
+
+            const result = await artwork.save();
+
+            console.log("Photo After Add:", result);
+            res.status(200).send({ message: "Photo added successfully" });
+        } catch (err) {
+            console.error(err);
+            res.status(400).json({ message: "Failed to add the photo" });
+        }
     }
-}
+
+};

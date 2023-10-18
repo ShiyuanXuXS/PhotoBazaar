@@ -84,7 +84,7 @@ class TagController {
             if (!existingTag) {
                 return res.status(404).json({ message: 'Tag not found' });
             }
-            const updatedCount = await tagModel.updateTagCount(id);
+            const updatedCount = await tagModel.increaseTagCount(id);
             if (updatedCount === 0) {
                 return res.status(404).json({ message: 'Tag not found' });
             }
@@ -103,7 +103,7 @@ class TagController {
             if (!existingTag) {
                 return res.status(404).json({ message: 'Tag not found' });
             }
-            const updatedCount = await tagModel.updateTagCount(id);
+            const updatedCount = await tagModel.decreaseTagCount(id);
             if (updatedCount === 0) {
                 return res.status(404).json({ message: 'Tag not found' });
             }

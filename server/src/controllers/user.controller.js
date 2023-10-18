@@ -16,8 +16,8 @@ module.exports = {
   findAll: async (req, res) => {
     try {
       const users = await User.find();
-      console.log(users);
-      res.json(users).status(200);
+      res.status(200).json(users);
+      console.log("insede find all user control" + users);
     } catch (error) {
       console.log(error);
       res
@@ -113,7 +113,7 @@ module.exports = {
     }
   },
 
-  // delete user
+  // delete user by email
   deleteUserByEmail: async (req, res) => {
     const user_email = req.params.email;
     await User.findOneAndDelete({ email: user_email })
@@ -139,12 +139,6 @@ module.exports = {
     }
     const hash = await bcrypt.hash(req.body.password, 10);
     const update = { password: hash };
-
-    // find the user by user email, and generate new token
-    // const user = await User.findOne({ email: user_email });
-    // const token = sign({ _id: user._id }, process.env.JWT_SECRET, {
-    //   expiresIn: "3h",
-    // });
 
     //find the user and update the password
     await User.findOneAndUpdate({ email: user_email }, update, { new: true })

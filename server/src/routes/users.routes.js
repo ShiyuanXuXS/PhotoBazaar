@@ -36,8 +36,10 @@ router.patch("/my_assets/:id", userController.updateMyAssetsById);
 router.post("/forgotpassword", userController.forgotPassword);
 //update user password
 router.put("/changepassword/:email", userController.updateUserByEmail);
-//update user name
+//update user name by email
 router.put("/changeusername/:email", userController.updateUsernameByEmail);
+//delete user by email
+router.delete("/deleteuser/:email", userController.deleteUserByEmail);
 //search users
 router.get("/search/:searchString", userController.searchUsers);
 

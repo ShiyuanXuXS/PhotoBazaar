@@ -24,14 +24,14 @@ const config = {
 const client = new S3Client(config);
 
 function AddArtworkComponent({ isAdd, artwork_id }) {
-    const url = process.env.REACT_APP_API_URL;
-    const [tagList, setTagList] = useState([]);
+    const [tagList, setTagList] = useState([]); // all tags
     const [tagArray, setTagArray] = useState([]);
     const tags = tagArray.map(data => ({ tag_id: data }));
     const [token, setToken] = useState(localStorage.getItem('accessToken'))
     const [user, setUser] = useState(null);
     const navigate = useNavigate();
     const [artworkToUpdate, setArtworkToUpdate] = useState([]);
+    // box handle adding photo
     const [imagesBoxes, setImagesBoxes] = useState(
         [{
             index: 1,
@@ -50,6 +50,7 @@ function AddArtworkComponent({ isAdd, artwork_id }) {
         }
     }, []);
 
+    // when + click, show a new image box
     const handleAddImagesBox = (event) => {
         event.preventDefault();
         const newImagesBox = {
@@ -65,12 +66,14 @@ function AddArtworkComponent({ isAdd, artwork_id }) {
         }
     };
 
+    // when - click, hide the image box
     const handleShowImagesBox = (index) => {
         //change status in newImagesBoxes based on index
         const updatedUploadImages = imagesBoxes.filter((imagesBox) => imagesBox.index !== index);
         setImagesBoxes(updatedUploadImages);
     };
 
+    // dynamic add choosed tags in array and show in input
     const handleTags = (event, id) => {
         event.preventDefault();
 
@@ -86,11 +89,12 @@ function AddArtworkComponent({ isAdd, artwork_id }) {
             }
         }
     };
+
+    // get artwork data if it is edit
     useEffect(() => {
         if (!isAdd) {
             Axios.get(`http://localhost:3001/api/artworks/${artwork_id}`).then((response) => {
                 setArtworkToUpdate(response.data);
-                // console.log(response.data);
                 setTagArray(response.data.tags.map((tag) => tag.tag_id));
                 setTitle(response.data.title);
                 setDescription(response.data.description);
@@ -100,9 +104,9 @@ function AddArtworkComponent({ isAdd, artwork_id }) {
                     console.error(error);
                 });
         }
-
     }, []);
 
+    // get all the tags
     useEffect(() => {
         Axios.get("http://localhost:3001/api/tags").then((response) => {
             setTagList(response.data);
@@ -115,9 +119,10 @@ function AddArtworkComponent({ isAdd, artwork_id }) {
     const [title, setTitle] = useState('');
     const [description, setDescription] = useState('');
     const [price, setPrice] = useState();
-    const [uploadImg, setUploadImg] = useState([]);
-    let index = 0;
+    const [uploadImg, setUploadImg] = useState([]); // all images to upload
+    let index = 0; // index for each image in uploadImg, 0 is cover image, 1-8 are photos
 
+    // save cover image to uploadImg
     const handleSaveCoverImage = (event) => {
         event.preventDefault();
         const data = {
@@ -126,38 +131,37 @@ function AddArtworkComponent({ isAdd, artwork_id }) {
             description: "cover image",
             file: event.target.files[0],
         };
-
         const newUploadImg = [...uploadImg, data];
         setUploadImg(newUploadImg);
     }
-    const handleSaveChildrenPhoto = (data) => {
 
+    // save photos from image box to uploadImg
+    const handleSaveChildrenPhoto = (data) => {
         const updatedUploadImages = uploadImg.filter((photo) => photo.index !== data.index);
         const newUploadImg = [...updatedUploadImages, data];
         setUploadImg(newUploadImg);
     }
 
-    const saveImage = (img, flag) => {
-        var newFileName = "";
+    // save image to s3 bucket
+    const saveImage = (img, flag) => { // flag = 0 is cover image
+        let newFileName = "";
 
         if (flag == 0) {
             newFileName = `${new Date().getTime()}_${user.id}.cover.${img.file.name.split(".").pop()}`;
         } else {
-
             newFileName = `${new Date().getTime()}.${index++}_${user.id}.photo.${img.file.name.split(".").pop()}`;
         }
 
-        const params = {
+        const uploadParams = {
             Bucket: config.bucketName,
             Key: "artwork/" + newFileName,
             Body: img.file,
         };
         // Create a promise for each image upload
         const uploadPromise = client
-            .send(new PutObjectCommand(params))
-            .then((data) => {
-                console.log("Image uploaded successfully:", data);
-                // setNewFileNames([...newFileNames, newFileName]);
+            .send(new PutObjectCommand(uploadParams))
+            .then((uploadResult) => {
+                console.log("Image uploaded successfully:", uploadResult);
                 return newFileName;
             })
             .catch((error) => {
@@ -165,12 +169,12 @@ function AddArtworkComponent({ isAdd, artwork_id }) {
                 return null;
             });
         return uploadPromise;
-
     }
+
+    // save new artwork to database
     const saveArtwork = (event) => {
         event.preventDefault();
 
-        //Validate
         validationSchema
             .validate({ title, description, price }, { abortEarly: false })
             .then(() => {
@@ -181,7 +185,6 @@ function AddArtworkComponent({ isAdd, artwork_id }) {
                     alert("Please select a file less than 5MB");
                     return;
                 } else {
-                    console.log(uploadImg);
                     // save cover image to s3 bucket                   
                     uploadPromises.push(saveImage(uploadImg[0], 0));
                     // save photos to s3 bucket
@@ -195,8 +198,6 @@ function AddArtworkComponent({ isAdd, artwork_id }) {
                         console.log("All images uploaded successfully.", fileNames); // 'fileNames' contain an array of successfully uploaded file names
                         // get photos data
                         const photos = [];
-                        // const photoFileNames = fileNames.filter((fileName) => fileName.includes("photo")); // exclude cover image
-                        // console.log(photoFileNames);
                         for (let i = 0; i < uploadImg.length; i++) {
                             photos.push({
                                 photo_name: uploadImg[i].name,
@@ -206,8 +207,6 @@ function AddArtworkComponent({ isAdd, artwork_id }) {
                                 modify_time: new Date(),
                             });
                         }
-                        console.log(photos);
-                        console.log(photos.slice(1));
 
                         // save artwork to database
                         Axios.post("http://localhost:3001/api/artworks", {
@@ -217,13 +216,12 @@ function AddArtworkComponent({ isAdd, artwork_id }) {
                             price: parseFloat(price),
                             cover_url: `https://${config.bucketName}.s3.${config.region}.amazonaws.com/${config.dirName}/${fileNames[0]}`,
                             tags: tags,
-                            photos: photos.slice(1),
+                            photos: photos.slice(1), // exclude cover image
                         }).then((response) => {
                             console.log(response);
                             alert("Artwork saved successfully!");
                             navigate(`/artwork/${user.id}`);
-                            index = 0;
-                            // window.location.reload();
+                            index = 0; // reset index to 0
 
                             // add artwork_id to user
                             Axios.patch(`http://localhost:3001/api/users/my_assets/${user.id}`, {
@@ -254,7 +252,6 @@ function AddArtworkComponent({ isAdd, artwork_id }) {
                     .catch((uploadErrors) => {
                         console.error("Error uploading images:", uploadErrors);
                     });
-
             })
             .catch((validationErrors) => {
                 console.error("Validation errors:", validationErrors);
@@ -282,14 +279,11 @@ function AddArtworkComponent({ isAdd, artwork_id }) {
                 if (value === undefined) return true; // Allow undefined values
                 return /^\d+(\.\d+)?$/.test(value);
             }),
-
     });
 
-
+    // update artwork main info(title, description, price, tags, cover page) to database if it is edit
     const updateArtwork = (event) => {
         event.preventDefault();
-        console.log(uploadImg);
-        //Validate
         validationSchema
             .validate({ title, description, price }, { abortEarly: false })
             .then(() => {
@@ -303,22 +297,21 @@ function AddArtworkComponent({ isAdd, artwork_id }) {
                         return;
                     } else {
                         changeCover = true;
+                        // save cover image to s3 bucket                  
+                        uploadPromises.push(saveImage(uploadImg[0], 0));
+
                         // delete old cover image from s3 bucket
                         const parts = artworkToUpdate.cover_url.split(".com/");
                         const deleteFileName = parts.pop();
-
-                        const params = {
+                        const deleteParams = {
                             Bucket: config.bucketName,
                             Key: deleteFileName, // Specify the path to the file you want to delete
                         };
 
                         client
-                            .send(new DeleteObjectCommand(params))
+                            .send(new DeleteObjectCommand(deleteParams))
                             .then((data) => console.log(data))
                             .catch((error) => console.log(error));
-
-                        // save cover image to s3 bucket                  
-                        uploadPromises.push(saveImage(uploadImg[0], 0));
                     }
                 }
                 Promise.all(uploadPromises)
@@ -335,17 +328,16 @@ function AddArtworkComponent({ isAdd, artwork_id }) {
                         }).then((response) => {
                             console.log(response);
                             alert("Artwork updated successfully!");
-                            // navigate(`/artwork/${user.id}`);
                         })
                             .catch((error) => {
                                 console.error(error);
                             });
-                        // update tag count  fixme:500
+
                         // compare old tag array and new tag array
                         const oldTagArray = artworkToUpdate.tags.map((tag) => tag.tag_id);
+
                         // find tags that are in old tag array but not in new tag array, decrease count
                         const decreaseTagArray = oldTagArray.filter((tag) => !tagArray.includes(tag));
-                        console.log(decreaseTagArray);
                         if (decreaseTagArray.length > 0) {
                             decreaseTagArray.forEach((tag) => {
                                 Axios.patch(`http://localhost:3001/api/tags/updateTagCountDecrease/${tag}`, {
@@ -358,9 +350,9 @@ function AddArtworkComponent({ isAdd, artwork_id }) {
                                     });
                             })
                         }
+
                         // find tags that are in new tag array but not in old tag array, increase count
                         const increaseTagArray = tagArray.filter((tag) => !oldTagArray.includes(tag));
-                        console.log(increaseTagArray);
                         if (increaseTagArray.length > 0) {
                             increaseTagArray.forEach((tag) => {
                                 Axios.patch(`http://localhost:3001/api/tags/updateTagCountIncrease/${tag}`, {
@@ -386,106 +378,110 @@ function AddArtworkComponent({ isAdd, artwork_id }) {
     };
 
 
-
     return (
-        <div className="my-4">
-            <div className="container mx-auto capitalize">
-                <div className="text-2xl font-semibold capitalize"> {isAdd ? (<>Create new artwork</>) : (<>Edit artwork</>)}</div>
-                <div className="mt-4">
+        <div className="editArtworkBox m-5 p-5 capitalize">
+            <div className="text-2xl font-semibold capitalize"> {isAdd ? (<>Create artwork</>) : (<>Edit artwork</>)}</div>
+            <div className='mainInfoBox'>
+                <div className='text-xl font-bold capitalize'>General Information</div>
+                <div className='generalInfoBox flex items-center'>
                     <form>
-                        {isAdd ? (<></>) : (<><div className="mb-4">
-                            <label htmlFor="formArtworkId" className="block font-medium mb-2">artwork Id:</label>
-                            <input
-                                type="text"
-                                id="formArtworkId"
-                                name="artworkId"
-                                className="block w-full border border-gray-300 rounded p-2"
-                                defaultValue={artwork_id}
-                                readOnly
-                            />
-                        </div></>)}
+                        <div>
+                            {isAdd ? (<></>) : (<>
+                                <div className="mb-4">
+                                    <label htmlFor="formArtworkId" className="block font-medium mb-2">artwork Id:</label>
+                                    <input
+                                        type="text"
+                                        id="formArtworkId"
+                                        name="artworkId"
+                                        className="block w-full border border-gray-300 rounded p-2"
+                                        defaultValue={artwork_id}
+                                        readOnly
+                                    />
+                                </div></>)}
 
-                        <div className="mb-4">
-                            <label htmlFor="formArtworkTitle" className="block font-medium mb-2">title:</label>
-                            <input
-                                type="text"
-                                id="formArtworkTitle"
-                                name="artworkTitle"
-                                defaultValue={isAdd ? '' : artworkToUpdate.title}
-                                className="block w-full border border-gray-300 rounded p-2"
-                                onChange={(e) => setTitle(e.target.value)}
-                            />
-                            <p className="text-gray-500 text-sm">Required, 10-50 characters, only letters or spaces.</p>
+                            <div className="mb-4">
+                                <label htmlFor="formArtworkTitle" className="block font-medium mb-2">title:</label>
+                                <input
+                                    type="text"
+                                    id="formArtworkTitle"
+                                    name="artworkTitle"
+                                    defaultValue={isAdd ? '' : artworkToUpdate.title}
+                                    className="block w-full border border-gray-300 rounded p-2"
+                                    onChange={(e) => setTitle(e.target.value)}
+                                />
+                                <p className="text-gray-500 text-sm">Required, 10-50 characters, only letters or spaces.</p>
+                            </div>
+
+                            <div className="mb-4">
+                                <label htmlFor="formArtworkDescription" className="block font-medium mb-2">Description:</label>
+                                <input
+                                    type="text"
+                                    id="formArtworkDescription"
+                                    name="artworkDescription"
+                                    defaultValue={isAdd ? '' : artworkToUpdate.description}
+                                    className="block w-full border border-gray-300 rounded p-2"
+                                    onChange={(e) => setDescription(e.target.value)}
+                                />
+                                <p className="text-gray-500 text-sm">Required, 50-100 characters.</p>
+                            </div>
+
+                            <div className="mb-4">
+                                <label htmlFor="formCoverUrl" className="block font-medium mb-2">cover image:</label>
+                                {isAdd ? (<></>) : (<><img src={artworkToUpdate.cover_url} alt="cover image" className="w-1/3 my-3 border-2" /></>)}
+                                <input
+                                    type="file"
+                                    id="formCoverUrl"
+                                    name="coverUrl"
+                                    accept=".jpg, .png, .jpeg"
+                                    multiple={false}
+                                    className="block w-full border border-gray-300 rounded p-2"
+                                    onChange={handleSaveCoverImage}
+                                />
+                                <p className="text-gray-500 text-sm">Required, image format should be JPG or PNG.</p>
+                            </div>
+
+                            <div className="mb-4">
+                                <label htmlFor="formArtworkTag" className="block font-medium mb-2">Tags:</label>
+                                <input
+                                    type="text"
+                                    id="formArtworkTag"
+                                    name="artworkTag"
+                                    defaultValue={tagArray.map((id) => {
+                                        const matchingTag = tagList.find((tag) => tag._id === id);
+                                        return matchingTag ? matchingTag.tag : ''; // If a matching tag is found, return its tag, otherwise an empty string
+                                    }).join(', ')}
+                                    className="block w-full border border-gray-300 rounded p-2 mb-2"
+                                />
+                                <p className="text-gray-500 text-sm">Required, maximum choose 5 tags.</p>
+                                {tagList.map((tag, index) => {
+                                    return (
+                                        <button
+                                            key={index}
+                                            className={`font-serif capitalize p-1 text-sm inline ml-2 rounded-lg bg-sky-600 text-white mt-2`}
+                                            onClick={(event) => handleTags(event, tag._id)}
+                                        >
+                                            {tag.tag}
+                                        </button>
+                                    );
+                                })}
+                            </div>
+
+                            <div className="mb-4">
+                                <label htmlFor="formArtworkPrice" className="block font-medium">Price:</label>
+                                <input
+                                    type="number"
+                                    id="formArtworkPrice"
+                                    name="artworkPrice"
+                                    className="block w-full border border-gray-300 rounded p-2"
+                                    min="0"
+                                    step="any"
+                                    defaultValue={isAdd ? '' : artworkToUpdate.price}
+                                    onChange={(e) => setPrice(e.target.value)}
+                                />
+                                <p className="text-gray-500 text-sm">Required, must be equal or higher than 0.</p>
+                            </div>
                         </div>
 
-                        <div className="mb-4">
-                            <label htmlFor="formArtworkDescription" className="block font-medium mb-2">Description:</label>
-                            <input
-                                type="text"
-                                id="formArtworkDescription"
-                                name="artworkDescription"
-                                defaultValue={isAdd ? '' : artworkToUpdate.description}
-                                className="block w-full border border-gray-300 rounded p-2"
-                                onChange={(e) => setDescription(e.target.value)}
-                            />
-                            <p className="text-gray-500 text-sm">Required, 50-100 characters.</p>
-                        </div>
-
-                        <div className="mb-4">
-                            <label htmlFor="formCoverUrl" className="block font-medium mb-2">cover image:</label>
-                            {isAdd ? (<></>) : (<><img src={artworkToUpdate.cover_url} alt="cover image" className="w-1/3 my-3 border-2" /></>)}
-                            <input
-                                type="file"
-                                id="formCoverUrl"
-                                name="coverUrl"
-                                accept=".jpg, .png, .jpeg"
-                                multiple={false}
-                                className="block w-full border border-gray-300 rounded p-2"
-                                onChange={handleSaveCoverImage}
-                            />
-                            <p className="text-gray-500 text-sm">Required, image format should be JPG or PNG.</p>
-                        </div>
-
-                        <div className="mb-4">
-                            <label htmlFor="formArtworkTag" className="block font-medium mb-2">Tags:</label>
-                            <input
-                                type="text"
-                                id="formArtworkTag"
-                                name="artworkTag"
-                                defaultValue={tagArray.map((id) => {
-                                    const matchingTag = tagList.find((tag) => tag._id === id);
-                                    return matchingTag ? matchingTag.tag : ''; // If a matching tag is found, return its tag, otherwise an empty string
-                                }).join(', ')}
-                                className="block w-full border border-gray-300 rounded p-2 mb-2"
-                            />
-                            <p className="text-gray-500 text-sm">Required, maximum choose 5 tags.</p>
-                            {tagList.map((tag, index) => {
-                                return (
-                                    <button
-                                        key={index}
-                                        className={`font-serif capitalize p-1 text-sm inline ml-2 rounded-lg bg-sky-600 text-white mt-2`}
-                                        onClick={(event) => handleTags(event, tag._id)}
-                                    >
-                                        {tag.tag}
-                                    </button>
-                                );
-                            })}
-                        </div>
-
-                        <div className="mb-4">
-                            <label htmlFor="formArtworkPrice" className="block font-medium">Price:</label>
-                            <input
-                                type="number"
-                                id="formArtworkPrice"
-                                name="artworkPrice"
-                                className="block w-full border border-gray-300 rounded p-2"
-                                min="0"
-                                step="any"
-                                defaultValue={isAdd ? '' : artworkToUpdate.price}
-                                onChange={(e) => setPrice(e.target.value)}
-                            />
-                            <p className="text-gray-500 text-sm">Required, must be equal or higher than 0.</p>
-                        </div>
                         {isAdd ? (<>
                             <div className='flex items-center mb-4'>
                                 <div className='text-xl font-bold capitalize'>Photo</div>
@@ -542,7 +538,7 @@ function AddArtworkComponent({ isAdd, artwork_id }) {
                         </div>
                     </form>
                 </div>
-            </div >
+            </div>
         </div >
 
     )

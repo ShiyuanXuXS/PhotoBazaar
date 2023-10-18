@@ -29,17 +29,15 @@ function ArtworkDetailsComponent({ artworkId }) {
     const [showEdit, setShowEdit] = useState(false);
     const [photoName, setPhotoName] = useState("");
     const [photoDescription, setPhotoDescription] = useState("");
-    const [photoFile, setPhotoFile] = useState(null);
+    const [photoFile, setPhotoFile] = useState(null); // photo to upload
     const [author_id, setAuthor_id] = useState("");
     const [photoToUpdate, setPhotoToUpdate] = useState([]);
     const [photoToDelete, setPhotoToDelete] = useState([]);
-    const [isAdd, setIsAdd] = useState(false);
-
+    const [isAdd, setIsAdd] = useState(false); // add or edit photo
 
     useEffect(() => {
         Axios.get(`http://localhost:3001/api/artworks/${artworkId}`)
             .then((response) => {
-                console.log(response.data);
                 setArtworkToUpdate(response.data);
                 setAuthor_id(response.data.author_id);
             })
@@ -55,11 +53,12 @@ function ArtworkDetailsComponent({ artworkId }) {
             });
     }, [artworkId]);
 
-    const handleEditBox = (photo, index) => {
+    const handleEditBox = (photo, index) => {  // if index is true, it's edit photo, if false, it's add photo
+        // show the edit box
         setShowEdit(!showEdit);
+        // if it's edit photo, pass the photo value to update 
         if (index) {
             setIsAdd(false);
-            console.log(photo);
             setPhotoToUpdate(photo);
             setPhotoName(photo.photo_name);
             setPhotoDescription(photo.description);
@@ -68,7 +67,27 @@ function ArtworkDetailsComponent({ artworkId }) {
         }
     }
 
-    console.log(photoToDelete);
+    // upload photo to s3
+    const uploadPhoto = (img) => {
+        let newFileName = `${Date.now()}_${author_id}.photo.${photoFile.name.split(".").pop()}`;
+
+        const uploadParams = {
+            Bucket: config.bucketName,
+            Key: "artwork/" + newFileName,
+            Body: img,
+        };
+        const uploadPromise = client
+            .send(new PutObjectCommand(uploadParams))
+            .then((uploadResult) => {
+                console.log("Image uploaded successfully:", uploadResult);
+                return newFileName;
+            })
+            .catch((error) => {
+                console.error("Error uploading image:", error);
+                return null;
+            });
+        return uploadPromise;
+    }
 
     const deletePhoto = (photo) => {
         setPhotoToDelete(photo);
@@ -112,37 +131,7 @@ function ArtworkDetailsComponent({ artworkId }) {
         }
     }
 
-    console.log(photoName);
-    console.log(photoDescription);
-    console.log(photoFile);
-
-    const uploadPhoto = (img) => {
-        let newFileName = `${Date.now()}_${author_id}.photo.${photoFile.name.split(".").pop()}`;
-
-        const uploadParams = {
-            Bucket: config.bucketName,
-            Key: "artwork/" + newFileName,
-            Body: img,
-        };
-        const uploadPromise = client
-            .send(new PutObjectCommand(uploadParams))
-            .then((uploadResult) => {
-                console.log("Image uploaded successfully:", uploadResult);
-                return newFileName;
-            })
-            .catch((error) => {
-                console.error("Error uploading image:", error);
-                return null;
-            });
-        return uploadPromise;
-    }
-
     const addPhoto = () => {
-        console.log(photoName);
-        console.log(photoDescription);
-        console.log(photoFile);
-
-        // validate the form
         validationSchema
             .validate({ photoName, photoDescription }, { abortEarly: false })
             .then(() => {
@@ -170,7 +159,7 @@ function ArtworkDetailsComponent({ artworkId }) {
                                 console.log(response.data);
                                 setPhotoFile(null);
                                 // reload the page
-                                navigate(`/details/${artworkId}`, { replace: true });
+                                window.location.href = `/details/${artworkId}`;
                             })
                             .catch((error) => {
                                 console.error("Error adding photo:", error);
@@ -185,7 +174,7 @@ function ArtworkDetailsComponent({ artworkId }) {
             .then(() => {
                 const photoPromises = [];
                 let changePhoto = false;
-                // let newFileName = "";
+
                 // check if photo is changed
                 if (photoFile != null) {  // changed, check size and type
                     if (photoFile.size > 5000000 || photoFile.size == undefined) {
@@ -193,32 +182,12 @@ function ArtworkDetailsComponent({ artworkId }) {
                         return;
                     } else {
                         changePhoto = true;
-                        // newFileName = `${Date.now()}_${author_id}.photo.${photoFile.name.split(".").pop()}`;
-
-                        // // save new photo to s3
-                        // const uploadParams = {
-                        //     Bucket: config.bucketName,
-                        //     Key: "artwork/" + newFileName,
-                        //     Body: photoFile,
-                        // };
-
-                        // const uploadPromise = client
-                        //     .send(new PutObjectCommand(uploadParams))
-                        //     .then((uploadResult) => {
-                        //         console.log("Image uploaded successfully:", uploadResult);
-                        //         return newFileName;
-                        //     })
-                        //     .catch((error) => {
-                        //         console.error("Error uploading image:", error);
-                        //         return null;
-                        //     });
+                        // upload the photo to s3
                         photoPromises.push(uploadPhoto(photoFile));
 
                         // delete the previous photo from s3
                         const parts = photoToUpdate.file_url.split(".com/");
                         const deleteFileName = parts.pop();
-                        // console.log(deleteFileName);
-
                         const deleteParams = {
                             Bucket: config.bucketName,
                             Key: deleteFileName,
@@ -252,7 +221,7 @@ function ArtworkDetailsComponent({ artworkId }) {
                                 console.log(response.data);
                                 setPhotoFile(null);
                                 // reload the page
-                                navigate(`/details/${artworkId}`, { replace: true });
+                                window.location.href = `/details/${artworkId}`;
                             })
                             .catch((error) => {
                                 console.error("Error updating photo:", error);
@@ -282,10 +251,6 @@ function ArtworkDetailsComponent({ artworkId }) {
             )
             .required("Description is required"),
     });
-    console.log("ArtworkDetailsComponent");
-    console.log(artworkId);
-    console.log(artworkToUpdate.tags);
-    console.log(tagList);
 
     return (
         <>
@@ -308,12 +273,12 @@ function ArtworkDetailsComponent({ artworkId }) {
             </div>
 
             <div className='photos  m-5 p-3 flex'>
-                <div className='flex flex-wrap justify-center border-2'>
+                <div className='flex flex-wrap justify-center'>
                     {(artworkToUpdate.photos == undefined || artworkToUpdate.photos.length == 0) ? (<></>) : (
                         <>
                             {artworkToUpdate.photos.map((photo, photoIndex) => {
                                 return (
-                                    <div key={photoIndex} className='m-3 p-3'>
+                                    <div key={photoIndex} className='m-3 p-3 border-2'>
                                         <img src={photo.file_url} className='w-60 h-80 justify-center m-auto p-2' alt="Artwork" />
                                         <div className="text-xl p-3 text-center font-bold subpixel-antialiased capitalize">{photo.photo_name}</div>
                                         <div className="text-l p-3 pt-0 capitalize">{photo.description}</div>

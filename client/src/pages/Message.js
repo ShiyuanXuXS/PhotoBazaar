@@ -146,19 +146,6 @@ function Message() {
         }
     }, [userList])
     const searchUsers = () => {
-        //todo: search users from api/users
-        // setUserListFromSearch([
-        //     {
-        //         username: 'user1',
-        //         nickname: 'nickname1',
-        //         messages: []
-        //     },
-        //     {
-        //         username: 'new user',
-        //         nickname: 'new user from search',
-        //         messages: []
-        //     }
-        // ])
         if (!token || !searchUserBy) {
             return;
         }
@@ -300,7 +287,7 @@ function Message() {
                     </div>
                 )}
             </div>
-            <Footer />
+            <Footer fixBottom={true} />
         </div>
     );
 }

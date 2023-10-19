@@ -12,6 +12,8 @@ router.post('/', purchaseController.createPurchase);
 router.get('/', purchaseController.getAllPurchases);
 
 router.get('/:id', purchaseController.getPurchaseById);
+router.get('/payments/:purchase_id', purchaseController.getPaymentStatusById);
+
 //payment
 // router.put('/:id', purchaseController.payPurchase);
 

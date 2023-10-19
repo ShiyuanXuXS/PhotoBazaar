@@ -139,34 +139,17 @@ function ProfileComponent() {
     else setisAdd(false);
   };
 
-  // save profle image to uploadImg
-  const handleSaveCoverImage = (event) => {
-    event.preventDefault();
-    console.log("inside handle save cover:image save succssuflly");
+  console.log(uploadImg);
 
-    const data = {
-      file: event.target.files[0],
-    };
-
-    const newUploadImg = [...uploadImg, data];
-    setUploadImg(newUploadImg);
-    console.log(
-      "inside handle save cover:image save succssuflly data" + data.file.size
-    );
-  };
-
-  // save profile mage to s3 bucket
+  // save profile image to s3 bucket
   const saveImage = (img) => {
-    let newFileName = "";
-
-    newFileName = `${new Date().getTime()}_${user._id}.cover.${img.file.name
-      .split(".")
-      .pop()}`;
+    let newFileName = `${Date.now()}_${user._id}.avator.${img.name.split(".").pop()}`;
+    console.log("new file name:" + newFileName);
 
     const uploadParams = {
       Bucket: config.bucketName,
       Key: "userprofile/" + newFileName,
-      Body: img.file,
+      Body: img,
     };
     // Create a promise for each image upload
     const uploadPromise = client
@@ -185,45 +168,43 @@ function ProfileComponent() {
   // save new artwork to database
   const saveArtwork = (event) => {
     event.preventDefault();
-    console.log("insdide save artwrok:" + uploadImg[0].file.size);
 
-    //Validate Cover Image
+    //Validate Image
     const uploadPromises = []; // Create an array to store promises for image uploads
     if (
       uploadImg === null ||
-      uploadImg[0] === null ||
-      uploadImg[0] === undefined ||
-      uploadImg[0].file.size > 5000000
+      uploadImg === undefined ||
+      uploadImg.size > 5000000
     ) {
       alert("Please select a file less than 5MB");
       return;
-    } else {
-      // save cover image to s3 bucket
-      uploadPromises.push(saveImage(uploadImg[0]));
-      console.log("aaaa:" + uploadImg[0].file.size);
-      // save photos to s3 bucket
+    }
+    else {
+      // save image to s3 bucket
+      uploadPromises.push(saveImage(uploadImg));
     }
     // Use Promise.all to wait for all image uploads to complete
     Promise.all(uploadPromises)
-      .then((fileNames) => {
-        console.log("All images uploaded successfully.", fileNames[0]); // 'fileNames' contain an array of successfully uploaded file names
+      .then((newFileNames) => {
+        console.log("All images uploaded successfully.", newFileNames); // 'fileNames' contain an array of successfully uploaded file names
 
         // save artwork to database
-        axios
-          .put(`http://localhost:3001/api/users/profile/${user.email}`, {
-            avatar: `https://${config.bucketName}.s3.${config.region}.amazonaws.com/${config.dirName}/${fileNames[0]}`,
-          })
-          .then((response) => {
-            console.log(response);
-            alert("Artwork saved successfully!");
-          })
-          .catch((error) => {
-            console.error(error);
-          });
+        // axios
+        //   .put(`http://localhost:3001/api/users/profile/${user.email}`, {
+        //     avatar: `https://${config.bucketName}.s3.${config.region}.amazonaws.com/${config.dirName}/${fileName}`,
+        //   })
+        //   .then((response) => {
+        //     console.log(response);
+        //     alert("Artwork saved successfully!");
+        //   })
+        //   .catch((error) => {
+        //     console.error(error);
+        //   });
       })
       .catch((uploadErrors) => {
         console.error("Error uploading images:", uploadErrors);
-      });
+      }
+      )
   };
 
   return (
@@ -396,7 +377,7 @@ function ProfileComponent() {
                         accept=".jpg, .png, .jpeg"
                         multiple={false}
                         className="block w-full border border-gray-300 rounded p-2"
-                        onChange={handleSaveCoverImage}
+                        onChange={(e) => setUploadImg(e.target.files[0])}
                       />
                       <button
                         type="submit"

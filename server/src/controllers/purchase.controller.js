@@ -292,9 +292,9 @@ class PurchaseController {
     // check if buyer has purchased the artwork or added to cart
     async checkPurchased(req, res) {
         try {
-            const { artworkId } = req.params;
-            const { userId } = req.params;
-            const purchase = await PurchaseModel.checkPurchased(artworkId, userId);
+            const { artworkId } = req.params.artworkId;
+            const { buyerId } = req.params.buyerId;
+            const purchase = await PurchaseModel.checkPurchased(artworkId, buyerId);
             return res.status(200).json(purchase);
         }
         catch (error) {

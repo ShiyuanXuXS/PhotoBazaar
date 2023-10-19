@@ -147,9 +147,9 @@ function AddArtworkComponent({ isAdd, artwork_id }) {
         let newFileName = "";
 
         if (flag == 0) {
-            newFileName = `${new Date().getTime()}_${user.id}.cover.${img.file.name.split(".").pop()}`;
+            newFileName = `${Date.now()}_${user.id}.cover.${img.file.name.split(".").pop()}`;
         } else {
-            newFileName = `${new Date().getTime()}.${index++}_${user.id}.photo.${img.file.name.split(".").pop()}`;
+            newFileName = `${Date.now()}.${index++}_${user.id}.photo.${img.file.name.split(".").pop()}`;
         }
 
         const uploadParams = {

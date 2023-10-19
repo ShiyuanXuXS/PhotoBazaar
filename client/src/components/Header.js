@@ -12,6 +12,7 @@ function HeaderComponent() {
   const [user, setUser] = useState(localStorage.getItem("user"));
   let page = "myArtworks";
 
+
   useEffect(() => {
     if (token) {
       axios

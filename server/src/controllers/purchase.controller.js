@@ -6,7 +6,7 @@ const secretKey = process.env.SECRET_KEY || 'importantsecret';
 
 const PurchaseModel = require('../models/purchase.model');
 const ArtworkModel = require('../models/artwork.model');
-
+const UserModel=require('../models/user.model')
 class PurchaseController {
 
 
@@ -71,7 +71,7 @@ class PurchaseController {
             if (err) {
                 return res.status(400).json({ error: "Token is invalid" });
             }
-            console.log(decoded)
+            // console.log(decoded)
             const user_id = decoded.id;
             try {
                 const { id } = req.params;
@@ -109,9 +109,53 @@ class PurchaseController {
 
     }
 
+    async getPaymentStatusById(req,res){
+        const { authorization } = req.headers;
+        if (!authorization) {return  res.status(404).json({ message: "No authorization" }); }
+        const token = authorization.split(' ')[1];
+        if (!token) { return res.status(400).json({ message: "No token" }); }
+        jwt.verify(token, secretKey, async (err, decoded) => {
+            if (err) {
+                return res.status(400).json({ error: "Token is invalid" });
+            }
+            
+            try{
+                const {purchase_id}=req.params
+                const user_id = decoded.id;
+                const user=await UserModel.findOne({ _id: user_id})
+                if (!user){
+                    return res.status(400).json({ error: "User is invalid" });
+                }
+
+                if (user.role!=='admin'){
+                    const purchase = await PurchaseModel.getPurchaseById(purchase_id);
+                    if (purchase.buyer_id !== user_id) {
+                        return  res.status(400).json({ message: "You are not the buyer" });
+                    }
+                      
+                }
+                const paymentIntentsSearch = await stripe.paymentIntents.search({
+                    query: 'metadata[\'purchase_id\']:\''+purchase_id+'\'',
+                });
+                const paymentIntentsStatus = paymentIntentsSearch.data.map(paymentIntent=>{
+                    return {
+                        id:paymentIntent.id,
+                        status:paymentIntent.status,
+                        date:new Date(paymentIntent.created*1000)
+                    }
+                });
+                return res.status(200).json(paymentIntentsStatus);
+            }catch (error) {
+                console.error('retrieve error:', error);
+                return res.status(500).json({message:"retrieve records failed"})
+            }
+        })
+
+    }
+
     async createPurchase(req, res) {
         const { authorization } = req.headers;
-        console.log(req.headers)
+        // console.log(req.headers)
         if (!authorization) {return  res.status(400).json({ message: "No authorization" }); }
         const token = authorization.split(' ')[1];
         if (!token) { return res.status(400).json({ message: "No token" }); }

@@ -10,7 +10,7 @@ function ArtworkListComponent({ userId, page }) {
     const [arworkIds, setArtworkIds] = useState([]);
 
     useEffect(() => {
-        if (userId !== null && userId !== undefined) {
+        if (page === "myArtworks") {
             // If userId is not null, fetch data for a specific user
             // get artwork_id from user_id
             Axios.get(`http://localhost:3001/api/artworks/author/${userId}`)
@@ -55,17 +55,67 @@ function ArtworkListComponent({ userId, page }) {
             });
     }, [userId]);
 
-    const addToCart = (artworkId) => {
+    const addToCart = (artworkId, authorId, userId) => {
+        // check if artworkId exists in purchase
+        Axios.get(`http://localhost:3001/api/purchases/checkPurchased/${artworkId}/${userId}`)
+            .then((response) => {
+                console.log(response.data);
+                if (response.data === null) {
+                    // if no, add artworkId to purchase
+                    Axios.post(`http://localhost:3001/api/purchases`, {
+                        seller_id: authorId,
+                        buyer_id: userId,
+                        artwork_id: artworkId,
+                        purchase_time: new Date(),
+                        is_paid: false,
+                    })
+                        .then((response) => {
+                            console.log(response.data);
+                            alert("Artwork added to cart!");
+                        })
+                        .catch((error) => {
+                            console.error(error);
+                        });
+                } else {
+                    response.data.is_paid === true ? alert("Artwork has been purchased!") : alert("Artwork has been added to cart!");
+                }
+            })
+            .catch((error) => {
+                console.error(error);
+            });
+
     }
 
     const deleteArtwork = (artworkId) => {
-        // check if artworkId exists in purchase
-
-        // if no, delete artworkId from purchase
-
-        // if yes, alert user that artwork has been purchased
-
+        if (!window.confirm("Are you sure you to delete it?")) {
+            return;
+        } else {
+            // check if artworkId exists in purchase
+            Axios.get(`http://localhost:3001/api/purchases/checkSold/${artworkId}`)
+                .then((response) => {
+                    console.log(response.data);
+                    if (response.data === null) {
+                        // if no, delete artworkId from artwork
+                        Axios.delete(`http://localhost:3001/api/artworks/${artworkId}`)
+                            .then((response) => {
+                                console.log(response.data);
+                                alert("Artwork deleted!");
+                                window.location.reload();
+                            })
+                            .catch((error) => {
+                                console.error(error);
+                            });
+                    } else {
+                        // if yes, alert user that artwork has been purchased
+                        alert("Artwork has been purchased!");
+                    }
+                })
+                .catch((error) => {
+                    console.error(error);
+                });
+        }
     }
+
     console.log(userId);
     return (
         <>
@@ -147,7 +197,7 @@ function ArtworkListComponent({ userId, page }) {
                                             {/* add to cart */}
                                             <button className="border-r-2 items-center px-1"
                                                 onClick={() => {
-                                                    addToCart(artwork._id)
+                                                    addToCart(artwork._id, artwork.author_id, userId)
                                                 }}>
                                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
                                                     <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v6m3-3H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" />

@@ -273,6 +273,32 @@ class PurchaseController {
             return res.status(500).json({ message: 'An error occurred while retrieving unpaid purchase history' });
         }
     }
+
+    // check if a artwork is sold
+    async checkArtworkSold(req, res) {
+        try {
+            const { artworkId } = req.params;
+            const purchase = await PurchaseModel.checkArtworkSold(artworkId);
+            return res.status(200).json(purchase);
+        }
+        catch (error) {
+            console.error('An error occurred while checking if a artwork is sold:', error);
+            return res.status(500).json({ message: 'An error occurred while checking if a artwork is sold' });
+        }
+    }
+
+    // check if buyer has purchased the artwork or added to cart
+    async checkPurchased(req, res) {
+        try {
+            const { artworkId, buyerId } = req.params;
+            const purchase = await PurchaseModel.checkPurchased(artworkId, buyerId);
+            return res.status(200).json(purchase);
+        }
+        catch (error) {
+            console.error('An error occurred while checking if buyer has purchased the artwork or added to cart:', error);
+            return res.status(500).json({ message: 'An error occurred while checking if buyer has purchased the artwork or added to cart' });
+        }
+    }
 }
 
 module.exports = new PurchaseController();

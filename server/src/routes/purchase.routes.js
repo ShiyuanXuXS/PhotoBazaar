@@ -20,6 +20,6 @@ router.get('/payments/:purchase_id', purchaseController.getPaymentStatusById);
 router.delete('/:id', purchaseController.deletePurchase);
 
 // get all unpaid purchase records by buyerId
-router.get('/unpaid/:buyerId', purchaseController.getUnpaidPurchasesByBuyerId);
-
+// router.get('/unpaid/:buyerId', purchaseController.getUnpaidPurchasesByBuyerId);
+router.get('/unpaid/buyer', purchaseController.getUnpaidPurchases);
 module.exports = router;

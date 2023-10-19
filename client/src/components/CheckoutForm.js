@@ -58,7 +58,7 @@ export default function CheckoutForm() {
       elements,
       confirmParams: {
         // todo: navigate to payment result page
-        return_url: process.env.REACT_APP_URL+"/payment",
+        return_url: process.env.REACT_APP_URL+"/cart",
       },
     });
 

@@ -38,19 +38,19 @@ function HeaderComponent() {
   return (
     <header className="bg-white">
       <nav
-        className="mx-auto flex w-full items-center justify-between p-6 lg:px-8"
+        className="mx-auto flex flex-wrap w-full items-center justify-between p-6 lg:px-8"
         aria-label="Global"
       >
-        <div className="flex lg:flex-1">
+        <div className="home flex lg:flex-1">
           <button onClick={() => Navigate("/")} className="-m-1.5 p-1.5">
             <span className="sr-only">Photobazarr</span>
             <img className="h-8 w-auto" src="https://photobazarr.s3.ca-central-1.amazonaws.com/logo2.png" alt="photobazarr" />
           </button>
         </div>
-        <h1 className="text-4xl font-extrabold text-gray-800 font-serif">
+        <h1 className="name text-4xl font-extrabold text-gray-800 font-serif">
           PhotoBazaar
         </h1>
-        <p className="text-lg font-semibold text-gray-600 mx-5">
+        <p className="slogan text-lg font-semibold text-gray-600 mx-5">
           Your Photos, Our Marketplace
         </p>
         {/* shows up when user haven't login in or sign up */}
@@ -214,7 +214,8 @@ function HeaderComponent() {
                           className="block flex items-center px-1 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900"
                           role="menuitem"
                           onClick={() => {
-                            Navigate(`/cart/${user.id}`)
+                            // Navigate(`/cart/${user.id}`)
+                            Navigate(`/cart`)
                             setIsOpen(false);
                           }}
                         >

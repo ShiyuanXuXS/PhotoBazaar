@@ -249,6 +249,7 @@ class PurchaseController {
     async deletePurchase(req, res) {
         //todo: auth
         try {
+            console.log(req.params)
             const { id } = req.params;
             const deletedCount = await PurchaseModel.deletePurchase(id);
             if (deletedCount === 0) {
@@ -272,6 +273,31 @@ class PurchaseController {
             console.error('An error occurred while retrieving unpaid purchase history:', error);
             return res.status(500).json({ message: 'An error occurred while retrieving unpaid purchase history' });
         }
+    }
+
+
+    async getUnpaidPurchases(req,res){
+        const { authorization } = req.headers;
+        if (!authorization) { return res.status(404).json({ message: "No authorization" }); }
+        const token = authorization.split(' ')[1];
+        if (!token) { return res.status(400).json({ message: "No token" }); }
+        jwt.verify(token, secretKey, async (err, decoded) => {
+            if (err) {
+                return res.status(400).json({ error: "Token is invalid" });
+            }
+            // console.log(decoded)
+            const buyer_id = decoded.id;
+            try {
+                // console.log(`buyer_id: ${buyer_id}`)
+                const purchases = await PurchaseModel.getUnpaidPurchasesByBuyerId(buyer_id);
+                return res.status(200).json(purchases);
+            }
+            catch (error) {
+                console.error('An error occurred while retrieving unpaid purchase history:', error);
+                return res.status(501).json({ message: 'An error occurred while retrieving unpaid purchase history' });
+            }
+
+        })
     }
 }
 

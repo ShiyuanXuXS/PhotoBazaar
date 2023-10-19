@@ -10,7 +10,8 @@ const stripeKey = process.env.REACT_APP_STRIPE_API_KEY;
 const stripePromise = loadStripe(stripeKey);
 
 function Payment(props) {
-    const purchase_id = props.purchase_id;
+    console.log(props)
+    const purchase_id = props.purchase._id;
     // console.log(purchase_id)
     const [message, setMessage] = useState("");
     const [error, setError] = useState("");
@@ -123,7 +124,7 @@ function Payment(props) {
                             {message}
                         </div>
                         <button
-                            onClick={() => Navigate('/')}
+                            onClick={() => props.onCancel()}
                             className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded whitespace-normal"
                         >
                             Back to cart
@@ -131,9 +132,24 @@ function Payment(props) {
                     </div>
                 )}
             {!error && !message && clientSecret && (
-                    <Elements options={options} stripe={stripePromise}>
-                        <CheckoutForm />
-                    </Elements>
+                
+                <div className="purchase-info bg-white border p-4 rounded shadow-md mb-4 md:flex md:flex-row md:items-center md:space-x-4 md:space-y-0 md:mb-0">
+                    <div className="w-full md:w-1/3">
+                        <div className="w-full md:w-1/2">
+                            <p className="text-xl font-bold">Purchase ID: {props.purchase._id}</p>
+                            <p className="text-lg">Price: ${props.purchase.transaction_price}</p>
+                            <p className="text-lg">Artwork Title: {props.purchase.artwork.title}</p>
+                        </div>
+                        <div className="imageBox w-full md:w-1/2 border-2">
+                            <img className="w-60 h-60 m-auto my-3" src={props.purchase.artwork.cover_url} alt="artwork cover" />
+                        </div>
+                    </div>
+                    <div className="w-full md:w-1/2">
+                        <Elements options={options} stripe={stripePromise}>
+                            <CheckoutForm />
+                        </Elements>
+                    </div>
+                </div>
             )
             }
         </div>

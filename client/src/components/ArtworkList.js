@@ -121,20 +121,20 @@ function ArtworkListComponent({ userId, page }) {
                 if (response.data == null) {
 
                     // if no, add artworkId to purchase
-                    // Axios.post(`http://localhost:3001/api/purchases`, {
-                    //     artwork_id: artworkId,
-                    // },
-                    //     { headers: { Authorization: `Bearer ${token}` } }
-                    // )
-                    //     .then((response) => {
-                    //         console.log(response.data);
-                    //         alert("Artwork added to cart!");
-                    //     })
-                    //     .catch((error) => {
-                    //         console.error(error);
-                    //     });
+                    Axios.post(`http://localhost:3001/api/purchases`, {
+                        artwork_id: artworkId,
+                    },
+                        { headers: { Authorization: `Bearer ${token}` } }
+                    )
+                        .then((response) => {
+                            console.log(response.data);
+                            alert("Artwork added to cart!");
+                        })
+                        .catch((error) => {
+                            console.error(error);
+                        });
                 } else {
-                    response.data.is_paid === true ? alert("Artwork has been purchased!") : alert("Artwork has been added to cart!");
+                    response.data.is_paid === true ? alert("Artwork has been purchased!") : alert("Artwork has already been added to cart!");
                 }
             })
             .catch((error) => {

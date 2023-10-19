@@ -10,6 +10,7 @@ function HeaderComponent() {
   const [isOpen, setIsOpen] = useState(false);
   const [token, setToken] = useState(localStorage.getItem("accessToken"));
   const [user, setUser] = useState(localStorage.getItem("user"));
+  let page = "myArtworks";
 
   useEffect(() => {
     if (token) {
@@ -32,7 +33,7 @@ function HeaderComponent() {
     localStorage.clear();
     setUser(null);
     setToken(null);
-    Navigate("/");
+    window.location.reload("/");
   };
 
   return (
@@ -150,10 +151,7 @@ function HeaderComponent() {
                               d="M17.982 18.725A7.488 7.488 0 0012 15.75a7.488 7.488 0 00-5.982 2.975M23.963 18.725A9 9 0 0012 15.75a9 9 0 00-11.963 2.975M23.963 18.725A8.966 8.966 0 0112 21a8.966 8.966 0 01-5.982-2.275M15 9.75a3 3 0 11-6 0 3 3 0 016 0z"
                             />
                           </svg>
-                          {/* if you set link here, it will not work when you click the icon. */}
-                          {/* <Link to={`/profile/${userId}`}> */}
                           Profile
-                          {/* </Link> */}
                         </button>
                       </div>
 
@@ -188,7 +186,7 @@ function HeaderComponent() {
                           className="block flex items-center px-1 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900"
                           role="menuitem"
                           onClick={() => {
-                            Navigate(`/asset/${user.id}`);
+                            Navigate(`/asset/${user.id}`, page = "myArtworks");
                             setIsOpen(false);
                           }}
                         >

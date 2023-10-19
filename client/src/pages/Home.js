@@ -17,7 +17,6 @@ function Home() {
           setToken(response.data.token);
           setUser(response.data.user)
           setUserId(response.data.user.id);
-          console.log(response.data.user);
         }).catch(() => {
           localStorage.removeItem('token');
         });
@@ -26,9 +25,7 @@ function Home() {
 
   useEffect(() => {
     Axios.get("http://localhost:3001/api/tags").then((response) => {
-      console.log(response.data);
       const tagList = response.data;
-      console.log(tagList);
       // sort by count
       const sortedTagList = tagList.sort((a, b) => b.count - a.count);
       setTopTags(sortedTagList.slice(0, 3));

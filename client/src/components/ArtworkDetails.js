@@ -333,6 +333,7 @@ function ArtworkDetailsComponent({ artworkId }) {
                                                         </svg>
                                                     </button>
                                                 </a></>) : (<> </>)}
+                                            {/* only author can download */}
                                             {author_id === userId ?
                                                 (<>
                                                     <button className="border-2 items-center p-1"
@@ -359,6 +360,7 @@ function ArtworkDetailsComponent({ artworkId }) {
                             })}
                         </>)}
                 </div>
+                {/* only author can add photo */}
                 {author_id !== userId ? (<></>) : (<>
                     <div className='addPhotoBtn flex flex-wrap justify-center pt-3 m-5 p-5'>
                         <button className="border-4 w-60 h-60 m-auto flex flex-col justify-center items-center rounded-full" onClick={() => handleEditBox(false)}>

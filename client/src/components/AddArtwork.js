@@ -501,7 +501,7 @@ function AddArtworkComponent({ isAdd, artwork_id }) {
 
                             <div className="flex flex-wrap">
                                 {imagesBoxes.map((imagesBox, index) => (
-                                    <div key={index} className="w-1/4"> {/* w-1/4 means each element takes 25% width */}
+                                    <div key={index} >
                                         <UploadImagesBoxComponent
                                             key={index}
                                             index={imagesBox.index}

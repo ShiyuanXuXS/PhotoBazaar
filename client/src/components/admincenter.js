@@ -1,25 +1,37 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext, useEffect, useState, useRef } from "react";
 import axios from "axios";
 import { useNavigate, useParams } from "react-router-dom";
 import { AuthContext } from "../Helpers/AuthContext";
-// import ForgotPassword from "../pages/ForgotPassword";
+import { Transition } from "@headlessui/react";
 
 function AdmincenterCompoment() {
+  // the id of admin
+  let { id } = useParams();
+  const Navigate = useNavigate("");
+  const myRef = useRef(null);
+  //fetch user list
+  const [userList, setUserList] = useState([]);
+  //fetch artwork list
+  const [artworkList, setArtworkList] = useState([]);
+  //fetch tag list
+  const [tagList, setTagList] = useState([]);
+  //tag edit status
+  const [tagisOpen, setTagIsOpen] = useState(false);
+  // tag description status
+  const [tag, setTag] = useState([]);
+  //fetch current user
+  const [user, setUser] = useState(localStorage.getItem("user"));
+  //create a new user
+  const [username, setUserName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const Navigate = useNavigate("");
-  const [userList, setUserList] = useState([]);
-  const [artworkList, setArtworkList] = useState([]);
-  const [tagList, setTagList] = useState([]);
-  const [tagDescription, settagDescription] = useState([]);
-  const [user, setUser] = useState(localStorage.getItem("user"));
-  let { id } = useParams();
-
+  const [confirmPassword, setConfirmPassword] = useState("");
+  // message and errors
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
 
   useEffect(() => {
-    //fetch user list
+    //fetch current user information
     axios
       .get(`http://localhost:3001/api/users/userProfile/${id}`)
       .then((res) => {
@@ -51,7 +63,7 @@ function AdmincenterCompoment() {
       });
   }, [user._id]);
 
-  //disable an existing user by email
+  //disable/Enable an existing user by email
   const disableUser = (event, email, disableorenable) => {
     event.preventDefault();
     let requestUrl = "";
@@ -81,7 +93,6 @@ function AdmincenterCompoment() {
   //delete artwork by id
   const deleteArtworkById = (event, artworkid) => {
     event.preventDefault();
-    //delete artwork
     axios
       .delete(`http://localhost:3001/api/artworks/${artworkid}`)
       .then((response) => {
@@ -97,7 +108,6 @@ function AdmincenterCompoment() {
   //delete tag by id
   const deleteTagById = (event, tagid) => {
     event.preventDefault();
-    //delete artwork
     axios
       .delete(`http://localhost:3001/api/tags/${tagid}`)
       .then((response) => {
@@ -113,12 +123,10 @@ function AdmincenterCompoment() {
   //update tag by id
   const updateTagById = (event, tagid) => {
     event.preventDefault();
-    //delete artwork
     axios
       .put(`http://localhost:3001/api/tags/${tagid}`)
       .then((response) => {
         window.location.reload();
-
         const { message: resMessage } = response.data;
         setMessage(resMessage);
       })
@@ -127,7 +135,25 @@ function AdmincenterCompoment() {
       });
   };
   //todo: update tag description by id
-
+  //add tag
+  const addTag = (event) => {
+    event.preventDefault();
+    axios
+      .post("http://localhost:3001/api/tags", {
+        tag,
+      })
+      .then((response) => {
+        // Handle the response if needed
+        console.log("response data:" + response.data);
+        const { message: resMessage } = response.data;
+        setMessage(resMessage);
+        setTagIsOpen(!tagisOpen);
+      })
+      .catch((error) => {
+        // Handle errors
+        setError(error.response.data.message);
+      });
+  };
   return (
     <div>
       {/* user management */}
@@ -145,7 +171,7 @@ function AdmincenterCompoment() {
             User role
           </th>
           <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider ">
-            Disable
+            Disable/Enable
           </th>
         </thead>
         <tbody className="bg-white divide-y divide-gray-200">
@@ -180,6 +206,7 @@ function AdmincenterCompoment() {
           )}
         </tbody>
       </table>
+
       {/* artwork management */}
       {error && <div className="text-red-500 mb-8">{error}</div>}
       {message && <div className="text-green-500 mb-8">{message}</div>}
@@ -237,6 +264,15 @@ function AdmincenterCompoment() {
                   </div>
                 </div>
               ))}
+              <div class="table-row">
+                <button
+                  type="submit"
+                  className={`font-serif capitalize p-1 text-sm inline ml-2 rounded-lg bg-sky-600 text-white mt-2`}
+                  onClick={() => Navigate("/addArtwork")}
+                >
+                  Add Artwork
+                </button>
+              </div>
             </>
           ) : (
             <p>No artwork!</p>
@@ -305,6 +341,65 @@ function AdmincenterCompoment() {
           )}
         </tbody>
       </table>
+      <button
+        type="submit"
+        className={`font-serif capitalize p-1 text-sm inline ml-2 rounded-lg bg-sky-600 text-white mt-2`}
+        onClick={() => setTagIsOpen(!tagisOpen)}
+      >
+        Add Tag
+      </button>
+
+      <Transition
+        show={tagisOpen}
+        enter="transition ease-out duration-100 transform"
+        enterFrom="opacity-0 scale-95"
+        enterTo="opacity-100 scale-100"
+        leave="transition ease-in duration-75 transform"
+        leaveFrom="opacity-100 scale-100"
+        leaveTo="opacity-0 scale-95"
+      >
+        {(ref) => (
+          <div
+            ref={myRef}
+            // className="origin-top-right absolute right-0 mt-2 w-50 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5"
+            // role="menu"
+            // aria-orientation="vertical"
+            // aria-labelledby="options-menu"
+          >
+            <div className="w-1/3 mx-auto">
+              <form>
+                <h1 className="text-3xl my-5 font-bold text-center">
+                  Create New Tag
+                </h1>
+
+                <div className="mb-4">
+                  <label className="text-left block text-sm font-medium text-gray-700">
+                    Tag name:
+                  </label>
+
+                  <input
+                    type="text"
+                    placeholder="Enter username"
+                    className="mt-1 p-2 w-full rounded-md border border-gray-300"
+                    name="tag"
+                    value={tag}
+                    onChange={(e) => setTag(e.target.value)}
+                  />
+                </div>
+
+                <button
+                  onClick={addTag}
+                  className="w-full px-4 py-2 text-white bg-blue-500 rounded-md hover:bg-blue-600"
+                >
+                  Create Tag
+                </button>
+              </form>
+              {error && <div className="text-red-500 mb-8">{error}</div>}
+              {message && <div className="text-green-500 mb-8">{message}</div>}
+            </div>
+          </div>
+        )}
+      </Transition>
       {/* end tag list */}
     </div>
   );

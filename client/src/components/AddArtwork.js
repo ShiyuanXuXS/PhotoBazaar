@@ -224,14 +224,14 @@ function AddArtworkComponent({ isAdd, artwork_id }) {
                             index = 0; // reset index to 0
 
                             // add artwork_id to user
-                            Axios.patch(`http://localhost:3001/api/users/my_assets/${user.id}`, {
-                                my_assets: response.data._id,
-                            }).then((response) => {
-                                console.log("after patch," + response);
-                            })
-                                .catch((error) => {
-                                    console.error(error);
-                                });
+                            // Axios.patch(`http://localhost:3001/api/users/my_assets/${user.id}`, {
+                            //     my_assets: response.data._id,
+                            // }).then((response) => {
+                            //     console.log("after patch," + response);
+                            // })
+                            //     .catch((error) => {
+                            //         console.error(error);
+                            //     });
 
                             // add tag count
                             tagArray.forEach((tag) => {

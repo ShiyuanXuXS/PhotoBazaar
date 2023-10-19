@@ -20,7 +20,7 @@ function HeaderComponent() {
         .then((response) => {
           setToken(response.data.token);
           setUser(response.data.user);
-          console.log("inside header:" + user.email);
+          // console.log("inside header:" + user.email);
         })
         .catch(() => {
           localStorage.removeItem("token");

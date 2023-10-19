@@ -10,10 +10,9 @@ function MyArtwork() {
     return (
         <>
             <HeaderComponent />
-            <ArtworkListComponent userId={userId} />
+            <ArtworkListComponent userId={userId} page="myArtworks" />
             <FooterComponent />
         </>
-
     )
 }
 

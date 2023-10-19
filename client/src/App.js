@@ -27,7 +27,7 @@ function App() {
       <div className="page-container">
         <Router>
           <Routes>
-            <Route path="/Login" element={<Login />} />
+            <Route path="/login" element={<Login />} />
             <Route path="/" element={<Home />} />
             <Route path="/register" element={<Register />} />
             <Route path="/profile/:id" element={<Profile />} />
@@ -36,10 +36,7 @@ function App() {
             <Route path="/trackpayments" element={<TrackPayments />} />
             <Route path="/artwork" element={<Artwork />} />
             <Route path="/addArtwork" element={<AddArtwork />} />
-            <Route
-              path="/updateArtworkMainInfo/:artworkId"
-              element={<UpdateArtwork />}
-            />
+            <Route path="/updateArtworkMainInfo/:artworkId" element={<UpdateArtwork />} />
             <Route path="/details/:artworkId" element={<ArtworkDetails />} />
             <Route path="/artwork/:userId" element={<MyArtwork />} />
             <Route path="/asset/:userId" element={<MyAssets />} />

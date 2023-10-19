@@ -10,7 +10,7 @@ function Cart() {
         <>
             <HeaderComponent />
             <CartComponent buyerId={userId} />
-            <FooterComponent />
+            <FooterComponent fixBottom={true} />
         </>
 
     )

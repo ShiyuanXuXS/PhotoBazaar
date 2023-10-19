@@ -6,7 +6,7 @@ import {
   useElements
 } from "@stripe/react-stripe-js";
 
-export default function CheckoutForm() {
+export default function CheckoutForm({purchase_id}) {
   const stripe = useStripe();
   const elements = useElements();
 
@@ -58,7 +58,7 @@ export default function CheckoutForm() {
       elements,
       confirmParams: {
         // todo: navigate to payment result page
-        return_url: process.env.REACT_APP_URL+"/cart",
+        return_url: process.env.REACT_APP_URL+`/payment_result/${purchase_id}`,
       },
     });
 

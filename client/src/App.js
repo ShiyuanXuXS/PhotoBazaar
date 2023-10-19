@@ -20,7 +20,7 @@ import ArtworkDetails from "./pages/ArtworkDetails";
 import MyAssets from "./pages/MyAssets";
 import Admincenter from "./pages/Admincenter";
 import MyCart from "./pages/Cart";
-
+import PaymentResult from "./pages/PaymentResult";
 function App() {
   return (
     <AuthProvider>
@@ -41,6 +41,7 @@ function App() {
             <Route path="/artwork/:userId" element={<MyArtwork />} />
             <Route path="/asset/:userId" element={<MyAssets />} />
             <Route path="/cart" element={<MyCart />} />
+            <Route path="/payment_result/:purchase_id" element={<PaymentResult />} />
             <Route path="/forgotpassword" element={<ForgotPassword />} />
             <Route path="/changepassword/:email" element={<ChangePassword />} />
             <Route path="/admincenter/:id" element={<Admincenter />} />

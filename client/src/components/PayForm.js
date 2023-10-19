@@ -17,50 +17,54 @@ function Payment(props) {
     const [error, setError] = useState("");
     const [clientSecret, setClientSecret] = useState("");
     const url = process.env.REACT_APP_API_URL;
+    const token = localStorage.getItem('accessToken');
+
     const Navigate = useNavigate();
-    useEffect(() => {
-        const token = localStorage.getItem('accessToken');
+    
+    const checkPaymentStatus = async () => {
+        if (!token) {
+            setError("Please log in")
+            Navigate('/login')
+            throw new Error();
+        } else {
+            try {
+                const response = await axios.post(
+                    `${url}/api/purchases/checkPaymentStatus/${purchase_id}`,
+                    null,
+                    {
+                    headers: { Authorization: `Bearer ${token}` }
+                    }
+                );
+                const { message: resMessage } = response.data;
+                console.log(response.status)
+                switch (response.status) {
+                    case 200:   //not paid, show payment form without message
+                        break;
+                    case 201:   //paid
+                        setMessage(resMessage)
+                        throw new Error();
+                    case 202:   //multiple paid
+                        setError(resMessage)
+                        throw new Error();
+                    default:
+                        setError("undefined error")
+                        throw new Error();
+                }
+                
+            } catch (err) {
+                // order not found
+                const { message: resMessage } = err.response.data;
+                setError(resMessage);
+                throw new Error();
+            }
+        }
+        
+    }
+        useEffect(() => {
+        
         // console.log(token);
         // check if is_paid
-        const checkPaymentStatus = async () => {
-            if (!token) {
-                setError("Please log in")
-                Navigate('/login')
-                throw new Error();
-            } else {
-                try {
-                    const response = await axios.post(
-                        `${url}/api/purchases/checkPaymentStatus/${purchase_id}`,
-                        null,
-                        {
-                        headers: { Authorization: `Bearer ${token}` }
-                        }
-                    );
-                    const { message: resMessage } = response.data;
-                    console.log(response.status)
-                    switch (response.status) {
-                        case 200:   //not paid, show payment form without message
-                            break;
-                        case 201:   //paid
-                            setMessage(resMessage)
-                            throw new Error();
-                        case 202:   //multiple paid
-                            setError(resMessage)
-                            throw new Error();
-                        default:
-                            setError("undefined error")
-                            throw new Error();
-                    }
-                    
-                } catch (err) {
-                    // order not found
-                    const { message: resMessage } = err.response.data;
-                    setError(resMessage);
-                    throw new Error();
-                }
-            }
-            
-        }
+
 
         //apply payment
         const fetchClientSecret = async () => {
@@ -110,7 +114,7 @@ function Payment(props) {
                             {error}
                         </div>
                         <button
-                            onClick={() => Navigate('/')}
+                            onClick={() => props.onCancel()}
                             className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded whitespace-normal"
                         >
                             Back to cart
@@ -146,7 +150,7 @@ function Payment(props) {
                     </div>
                     <div className="w-full md:w-1/2">
                         <Elements options={options} stripe={stripePromise}>
-                            <CheckoutForm />
+                            <CheckoutForm purchase_id={purchase_id}/>
                         </Elements>
                     </div>
                 </div>

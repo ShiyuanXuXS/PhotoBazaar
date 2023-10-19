@@ -155,7 +155,8 @@ class PurchaseController {
 
     async createPurchase(req, res) {
         const { authorization } = req.headers;
-        // console.log(req.headers)
+        console.log(req.headers.authorization)
+        console.log("enter");
         if (!authorization) { return res.status(400).json({ message: "No authorization" }); }
         const token = authorization.split(' ')[1];
         if (!token) { return res.status(400).json({ message: "No token" }); }
@@ -165,7 +166,8 @@ class PurchaseController {
             }
             console.log(decoded)
             const user_id = decoded.id;
-
+            console.log("got user id");
+            console.log(user_id);
             try {
                 const { artwork_id } = req.body;
                 if (!artwork_id) {
@@ -273,6 +275,33 @@ class PurchaseController {
             console.error('An error occurred while retrieving unpaid purchase history:', error);
             return res.status(500).json({ message: 'An error occurred while retrieving unpaid purchase history' });
         }
+    }
+
+    // check if a artwork is sold
+    async checkArtworkSold(req, res) {
+        try {
+            const { artworkId } = req.params;
+            const purchase = await PurchaseModel.checkArtworkSold(artworkId);
+            return res.status(200).json(purchase);
+        }
+        catch (error) {
+            console.error('An error occurred while checking if a artwork is sold:', error);
+            return res.status(500).json({ message: 'An error occurred while checking if a artwork is sold' });
+        }
+    }
+
+    // check if buyer has purchased the artwork or added to cart
+    async checkPurchased(req, res) {
+        try {
+            const { artworkId, buyerId } = req.params;
+            const purchase = await PurchaseModel.checkPurchased(artworkId, buyerId);
+            return res.status(200).json(purchase);
+        }
+        catch (error) {
+            console.error('An error occurred while checking if buyer has purchased the artwork or added to cart:', error);
+            return res.status(500).json({ message: 'An error occurred while checking if buyer has purchased the artwork or added to cart' });
+        }
+
     }
 
 

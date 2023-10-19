@@ -147,9 +147,9 @@ function AddArtworkComponent({ isAdd, artwork_id }) {
         let newFileName = "";
 
         if (flag == 0) {
-            newFileName = `${new Date().getTime()}_${user.id}.cover.${img.file.name.split(".").pop()}`;
+            newFileName = `${Date.now()}_${user.id}.cover.${img.file.name.split(".").pop()}`;
         } else {
-            newFileName = `${new Date().getTime()}.${index++}_${user.id}.photo.${img.file.name.split(".").pop()}`;
+            newFileName = `${Date.now()}.${index++}_${user.id}.photo.${img.file.name.split(".").pop()}`;
         }
 
         const uploadParams = {
@@ -501,7 +501,7 @@ function AddArtworkComponent({ isAdd, artwork_id }) {
 
                             <div className="flex flex-wrap">
                                 {imagesBoxes.map((imagesBox, index) => (
-                                    <div key={index} className="w-1/4"> {/* w-1/4 means each element takes 25% width */}
+                                    <div key={index} >
                                         <UploadImagesBoxComponent
                                             key={index}
                                             index={imagesBox.index}

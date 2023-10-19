@@ -1,16 +1,47 @@
 import React, { useState, useEffect } from 'react';
 import Axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import {
+    S3Client,
+    DeleteObjectCommand,
+} from "@aws-sdk/client-s3";
+export default ArtworkListComponent;
 
+
+//S3 config
+const config = {
+    bucketName: "photobazarr",
+    dirName: "artwork",
+    region: "ca-central-1",
+    credentials: {
+        accessKeyId: process.env.REACT_APP_ACCESSKEYID,
+        secretAccessKey: process.env.REACT_APP_SECRETACCESSKEY,
+    },
+};
+
+const client = new S3Client(config);
 
 function ArtworkListComponent({ userId, page }) {
     const [artworkList, setArtworkList] = useState([]);
     const [tagList, setTagList] = useState([]);
     const navigate = useNavigate();
     const [arworkIds, setArtworkIds] = useState([]);
+    const [token, setToken] = useState(localStorage.getItem("accessToken"));
 
     useEffect(() => {
-        if (userId !== null && userId !== undefined) {
+        if (token) {
+            Axios.get(`http://localhost:3001/api/users/auth`, {
+                headers: { accessToken: token },
+            })
+                .then((response) => {
+                    setToken(response.data.token);
+                })
+                .catch(() => {
+                    localStorage.removeItem("token");
+                });
+        }
+
+        if (page === "myArtworks") {
             // If userId is not null, fetch data for a specific user
             // get artwork_id from user_id
             Axios.get(`http://localhost:3001/api/artworks/author/${userId}`)
@@ -42,7 +73,26 @@ function ArtworkListComponent({ userId, page }) {
 
         // if myAssets, get artworklist from user table
         if (page === "myAssets") {
-
+            // get artwork_id from user_id
+            Axios.get(`http://localhost:3001/api/users/id/${userId}`)
+                .then((response) => {
+                    let my_assets = response.data.my_assets;
+                    // get artwork data from artwork_id
+                    let myArtworkList = [];
+                    my_assets.forEach(asset => {
+                        Axios.get(`http://localhost:3001/api/artworks/${asset.artwork_id}`)
+                            .then((response) => {
+                                myArtworkList.push(response.data);
+                                setArtworkList(myArtworkList);
+                            })
+                            .catch((error) => {
+                                console.error(error);
+                            });
+                    });
+                })
+                .catch((error) => {
+                    console.error(error);
+                });
         }
 
         // Fetch the tag data
@@ -55,29 +105,109 @@ function ArtworkListComponent({ userId, page }) {
             });
     }, [userId]);
 
-    const addToCart = (artworkId) => {
-    }
-
-    const deleteArtwork = (artworkId) => {
+    const addToCart = (artworkId, authorId, userId) => {
+        // check if userId is author
+        if (authorId === userId) {
+            alert("You cannot add your own artwork to cart!");
+            return;
+        }
+        console.log("next");
         // check if artworkId exists in purchase
+        Axios.get(`http://localhost:3001/api/purchases/checkPurchased/${artworkId}/${userId}`)
+            .then((response) => {
+                console.log(response.data);
+                console.log("enter");
+                console.log(artworkId);
+                if (response.data == null) {
 
-        // if no, delete artworkId from purchase
-
-        // if yes, alert user that artwork has been purchased
+                    // if no, add artworkId to purchase
+                    Axios.post(`http://localhost:3001/api/purchases`, {
+                        artwork_id: artworkId,
+                    },
+                        { headers: { Authorization: `Bearer ${token}` } }
+                    )
+                        .then((response) => {
+                            console.log(response.data);
+                            alert("Artwork added to cart!");
+                        })
+                        .catch((error) => {
+                            console.error(error);
+                        });
+                } else {
+                    response.data.is_paid === true ? alert("Artwork has been purchased!") : alert("Artwork has already been added to cart!");
+                }
+            })
+            .catch((error) => {
+                console.error(error);
+            });
 
     }
-    console.log(userId);
+
+    const deleteArtwork = (artwork) => {
+        if (!window.confirm("Are you sure you to delete it?")) {
+            return;
+        } else {
+            // check if artworkId exists in purchase
+            Axios.get(`http://localhost:3001/api/purchases/checkSold/${artwork._id}`)
+                .then((response) => {
+                    if (response.data === null) {
+
+                        const deleteFiles = [];
+                        // get cover_url
+                        deleteFiles.push(artwork.cover_url);
+                        // get photos_url
+                        artwork.photos.forEach(photo => {
+                            deleteFiles.push(photo.file_url);
+                        });
+
+                        // get deleteFilesNames
+                        const deleteFilesNames = [];
+                        deleteFiles.map(file => {
+                            const fileName = file.split(".com/").pop();
+                            deleteFilesNames.push(fileName);
+                        });
+
+                        // delete files from s3
+                        let deleteFilesParams = {};
+                        const deleteFilesPromises = [];
+                        deleteFilesNames.forEach((fileName) => {
+                            deleteFilesParams = {
+                                Bucket: config.bucketName,
+                                Key: fileName,
+                            };
+                            const deleteFilesPromise = client
+                                .send(new DeleteObjectCommand(deleteFilesParams))
+                                .then((data) => console.log(data))
+                                .catch((error) => console.log(error));
+                            deleteFilesPromises.push(deleteFilesPromise);
+                        });
+                        Promise.all(deleteFilesPromises).then(() => {
+                            // delete artwork from db
+                            Axios.delete(`http://localhost:3001/api/artworks/${artwork._id}`)
+                                .then((response) => {
+                                    console.log(response.data);
+                                    alert("Artwork deleted!");
+                                    window.location.reload();
+                                })
+                                .catch((error) => {
+                                    console.error(error);
+                                });
+                        }
+                        ).catch((error) => {
+                            console.error(error);
+                        });
+                    }
+                    else {
+                        // if yes, alert user that artwork has been purchased
+                        alert("Artwork has been purchased!");
+                    }
+                })
+        }
+    }
+
     return (
         <>
             <div className="card flex flex-wrap justify-center p-3 m-5">
-                {page === "myAssets" || page === "home" ? (<></>) : (<> {/* add artwork button */}
-                    <button className="border-4 w-60 h-60 m-auto flex flex-col justify-center items-center rounded-full" onClick={() => navigate('/addArtwork')}>
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-20 h-20">
-                            <path strokeLinecap="round" strokeLinejoin="round" d="M12 10.5v6m3-3H9m4.06-7.19l-2.12-2.12a1.5 1.5 0 00-1.061-.44H4.5A2.25 2.25 0 002.25 6v12a2.25 2.25 0 002.25 2.25h15A2.25 2.25 0 0021.75 18V9a2.25 2.25 0 00-2.25-2.25h-5.379a1.5 1.5 0 01-1.06-.44z" />
-                        </svg>
-                        <div className="text-2xl font-bold subpixel-antialiased capitalize">Add Artwork</div>
-                    </button> </>)}
-
                 {artworkList.length > 0 ? (<>{artworkList.map((artwork, index) => (
                     <div key={index} className="border-4 w-96 h-100 m-5 flex flex-col justify-between rounded-lg w-1/4">
                         <img src={artwork.cover_url} className="mx-auto my-auto w-90 h-60 pt-2" alt="Artwork" />
@@ -120,7 +250,7 @@ function ArtworkListComponent({ userId, page }) {
                                 </div>
                                 <div className="button-group flex border-2 mr-4 p-1 rounded-full">
                                     {/* show/edit photos */}
-                                    <button className={`${page === "home" ? '' : 'border-r-2'} items-center px-1`}
+                                    <button className={`${page === "home" || page === "myAssets" ? 'border-r-2 pr-1' : ''} items-center pl-1`}
                                         onClick={() => {
                                             if (userId === null || userId === undefined) {
                                                 alert("Please login first!");
@@ -133,7 +263,7 @@ function ArtworkListComponent({ userId, page }) {
                                     </button>
                                     {page === "myAssets" || page === "home" ? (<></>) : (<>
                                         {/* edit main info */}
-                                        <button className="border-r-2 items-center ml-1"
+                                        <button className={`${page === "myArtworks" ? 'border-l-2 pl-1' : ''} border-r-2 items-center ml-1`}
                                             onClick={() => {
                                                 navigate(`/updateArtworkMainInfo/${artwork._id}`);
                                             }}>
@@ -145,9 +275,9 @@ function ArtworkListComponent({ userId, page }) {
                                         (<></>) :
                                         (<>
                                             {/* add to cart */}
-                                            <button className="border-r-2 items-center px-1"
+                                            <button className={`${page === "home" ? '' : 'border-r-2'} items-center px-1`}
                                                 onClick={() => {
-                                                    addToCart(artwork._id)
+                                                    addToCart(artwork._id, artwork.author_id, userId)
                                                 }}>
                                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
                                                     <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v6m3-3H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -158,7 +288,7 @@ function ArtworkListComponent({ userId, page }) {
                                         {/* delete artwork */}
                                         <button className="items-center px-1"
                                             onClick={() => {
-                                                deleteArtwork(artwork._id)
+                                                deleteArtwork(artwork)
                                             }}>
                                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
                                                 <path strokeLinecap="round" strokeLinejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0" />
@@ -181,9 +311,16 @@ function ArtworkListComponent({ userId, page }) {
                         </div>
                     </div>
                 ))}</>) : (<p>You don't have any artworks!</p>)}
+
+                {/* add artwork button */}
+                {page !== "myArtworks" ? (<></>) : (<>
+                    <button className="border-4 w-60 h-60 m-auto flex flex-col justify-center items-center rounded-full" onClick={() => navigate('/addArtwork')}>
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-20 h-20">
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M12 10.5v6m3-3H9m4.06-7.19l-2.12-2.12a1.5 1.5 0 00-1.061-.44H4.5A2.25 2.25 0 002.25 6v12a2.25 2.25 0 002.25 2.25h15A2.25 2.25 0 0021.75 18V9a2.25 2.25 0 00-2.25-2.25h-5.379a1.5 1.5 0 01-1.06-.44z" />
+                        </svg>
+                        <div className="text-2xl font-bold subpixel-antialiased capitalize">Add Artwork</div>
+                    </button> </>)}
             </div >
         </>
     )
 }
-
-export default ArtworkListComponent;

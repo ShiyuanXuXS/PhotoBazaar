@@ -22,4 +22,12 @@ router.delete('/:id', purchaseController.deletePurchase);
 // get all unpaid purchase records by buyerId
 // router.get('/unpaid/:buyerId', purchaseController.getUnpaidPurchasesByBuyerId);
 router.get('/unpaid/buyer', purchaseController.getUnpaidPurchases);
+// router.get('/unpaid/:buyerId', purchaseController.getUnpaidPurchasesByBuyerId);
+
+// check if a artwork is sold
+router.get('/checkSold/:artworkId', purchaseController.checkArtworkSold);
+
+// check if buyer has purchased the artwork or added to cart
+router.get('/checkPurchased/:artworkId/:buyerId', purchaseController.checkPurchased);
+
 module.exports = router;

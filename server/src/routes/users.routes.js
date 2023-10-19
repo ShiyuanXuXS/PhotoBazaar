@@ -49,4 +49,7 @@ router.get("/enable/:email", userController.enableUserByEmail);
 //search users
 router.get("/search/:searchString", userController.searchUsers);
 
+//update profile icon
+router.put("/profile/:email", userController.updateProfileIcon);
+
 module.exports = router;

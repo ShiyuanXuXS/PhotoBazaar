@@ -2,7 +2,23 @@ import { useEffect, useState, useContext } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
 import { AuthContext } from "../Helpers/AuthContext";
-
+import UploadImagesBoxComponent from "./UploadImagesBox";
+import {
+  S3Client,
+  DeleteObjectCommand,
+  PutObjectCommand,
+} from "@aws-sdk/client-s3";
+//S3 config
+const config = {
+  bucketName: "photobazarr",
+  dirName: "userprofile",
+  region: "ca-central-1",
+  credentials: {
+    accessKeyId: process.env.REACT_APP_ACCESSKEYID,
+    secretAccessKey: process.env.REACT_APP_SECRETACCESSKEY,
+  },
+};
+const client = new S3Client(config);
 function ProfileComponent() {
   let { id } = useParams();
   const Navigate = useNavigate();
@@ -16,6 +32,11 @@ function ProfileComponent() {
   const [userList, setUserList] = useState([]);
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
+  //show the update profile icon part if user want to update
+  const [updateProfile, setupdateProfile] = useState(false);
+  const [uploadImg, setUploadImg] = useState([]);
+  //user add profile or update profile
+  const [isAdd, setisAdd] = useState(false);
 
   useEffect(() => {
     axios
@@ -62,7 +83,29 @@ function ProfileComponent() {
         setError(resMessage);
       });
   };
-
+  //update user password
+  const updatePassword = (event) => {
+    event.preventDefault();
+    axios
+      .put(`http://localhost:3001/api/users/changepassword/${user.email}`, {
+        password,
+        confirmPassword,
+      })
+      .then((response) => {
+        if (response.data.error) {
+          const { message: resMessage } = error.response.data;
+          setError(resMessage);
+        } else {
+          const { message: resMessage } = response.data;
+          setMessage(resMessage);
+          // Navigate("/login");
+        }
+      })
+      .catch((error) => {
+        const { message: resMessage } = error.response.data;
+        setError(resMessage);
+      });
+  };
   //disable an existing user by email
   const disableUser = (event, email) => {
     event.preventDefault();
@@ -88,28 +131,80 @@ function ProfileComponent() {
     event.preventDefault();
     setUpdatepwd(true);
   };
-
-  const updatePassword = (event) => {
+  // when user click update profile button, it shows the image upload field
+  const enableProfileIcon = (event, isadd) => {
     event.preventDefault();
-    axios
-      .put(`http://localhost:3001/api/users/changepassword/${user.email}`, {
-        password,
-        confirmPassword,
-      })
-      .then((response) => {
-        if (response.data.error) {
-          const { message: resMessage } = error.response.data;
-          setError(resMessage);
-        } else {
-          const { message: resMessage } = response.data;
-          setMessage(resMessage);
-          // Navigate("/login");
-        }
+    setupdateProfile(true);
+    if (isadd == "add") setisAdd(true);
+    else setisAdd(false);
+  };
+
+  console.log(uploadImg);
+
+  // save profile image to s3 bucket
+  const saveImage = (img) => {
+    let newFileName = `${Date.now()}_${user._id}.avator.${img.name.split(".").pop()}`;
+    console.log("new file name:" + newFileName);
+
+    const uploadParams = {
+      Bucket: config.bucketName,
+      Key: "userprofile/" + newFileName,
+      Body: img,
+    };
+    // Create a promise for each image upload
+    const uploadPromise = client
+      .send(new PutObjectCommand(uploadParams))
+      .then((uploadResult) => {
+        console.log("Image uploaded successfully:", uploadResult);
+        return newFileName;
       })
       .catch((error) => {
-        const { message: resMessage } = error.response.data;
-        setError(resMessage);
+        console.error("Error uploading image:", error);
+        return null;
       });
+    return uploadPromise;
+  };
+
+  // save new artwork to database
+  const saveArtwork = (event) => {
+    event.preventDefault();
+
+    //Validate Image
+    const uploadPromises = []; // Create an array to store promises for image uploads
+    if (
+      uploadImg === null ||
+      uploadImg === undefined ||
+      uploadImg.size > 5000000
+    ) {
+      alert("Please select a file less than 5MB");
+      return;
+    }
+    else {
+      // save image to s3 bucket
+      uploadPromises.push(saveImage(uploadImg));
+    }
+    // Use Promise.all to wait for all image uploads to complete
+    Promise.all(uploadPromises)
+      .then((newFileNames) => {
+        console.log("All images uploaded successfully.", newFileNames); // 'fileNames' contain an array of successfully uploaded file names
+
+        // save artwork to database
+        // axios
+        //   .put(`http://localhost:3001/api/users/profile/${user.email}`, {
+        //     avatar: `https://${config.bucketName}.s3.${config.region}.amazonaws.com/${config.dirName}/${fileName}`,
+        //   })
+        //   .then((response) => {
+        //     console.log(response);
+        //     alert("Artwork saved successfully!");
+        //   })
+        //   .catch((error) => {
+        //     console.error(error);
+        //   });
+      })
+      .catch((uploadErrors) => {
+        console.error("Error uploading images:", uploadErrors);
+      }
+      )
   };
 
   return (
@@ -246,6 +341,52 @@ function ProfileComponent() {
                     >
                       submit new password
                     </button>
+                  </div>
+                ) : (
+                  <></>
+                )}
+                {/* update profile icon */}
+                <button
+                  className={`font-serif capitalize p-1 text-sm inline ml-2 rounded-lg bg-sky-600 text-white mt-2`}
+                  onClick={(event) =>
+                    enableProfileIcon(
+                      event,
+                      user.avatar == "" ? "add" : "update"
+                    )
+                  }
+                >
+                  {user.avatar == null ? (
+                    <>Add Profile Icon</>
+                  ) : (
+                    <>Update Profile Icon</>
+                  )}
+                </button>
+                {updateProfile ? (
+                  <div>
+                    <div className="mb-4">
+                      <label
+                        htmlFor="choosefile"
+                        className="block font-medium mb-2"
+                      >
+                        Choose file
+                      </label>
+                      <input
+                        type="file"
+                        id="formCoverUrl"
+                        name="coverUrl"
+                        accept=".jpg, .png, .jpeg"
+                        multiple={false}
+                        className="block w-full border border-gray-300 rounded p-2"
+                        onChange={(e) => setUploadImg(e.target.files[0])}
+                      />
+                      <button
+                        type="submit"
+                        className={`font-serif capitalize p-1 text-sm inline ml-2 rounded-lg bg-sky-600 text-white mt-2`}
+                        onClick={(event) => saveArtwork(event)}
+                      >
+                        Upload Profile Icon
+                      </button>
+                    </div>
                   </div>
                 ) : (
                   <></>

@@ -6,12 +6,26 @@ import ArtworkListComponent from "../components/ArtworkList";
 
 function Home() {
   const [topTags, setTopTags] = useState([]); // top 3 tags
+  const [token, setToken] = useState(localStorage.getItem('accessToken'))
+  const [user, setUser] = useState(null);
+  const [userId, setUserId] = useState(null);
+
+  useEffect(() => {
+    if (token) {
+      Axios.get(`http://localhost:3001/api/users/auth`, { headers: { accessToken: token } })
+        .then(response => {
+          setToken(response.data.token);
+          setUser(response.data.user)
+          setUserId(response.data.user.id);
+        }).catch(() => {
+          localStorage.removeItem('token');
+        });
+    }
+  }, []);
 
   useEffect(() => {
     Axios.get("http://localhost:3001/api/tags").then((response) => {
-      console.log(response.data);
       const tagList = response.data;
-      console.log(tagList);
       // sort by count
       const sortedTagList = tagList.sort((a, b) => b.count - a.count);
       setTopTags(sortedTagList.slice(0, 3));
@@ -20,6 +34,7 @@ function Home() {
         console.log(error);
       });
   }, []);
+
 
   return <div>
     <Header />
@@ -45,7 +60,7 @@ function Home() {
     </div>
 
     <div className="artworks">
-      <ArtworkListComponent page={"home"} />
+      <ArtworkListComponent userId={userId ? userId : null} page={"home"} />
     </div>
     <Footer />
   </div>;

@@ -37,6 +37,18 @@ class PurchaseModel {
     const purchases = await this.collection.find(filter).toArray();
     return purchases;
   }
+
+  async checkArtworkSold(artworkId) {
+    const filter = { artwork_id: artworkId, is_paid: true };
+    const result = await this.collection.findOne(filter);
+    return result;
+  }
+
+  async checkPurchased(artworkId, buyerId) {
+    const filter = { artwork_id: artworkId, buyer_id: buyerId };
+    const result = await this.collection.findOne(filter);
+    return result;
+  }
 }
 
 module.exports = new PurchaseModel();

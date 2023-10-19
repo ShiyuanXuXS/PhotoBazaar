@@ -20,7 +20,7 @@ class TagController {
         try {
             const tags = await tagModel.getAllTags();
             res.status(200).json(tags);
-            console.log(tags);
+            // console.log(tags);
         } catch (error) {
             console.error('Error fetching tags:', error);
             res.status(500).json({ message: 'Error fetching tags' });

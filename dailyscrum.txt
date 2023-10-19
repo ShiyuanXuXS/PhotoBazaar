@@ -185,4 +185,8 @@ Shiyuan Xu
 - Messages Debug
 2. To do
 - Admin payment record
-
+Chang Liu
+1. Done
+- admin can view user list, artwork list, tag list
+2. To do
+- admin can search artwork

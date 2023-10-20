@@ -191,9 +191,41 @@ Chang Liu
 - admin can view user list, artwork list, tag list
 2. To do
 - admin can search artwork
+Xiaoxing Pan
+1.  Done
+- show asset page, download photos from my_asset
+- shopping cart page
 
 2023/10/19
+Chang Liu 
 1. Done 
 user can update profile icon on user profile page
 2. To do
 user can update nick name on user profile page
+Xiaoxing Pan
+1.  Done
+- button shows up and hide logic for reusable component
+- home page
+2. To do
+- search box, search logic, search page
+
+2023/10/20
+Xiaoxing Pan
+1.  Done
+- search box, search page
+- search by keywords controller, route and postman self-test
+- search by tags controller, route
+2. To do
+- search by tags postman self-test
+- pagination
+- change alert to modal
+
+
+
+
+
+
+
+
+
+

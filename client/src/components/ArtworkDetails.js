@@ -318,8 +318,8 @@ function ArtworkDetailsComponent({ artworkId }) {
                         <>
                             {artworkToUpdate.photos.map((photo, photoIndex) => {
                                 return (
-                                    <div key={photoIndex} className='m-3 p-3 border-2'>
-                                        <img src={photo.file_url} className='w-60 h-80 justify-center m-auto p-2' alt="Artwork" />
+                                    <div key={photoIndex} className='m-3 p-3 border-2 w-96 h-100'>
+                                        <img src={photo.file_url} className='w-90 h-60 justify-center m-auto p-2' alt="Artwork" />
                                         <div className="text-xl p-3 text-center font-bold subpixel-antialiased capitalize">{photo.photo_name}</div>
                                         <div className="text-l p-3 pt-0 capitalize">{photo.description}</div>
                                         <div className="button-group flex p-3 pt-0 rounded-full justify-center mb-5">

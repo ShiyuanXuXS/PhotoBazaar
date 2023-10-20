@@ -37,6 +37,7 @@ function ProfileComponent() {
   const [uploadImg, setUploadImg] = useState([]);
   //user add profile or update profile
   const [isAdd, setisAdd] = useState(false);
+  console.log(uploadImg);
 
   useEffect(() => {
     axios

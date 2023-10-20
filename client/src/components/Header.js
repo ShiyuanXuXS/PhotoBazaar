@@ -33,7 +33,7 @@ function HeaderComponent() {
     localStorage.clear();
     setUser(null);
     setToken(null);
-    window.location.reload("/");
+    Navigate("/");
   };
 
   return (

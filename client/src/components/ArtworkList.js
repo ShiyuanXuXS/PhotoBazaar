@@ -22,19 +22,31 @@ const config = {
 
 const client = new S3Client(config);
 
-function ArtworkListComponent({ userId, page, option, searchKey }) {
+function ArtworkListComponent({ page, option, searchKey }) {
     const [artworkList, setArtworkList] = useState([]);
     const [tagList, setTagList] = useState([]);
     const navigate = useNavigate();
     // const [arworkIds, setArtworkIds] = useState([]);
     const [token, setToken] = useState(localStorage.getItem("accessToken"));
     const [user, setUser] = useState(null);
+    const [userList, setUserList] = useState([]);
+    const [userRole, setUserRole] = useState([]);
+    const [userId, setUserId] = useState(null);
+
 
 
     console.log(option, searchKey);
     console.log(userId);
 
     useEffect(() => {
+        Axios.get("http://localhost:3001/api/users")
+            .then((response) => {
+                setUserList(response.data);
+            })
+            .catch((error) => {
+                console.error(error);
+            });
+
         if (token) {
             Axios.get(`http://localhost:3001/api/users/auth`, {
                 headers: { accessToken: token },
@@ -42,6 +54,8 @@ function ArtworkListComponent({ userId, page, option, searchKey }) {
                 .then((response) => {
                     setToken(response.data.token);
                     setUser(response.data.user);
+                    setUserRole(response.data.user.role);
+                    setUserId(response.data.user.id);
                 })
                 .catch(() => {
                     localStorage.removeItem("token");
@@ -162,7 +176,7 @@ function ArtworkListComponent({ userId, page, option, searchKey }) {
             .catch((error) => {
                 console.error(error);
             });
-    }, [userId]);
+    }, [userId, option, searchKey]);
 
     const addToCart = (artworkId, authorId, userId) => {
         // check if userId is author
@@ -263,6 +277,7 @@ function ArtworkListComponent({ userId, page, option, searchKey }) {
                 })
         }
     }
+    console.log(userList);
 
     return (
         <>
@@ -274,8 +289,20 @@ function ArtworkListComponent({ userId, page, option, searchKey }) {
                     <div key={index} className="border-4 w-96 h-100 m-5 flex flex-col justify-between rounded-lg w-1/4">
                         <img src={artwork.cover_url} className="mx-auto my-auto w-90 h-60 pt-2" alt="Artwork" />
                         <div className="ml-4">
-                            <div className="text-lg subpixel-antialiased font-bold uppercase">{artwork.title}</div>
-                            <div className="flex justify-between mt-3">
+                            <div className="flex justify-between pt-2">
+                                <div className="text-lg subpixel-antialiased font-bold uppercase">{artwork.title}</div>
+                                <div className='flex pr-3'>
+                                    <img alt="tania andrew"
+                                        className="border border-gray-900 p-0.5 w-6 h-6 object-cover rounded-full cursor-pointer"
+                                        src={userList.find(user => user._id === artwork.author_id)?.avator || "https://images.unsplash.com/photo-1633332755192-727a05c4013d?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1480&q=80"}></img>
+                                    <div className="text-base pl-2">{userList.find(user => user._id === artwork.author_id)?.username || ""}</div>
+                                </div>
+                            </div>
+                            {userRole !== "admin" ? (<></>) : (<>
+                                <div className="text-base pt-2">Artwork_id: {artwork._id}</div>
+                                <div className="text-base pt-2">Author_id: {userList.find(user => user._id === artwork.author_id)?._id || ""}</div></>)}
+
+                            <div className="flex justify-between mt-2">
                                 <div className="flex items-center mr-4">
                                     <svg
                                         xmlns="http://www.w3.org/2000/svg"
@@ -339,7 +366,12 @@ function ArtworkListComponent({ userId, page, option, searchKey }) {
                                             {/* add to cart */}
                                             <button className={`${page === "home" || page === "search" ? '' : 'border-r-2'} items-center px-1`}
                                                 onClick={() => {
-                                                    addToCart(artwork._id, artwork.author_id, userId)
+                                                    if (userId === null || userId === undefined) {
+                                                        alert("Please login first!");
+                                                        navigate('/Login')
+                                                    } else {
+                                                        addToCart(artwork._id, artwork.author_id, userId)
+                                                    }
                                                 }}>
                                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
                                                     <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v6m3-3H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -358,7 +390,7 @@ function ArtworkListComponent({ userId, page, option, searchKey }) {
                                         </button></>)}
                                 </div>
                             </div>
-                            <div className="text-base capitalize mt-2">{artwork.description}</div>
+                            <div className="text-base capitalize py-2">{artwork.description}</div>
                             <div className="mb-2 flex justify-center mt-1">
                                 {artwork.tags.map((tag, tagIndex) => {
                                     // Find the corresponding tag object in tagList

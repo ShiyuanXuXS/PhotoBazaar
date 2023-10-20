@@ -34,7 +34,7 @@ const userSchema = new Schema({
   },
   my_assets: [
     {
-      arkwork_id: {
+      artwork_id: {
         type: String,
         required: false,
       },

@@ -311,7 +311,7 @@ module.exports = {
   // add a asset to my_assets
   addMyAssetsById: async (req, res) => {
     const user_id = req.params.id;
-    const update = [{ arkwork_id: req.body.my_assets }];
+    const update = [{ artwork_id: req.body.my_assets }];
 
     try {
       const user = await User.findOne({ _id: user_id });

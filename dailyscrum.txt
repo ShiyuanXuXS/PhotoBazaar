@@ -180,11 +180,12 @@ Shiyuan Xu
 - Debug messages
 
 2023/10/18
+Shiyuan Xu
 1. Done
 - Payment Debug
 - Messages Debug
 2. To do
-- Admin payment record
+- Add payment to cart
 Chang Liu
 1. Done
 - admin can view user list, artwork list, tag list

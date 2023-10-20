@@ -3,7 +3,7 @@ dotenv.config()
 const stripe = require('stripe')(process.env.STRIPE_API_KEY);
 const jwt = require('jsonwebtoken')
 const secretKey = process.env.SECRET_KEY || 'importantsecret';
-
+const { mongoose } = require("mongoose");
 const PurchaseModel = require('../models/purchase.model');
 const ArtworkModel = require('../models/artwork.model');
 const UserModel = require('../models/user.model')
@@ -63,6 +63,8 @@ class PurchaseController {
     }
 
     async checkPaymentStatus(req, res) {
+        console.log("calling checkPaymentStatus");
+
         const { authorization } = req.headers;
         if (!authorization) { return res.status(404).json({ message: "No authorization" }); }
         const token = authorization.split(' ')[1];
@@ -93,6 +95,17 @@ class PurchaseController {
                     return res.status(200).json({ message: 'No payments have succeeded.' });
                 } else {
                     await PurchaseModel.updatePurchase(id, { is_paid: true });
+                    const buyer =  await UserModel.findOne({ _id: user_id });
+                    const newAsset = { 
+                        artwork_id: purchase.artwork_id 
+                    };
+                    // buyer.my_assets=buyer.my_assets.concat(newAsset);
+                    if (!buyer.my_assets.some(asset => asset.artwork_id === newAsset.artwork_id)) {
+                        // buyer.my_assets=buyer.my_assets.concat(newAsset);
+                        buyer.my_assets.push(newAsset)
+                      }
+                    console.log(buyer.my_assets)
+                    await buyer.save();
                     if (paymentCount === 1) {
                         return res.status(201).json({ message: 'Payment succeeded.' });
                     } else {

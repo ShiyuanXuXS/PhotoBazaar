@@ -30,8 +30,8 @@ function PaymentResult() {
                 const { message: resMessage } = response.data;
                 console.log(response.status)
                 switch (response.status) {
-                    case 200:   //not paid, show payment form without message
-                        setError(resMessage)
+                    case 200:   //not paid
+                        setError("Your payment has not been received yet. Payment may be delayed. Please refresh or re-enter the payment page later to check.")
                         break;
                     case 201:   //paid
                         setMessage(resMessage)

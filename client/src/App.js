@@ -23,7 +23,7 @@ import MyCart from "./pages/Cart";
 import PaymentResult from "./pages/PaymentResult";
 function App() {
   return (
-    <AuthProvider>
+    // <AuthProvider>
       <div className="page-container">
         <Router>
           <Routes>
@@ -48,7 +48,7 @@ function App() {
           </Routes>
         </Router>
       </div>
-    </AuthProvider>
+    // </AuthProvider>
   );
 }
 

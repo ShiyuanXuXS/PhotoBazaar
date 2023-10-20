@@ -113,6 +113,19 @@ class TagController {
             res.status(500).json({ message: 'Error updating tag' });
         }
     }
+
+    // search tag by keyword
+    async searchTagByKeyword(req, res) {
+        try {
+            const { keyword } = req.params;
+            const tags = await tagModel.searchTagByKeyword(keyword);
+            const tagIds = tags.map((tag) => tag._id);
+            res.status(200).json(tagIds);
+        } catch (error) {
+            console.error('Error searching tag:', error);
+            res.status(500).json({ message: 'Error searching tag' });
+        }
+    }
 }
 
 module.exports = new TagController();

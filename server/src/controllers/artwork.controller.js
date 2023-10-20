@@ -1,4 +1,5 @@
 const Artwork = require('../models/artwork.model');
+const TagModel = require('../models/tag.model');
 
 module.exports = {
     getAllArtworks: async (req, res) => {
@@ -251,6 +252,39 @@ module.exports = {
             console.error(err);
             res.status(400).json({ message: "Failed to add the photo" });
         }
-    }
+    },
+    searchArtworksByKeywords: async (req, res) => {
+        try {
+            const keywords = req.params.keywords;
+            console.log(keywords);
+            const artworks = await Artwork.find({
+                $or: [
+                    { title: { $regex: keywords, $options: 'i' } }, // Case-insensitive search in the title field
+                    { description: { $regex: keywords, $options: 'i' } },
+                    { 'photos.photo_name': { $regex: keywords, $options: 'i' } },
+                    { 'photos.description': { $regex: keywords, $options: 'i' } },
+                ],
+            });
+            console.log(artworks);
+            res.status(200).send(artworks);
+        }
+        catch (err) {
+            console.error(err);
+            res.status(400).json({ message: "Failed to search artworks" });
+        }
+    },
 
+    searchArtworksByTagId: async (req, res) => {
+        try {
+            const tagId = req.params.tagId;
+            console.log(tagId);
+            const artworks = await Artwork.find({ 'tags.tag_id': tagId });
+            console.log(artworks);
+            res.status(200).send(artworks);
+        }
+        catch (err) {
+            console.error(err);
+            res.status(400).json({ message: "Failed to search artworks" });
+        }
+    }
 };

@@ -53,6 +53,13 @@ class TagModel {
     const result = await this.collection.updateOne(filter, { $set: { count: newCount } });
     return result.modifiedCount;
   }
+
+  // searchTagByKeyword(keyword) {
+  async searchTagByKeyword(keyword) {
+    const filter = { tag: { $regex: keyword, $options: 'i' } };
+    const tags = await this.collection.find(filter).toArray();
+    return tags;
+  }
 }
 
 module.exports = new TagModel();

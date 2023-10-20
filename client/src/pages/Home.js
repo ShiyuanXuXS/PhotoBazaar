@@ -3,6 +3,7 @@ import Header from '../components/Header';
 import Footer from '../components/Footer';
 import Axios from "axios";
 import ArtworkListComponent from "../components/ArtworkList";
+import SearchBoxComponent from "../components/SearchBox";
 
 function Home() {
   const [topTags, setTopTags] = useState([]); // top 3 tags
@@ -40,6 +41,7 @@ function Home() {
     <Header />
     <div className="search p-3 m-5">
       <img className="w-full" src="./homepagebg.png" alt="photobazaar" ></img>
+      <SearchBoxComponent />
     </div>
 
     <div className="tags p-3 m-5 flex capitalize text-xl font-bold justify-center items-center">

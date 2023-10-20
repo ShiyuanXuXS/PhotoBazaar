@@ -267,6 +267,7 @@ module.exports = {
         token: accessToken,
         user: existingUser,
         userId: existingUser._id,
+        avatar: existingUser.avatar,
       });
     } catch (error) {
       console.log(error);

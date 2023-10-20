@@ -32,5 +32,10 @@ router.delete("/:artworkId/deletePhoto/:photoId", artworkController.deletePhotoB
 // add a photo in one artwork.photos
 router.post("/:artworkId/addPhoto", artworkController.addPhoto);
 
+// search artworks by keywords
+router.get("/search/keywords/:keywords", artworkController.searchArtworksByKeywords);
+
+// search artworks by tags
+router.get("/search/tags/:tagId", artworkController.searchArtworksByTagId);
 
 module.exports = router;

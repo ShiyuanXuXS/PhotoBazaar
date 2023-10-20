@@ -37,7 +37,7 @@ function HeaderComponent() {
     setUser(null);
     setToken(null);
     Navigate('/login')
-    // window.location.reload("/");
+    // Navigate("/");
   };
 
   return (

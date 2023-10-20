@@ -122,12 +122,13 @@ function AddArtworkComponent({ isAdd, artwork_id }) {
     const [uploadImg, setUploadImg] = useState([]); // all images to upload
     let index = 0; // index for each image in uploadImg, 0 is cover image, 1-8 are photos
 
+    console.log(title);
     // save cover image to uploadImg
     const handleSaveCoverImage = (event) => {
         event.preventDefault();
         const data = {
             index: 0,
-            name: title,
+            name: "cover",
             description: "cover image",
             file: event.target.files[0],
         };
@@ -141,6 +142,8 @@ function AddArtworkComponent({ isAdd, artwork_id }) {
         const newUploadImg = [...updatedUploadImages, data];
         setUploadImg(newUploadImg);
     }
+
+    console.log(uploadImg);
 
     // save image to s3 bucket
     const saveImage = (img, flag) => { // flag = 0 is cover image
@@ -157,6 +160,9 @@ function AddArtworkComponent({ isAdd, artwork_id }) {
             Key: "artwork/" + newFileName,
             Body: img.file,
         };
+
+        // const mewUploadImg = [...uploadImg];
+        // setUploadImg(mewUploadImg.shift());
         // Create a promise for each image upload
         const uploadPromise = client
             .send(new PutObjectCommand(uploadParams))
@@ -222,6 +228,7 @@ function AddArtworkComponent({ isAdd, artwork_id }) {
                             alert("Artwork saved successfully!");
                             navigate(`/artwork/${user.id}`);
                             index = 0; // reset index to 0
+                            setUploadImg([]); // reset uploadImg
 
                             // add artwork_id to user
                             // Axios.patch(`http://localhost:3001/api/users/my_assets/${user.id}`, {
@@ -365,7 +372,7 @@ function AddArtworkComponent({ isAdd, artwork_id }) {
                                     });
                             })
                         }
-                        navigate(`/artwork/${user.id}`);
+                        window.location.href = `/artwork/${user.id}`;
                     })
                     .catch((uploadErrors) => {
                         console.error("Error uploading images:", uploadErrors);

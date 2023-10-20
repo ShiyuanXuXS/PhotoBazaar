@@ -6,6 +6,25 @@ function SearchBoxComponent({ page }) {
     const [option, setOption] = useState("keywords");
     const [searchKey, setSearchKey] = useState();
     const navigate = useNavigate();
+    const [token, setToken] = useState(localStorage.getItem("accessToken"));
+    const [userId, setUserId] = useState(null);
+
+    useEffect(() => {
+        if (token) {
+            Axios.get(`http://localhost:3001/api/users/auth`, {
+                headers: { accessToken: token },
+            })
+                .then((response) => {
+                    setToken(response.data.token);
+                    setUserId(response.data.user.id);
+                })
+                .catch(() => {
+                    localStorage.removeItem("token");
+                });
+        }
+    }
+        , [token]);
+
 
     console.log(page);
 
@@ -26,7 +45,18 @@ function SearchBoxComponent({ page }) {
                     onChange={(e) => setSearchKey(e.target.value)}
                 />
                 <button className="bg-sky-500 hover:bg-sky-600 text-white rounded-r-md px-2 py-1 mx-2"
-                    onClick={() => navigate(`/search/${option}/${searchKey}`)}>Search</button>
+                    onClick={() => {
+                        if (userId === null || userId === undefined) {
+                            alert("Please login first!");
+                            navigate('/Login')
+                        } else if (searchKey === null || searchKey === undefined || searchKey === "") {
+                            alert("Please enter a search key!");
+                        }
+                        else {
+                            navigate(`/search/${option}/${searchKey}`, { state: { userId: userId } })
+                        }
+                    }
+                    }>Search</button>
             </div>
         </div >)
 }

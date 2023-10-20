@@ -177,7 +177,7 @@ function CartComponent({ buyerId }) {
                         {purchases.map((purchase, index) =>
                         (<div key={index} className="cartItems p-3 m-5 flex flex-wrap">
                             <div className="imageBox w-full md:w-1/2 lg:w-1/4 flex flex-col items-center justify-center border-2">
-                                {purchase.artwork && (<img className="w-60 h-60 m-auto my-3" src={purchase.artwork.cover_url} alt="artwork cover"></img>)}
+                                {purchase.artwork && (<img className="w-90 h-60 m-auto my-3" src={purchase.artwork.cover_url} alt="artwork cover"></img>)}
                             </div>
                             {purchase.artwork && (<div className="generalInfo w-full md:w-1/2 lg:w-1/4 flex flex-col items-center justify-center font-bold">
                                 {purchase.artwork.title}

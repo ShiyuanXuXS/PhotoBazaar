@@ -265,7 +265,6 @@ module.exports = {
                     { 'photos.description': { $regex: keywords, $options: 'i' } },
                 ],
             });
-            console.log(artworks);
             res.status(200).send(artworks);
         }
         catch (err) {
@@ -277,9 +276,7 @@ module.exports = {
     searchArtworksByTagId: async (req, res) => {
         try {
             const tagId = req.params.tagId;
-            console.log(tagId);
             const artworks = await Artwork.find({ 'tags.tag_id': tagId });
-            console.log(artworks);
             res.status(200).send(artworks);
         }
         catch (err) {

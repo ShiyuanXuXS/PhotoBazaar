@@ -6,8 +6,8 @@ import Register from "./pages/Register";
 import Home from "./pages/Home";
 import AddArtwork from "./pages/AddArtwork";
 import Message from "./pages/Message";
-import Payment from "./pages/Payment";
-import TrackPayments from "./pages/TrackPayments"
+// import Payment from "./pages/Payment";
+import TrackPayments from "./pages/AdminTrackPayments"
 import { AuthProvider } from "./Helpers/AuthContext";
 import ChangePassword from "./pages/ChangePassword";
 import ForgotPassword from "./pages/ForgotPassword";
@@ -23,7 +23,7 @@ import MyCart from "./pages/Cart";
 import PaymentResult from "./pages/PaymentResult";
 function App() {
   return (
-    // <AuthProvider>
+    <AuthProvider>
       <div className="page-container">
         <Router>
           <Routes>
@@ -32,7 +32,7 @@ function App() {
             <Route path="/register" element={<Register />} />
             <Route path="/profile/:id" element={<Profile />} />
             <Route path="/message" element={<Message />} />
-            <Route path="/payment" element={<Payment />} />
+            {/* <Route path="/payment" element={<Payment />} /> */}
             <Route path="/trackpayments" element={<TrackPayments />} />
             <Route path="/artwork" element={<Artwork />} />
             <Route path="/addArtwork" element={<AddArtwork />} />
@@ -48,7 +48,7 @@ function App() {
           </Routes>
         </Router>
       </div>
-    // </AuthProvider>
+    </AuthProvider>
   );
 }
 

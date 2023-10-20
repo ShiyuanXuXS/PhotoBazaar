@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
 import axios from 'axios';
-
+import { useNavigate, useParams } from "react-router-dom";
 function AdminArtwork() {
   const [artworkId, setArtworkId] = useState('');
   const [artwork, setArtwork] = useState();
+  const Navigate = useNavigate();
   const url = process.env.REACT_APP_API_URL;
   const token = localStorage.getItem('accessToken');
   const searchArtwork = async () => {
@@ -69,15 +70,17 @@ function AdminArtwork() {
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 bg-white">
                     <button
                       className={`font-serif capitalize p-1 text-sm inline ml-2 rounded-lg bg-sky-600 text-white mt-2`}
-                      onClick={(event) => {
-                        
+                      onClick={() => {
+                        Navigate(`/details/${artwork._id}`, {
+                          state: { page: "myAssets" }, //fix me: page attribute
+                        });
                       }}
                     >
                      View
                     </button>
                     <button
                       className={`font-serif capitalize p-1 text-sm inline ml-2 rounded-lg bg-red-600 text-white mt-2`}
-                      onClick={(event) => {
+                      onClick={() => {
                         
                       }}
                     >

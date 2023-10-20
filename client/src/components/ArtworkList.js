@@ -5,6 +5,7 @@ import {
     S3Client,
     DeleteObjectCommand,
 } from "@aws-sdk/client-s3";
+import SearchBoxComponent from './SearchBox';
 export default ArtworkListComponent;
 
 
@@ -21,12 +22,17 @@ const config = {
 
 const client = new S3Client(config);
 
-function ArtworkListComponent({ userId, page }) {
+function ArtworkListComponent({ userId, page, option, searchKey }) {
     const [artworkList, setArtworkList] = useState([]);
     const [tagList, setTagList] = useState([]);
     const navigate = useNavigate();
-    const [arworkIds, setArtworkIds] = useState([]);
+    // const [arworkIds, setArtworkIds] = useState([]);
     const [token, setToken] = useState(localStorage.getItem("accessToken"));
+    const [user, setUser] = useState(null);
+
+
+    console.log(option, searchKey);
+    console.log(userId);
 
     useEffect(() => {
         if (token) {
@@ -35,6 +41,7 @@ function ArtworkListComponent({ userId, page }) {
             })
                 .then((response) => {
                     setToken(response.data.token);
+                    setUser(response.data.user);
                 })
                 .catch(() => {
                     localStorage.removeItem("token");
@@ -53,7 +60,9 @@ function ArtworkListComponent({ userId, page }) {
                 .catch((error) => {
                     console.error(error);
                 });
-        } else {
+        }
+
+        if (page === "home") {
             // If userId is null, fetch data for all users
             Axios.get("http://localhost:3001/api/artworks")
                 .then((response) => {
@@ -95,6 +104,56 @@ function ArtworkListComponent({ userId, page }) {
                 });
         }
 
+        if (page === "search") {
+            if (searchKey === undefined || searchKey === null) {
+                //show all artworks
+                Axios.get("http://localhost:3001/api/artworks")
+                    .then((response) => {
+                        setArtworkList(response.data);
+                    })
+                    .catch((error) => {
+                        console.error(error);
+                    });
+            } else if (option === "keywords") {
+                //search by keywords
+                Axios.get(`http://localhost:3001/api/artworks/search/keywords/${searchKey}`)
+                    .then((response) => {
+                        if (response.data.length === 0) {
+                            alert("No results found!");
+                        }
+                        setArtworkList(response.data);
+                    })
+                    .catch((error) => {
+                        console.error(error);
+                    });
+            }
+            else if (option === "tags") {
+                //search in tags table, get all tagIds that match the searchKey
+                Axios.get(`http://localhost:3001/api/tags/search/${searchKey}`)
+                    .then((response) => {
+                        if (response.data.length === 0) {
+                            alert("No results found!");
+                        }
+                        //get all artworks that have the tagIds
+                        let tagIds = response.data;
+                        tagIds.forEach(tagId => {
+                            Axios.get(`http://localhost:3001/api/artworks/search/tags/${tagId}`)
+                                .then((response) => {
+                                    setArtworkList(response.data);
+                                })
+                                .catch((error) => {
+                                    console.error(error);
+                                });
+                        }
+                        );
+                    })
+                    .catch((error) => {
+                        console.error(error);
+                    });
+            }
+        }
+
+
         // Fetch the tag data
         Axios.get("http://localhost:3001/api/tags")
             .then((response) => {
@@ -107,7 +166,7 @@ function ArtworkListComponent({ userId, page }) {
 
     const addToCart = (artworkId, authorId, userId) => {
         // check if userId is author
-        if (authorId === userId) {
+        if (authorId === userId || authorId === user.id) {
             alert("You cannot add your own artwork to cart!");
             return;
         }
@@ -207,6 +266,9 @@ function ArtworkListComponent({ userId, page }) {
 
     return (
         <>
+            <div>
+                {page === "search" ? (<><SearchBoxComponent page="search" /></>) : (<></>)}
+            </div>
             <div className="card flex flex-wrap justify-center p-3 m-5">
                 {artworkList.length > 0 ? (<>{artworkList.map((artwork, index) => (
                     <div key={index} className="border-4 w-96 h-100 m-5 flex flex-col justify-between rounded-lg w-1/4">
@@ -250,7 +312,7 @@ function ArtworkListComponent({ userId, page }) {
                                 </div>
                                 <div className="button-group flex border-2 mr-4 p-1 rounded-full">
                                     {/* show/edit photos */}
-                                    <button className={`${page === "home" || page === "myAssets" ? 'border-r-2 pr-1' : ''} items-center pl-1`}
+                                    <button className={`${page === "home" || page === "myAssets" || page === "search" ? 'border-r-2 pr-1' : ''} items-center pl-1`}
                                         onClick={() => {
                                             if (userId === null || userId === undefined) {
                                                 alert("Please login first!");
@@ -261,7 +323,7 @@ function ArtworkListComponent({ userId, page }) {
                                             <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
                                         </svg>
                                     </button>
-                                    {page === "myAssets" || page === "home" ? (<></>) : (<>
+                                    {page === "myAssets" || page === "home" || page === "search" ? (<></>) : (<>
                                         {/* edit main info */}
                                         <button className={`${page === "myArtworks" ? 'border-l-2 pl-1' : ''} border-r-2 items-center ml-1`}
                                             onClick={() => {
@@ -271,11 +333,11 @@ function ArtworkListComponent({ userId, page }) {
                                                 <path strokeLinecap="round" strokeLinejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10" />
                                             </svg>
                                         </button></>)}
-                                    {page === "myAssets" || userId === null || userId === undefined || page === "myArtworks" ?
+                                    {page === "myAssets" || page === "myArtworks" ?
                                         (<></>) :
                                         (<>
                                             {/* add to cart */}
-                                            <button className={`${page === "home" ? '' : 'border-r-2'} items-center px-1`}
+                                            <button className={`${page === "home" || page === "search" ? '' : 'border-r-2'} items-center px-1`}
                                                 onClick={() => {
                                                     addToCart(artwork._id, artwork.author_id, userId)
                                                 }}>
@@ -284,7 +346,7 @@ function ArtworkListComponent({ userId, page }) {
                                                 </svg>
                                             </button></>)}
 
-                                    {page === "home" ? (<></>) : (<>
+                                    {page === "home" || page === "search" ? (<></>) : (<>
                                         {/* delete artwork */}
                                         <button className="items-center px-1"
                                             onClick={() => {
@@ -310,7 +372,7 @@ function ArtworkListComponent({ userId, page }) {
                             </div>
                         </div>
                     </div>
-                ))}</>) : (<p>You don't have any artworks!</p>)}
+                ))}</>) : (page === "myArtworks" ? <p>You don't have any artworks!</p> : <p>No artworks found!</p>)}
 
                 {/* add artwork button */}
                 {page !== "myArtworks" ? (<></>) : (<>

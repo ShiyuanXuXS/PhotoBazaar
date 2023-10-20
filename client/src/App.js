@@ -11,7 +11,6 @@ import TrackPayments from "./pages/TrackPayments"
 import { AuthProvider } from "./Helpers/AuthContext";
 import ChangePassword from "./pages/ChangePassword";
 import ForgotPassword from "./pages/ForgotPassword";
-//fix me: footer cover the register button
 import Artwork from "./pages/ArtworkList";
 import MyArtwork from "./pages/MyArtwork";
 import "./App.css";
@@ -21,6 +20,8 @@ import MyAssets from "./pages/MyAssets";
 import Admincenter from "./pages/Admincenter";
 import MyCart from "./pages/Cart";
 import PaymentResult from "./pages/PaymentResult";
+import ArtworkList from "./pages/ArtworkList";
+
 function App() {
   return (
     <AuthProvider>
@@ -45,6 +46,7 @@ function App() {
             <Route path="/forgotpassword" element={<ForgotPassword />} />
             <Route path="/changepassword/:email" element={<ChangePassword />} />
             <Route path="/admincenter/:id" element={<Admincenter />} />
+            <Route path="/search/:option/:searchKey" element={<ArtworkList />} />
           </Routes>
         </Router>
       </div>

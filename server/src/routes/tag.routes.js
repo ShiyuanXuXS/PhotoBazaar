@@ -11,5 +11,7 @@ router.delete('/:id', tagController.deleteTag);
 router.patch('/updateTagCountIncrease/:id', tagController.increaseTagCount);
 // decrease tag count after artwork is deleted
 router.patch('/updateTagCountDecrease/:id', tagController.decreaseTagCount);
+// search tag by keyword
+router.get('/search/:keyword', tagController.searchTagByKeyword);
 
 module.exports = router;

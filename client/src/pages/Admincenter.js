@@ -4,7 +4,7 @@ import Footer from "../components/Footer";
 // import AdmincenterCompoment from "../components/admincenter";
 import AdminPaymentTrack from "../components/AdminPaymentTrack"
 import AdminUser from "../components/AdminUser";
-
+import AdminArtwork from "../components/AdminArtwork";
 function Admincenter() {
   return (
     <div>
@@ -19,7 +19,7 @@ function Admincenter() {
             <AdminUser />
           </div>
           <div className="p-4 bg-gray-100 rounded shadow">
-            Artwork Manage
+            <AdminArtwork/>
           </div>
           <div className="p-4 bg-gray-100 rounded shadow">
             Tag Manage

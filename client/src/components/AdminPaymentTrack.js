@@ -4,20 +4,16 @@ import axios from 'axios';
 function AdminPaymentTrack() {
   const [purchaseId, setPurchaseId] = useState('');
   const [payments, setPayments] = useState([]);
-  const [isLoading, setIsLoading] = useState(false);
   const url = process.env.REACT_APP_API_URL;
   const token = localStorage.getItem('accessToken');
   const searchPayments = async () => {
     try {
-      setIsLoading(true);
       const response = await axios.get(`${url}/api/purchases/payments/${purchaseId}`,{
         headers: { Authorization: `Bearer ${token}` }
         }); 
       setPayments(response.data);
-      setIsLoading(false);
     } catch (error) {
       console.error('Error fetching data:', error);
-      setIsLoading(false);
     }
   };
 
@@ -43,9 +39,7 @@ function AdminPaymentTrack() {
       </div>
       
 
-      {isLoading ? (
-        <p className="mt-4 text-gray-600">Loading...</p>
-      ) : (
+      {payments.length!==0 && (
         <div className="mt-4 overflow-x-auto">
         <table className="min-w-full divide-y divide-gray-200">
           <thead>

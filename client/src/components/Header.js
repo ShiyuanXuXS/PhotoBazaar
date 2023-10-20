@@ -24,16 +24,20 @@ function HeaderComponent() {
           // console.log("inside header:" + user.email);
         })
         .catch(() => {
-          localStorage.removeItem("token");
+          localStorage.removeItem("accessToken");
+          setToken(null)
         });
+    }else{
+      setUser(null)
     }
-  }, []);
+  }, [token]);
 
   const handleLogout = () => {
-    localStorage.clear();
+    localStorage.removeItem('accessToken');
     setUser(null);
     setToken(null);
-    Navigate("/");
+    Navigate('/login')
+    // Navigate("/");
   };
 
   return (

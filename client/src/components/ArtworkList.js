@@ -33,11 +33,6 @@ function ArtworkListComponent({ page, option, searchKey }) {
     const [userRole, setUserRole] = useState([]);
     const [userId, setUserId] = useState(null);
 
-
-
-    console.log(option, searchKey);
-    console.log(userId);
-
     useEffect(() => {
         Axios.get("http://localhost:3001/api/users")
             .then((response) => {
@@ -278,12 +273,71 @@ function ArtworkListComponent({ page, option, searchKey }) {
         }
     }
     console.log(userList);
+    const [sort, setSort] = useState();
 
+    const showAll = () => {
+        return new Promise((resolve, reject) => {
+            Axios.get("http://localhost:3001/api/artworks")
+                .then((response) => {
+                    resolve(response.data);
+                })
+                .catch((error) => {
+                    reject(error);
+                });
+        });
+    }
+
+    useEffect(() => {
+        if (sort === "showAll") {
+            showAll().then(data => {
+                setArtworkList(data);
+            });
+        }
+        if (sort === "priceAesc") {
+            showAll().then(data => {
+                data.sort((a, b) => {
+                    return a.price - b.price;
+                });
+                setArtworkList(data);
+            });
+        }
+        if (sort === "priceDesc") {
+            showAll().then(data => {
+                data.sort((a, b) => {
+                    return b.price - a.price;
+                });
+                setArtworkList(data);
+            });
+        }
+        if (sort === "dateAesc") {
+            showAll().then(data => {
+                data.sort((a, b) => {
+                    return a.updatedAt - b.updatedAt;
+                });
+                setArtworkList(data);
+            });
+        }
+
+    }, [sort])
+
+    console.log(artworkList);
     return (
         <>
             <div>
                 {page === "search" ? (<><SearchBoxComponent page="search" /></>) : (<></>)}
             </div>
+            {page !== "search" ? (<></>) : (
+                <div className="flex justify-center sortBox">
+                    <div className='flex items-center text-center text-lg'>Sorted By:</div>
+                    <select className="bg-transparent px-2 py-1 mx-2 rounded-l-md outline-none"
+                        onChange={(e) => setSort(e.target.value)}>
+                        <option value="" ></option>
+                        <option value="showAll" >Show All</option>
+                        <option value="priceAesc">Price: Lower to Higher</option>
+                        <option value="priceDesc">Price: Higher to Lower</option>
+                        <option value="dateDesc">UpdateDate: Newer to Older</option>
+                    </select>
+                </div>)}
             <div className="card flex flex-wrap justify-center p-3 m-5">
                 {artworkList.length > 0 ? (<>{artworkList.map((artwork, index) => (
                     <div key={index} className="border-4 w-96 h-100 m-5 flex flex-col justify-between rounded-lg w-1/4">

@@ -49,11 +49,12 @@ function SearchBoxComponent({ page }) {
                         if (userId === null || userId === undefined) {
                             alert("Please login first!");
                             navigate('/Login')
-                        } else if (searchKey === null || searchKey === undefined || searchKey === "") {
+                        }
+                        else if (searchKey === null || searchKey === undefined || searchKey === "") {
                             alert("Please enter a search key!");
                         }
                         else {
-                            navigate(`/search/${option}/${searchKey}`, { state: { userId: userId } })
+                            navigate(`/search/${option}/${searchKey}`)
                         }
                     }
                     }>Search</button>

@@ -299,6 +299,7 @@ module.exports = {
             username: user.username,
             role: user.role,
             nickname: user.nickname,
+            avatar: user.avatar,
           },
         });
         console.log("inside user controller validate token:" + user.email);

@@ -191,3 +191,9 @@ Chang Liu
 - admin can view user list, artwork list, tag list
 2. To do
 - admin can search artwork
+
+2023/10/19
+1. Done 
+user can update profile icon on user profile page
+2. To do
+user can update nick name on user profile page

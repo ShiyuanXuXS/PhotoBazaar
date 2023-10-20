@@ -12,7 +12,6 @@ function HeaderComponent() {
   const [user, setUser] = useState(localStorage.getItem("user"));
   let page = "myArtworks";
 
-
   useEffect(() => {
     if (token) {
       axios
@@ -46,7 +45,11 @@ function HeaderComponent() {
         <div className="home flex lg:flex-1">
           <button onClick={() => Navigate("/")} className="-m-1.5 p-1.5">
             <span className="sr-only">Photobazarr</span>
-            <img className="h-8 w-auto" src="https://photobazarr.s3.ca-central-1.amazonaws.com/logo2.png" alt="photobazarr" />
+            <img
+              className="h-8 w-auto"
+              src="https://photobazarr.s3.ca-central-1.amazonaws.com/logo2.png"
+              alt="photobazarr"
+            />
           </button>
         </div>
         <h1 className="name text-4xl font-extrabold text-gray-800 font-serif">
@@ -108,7 +111,11 @@ function HeaderComponent() {
                 onClick={() => setIsOpen(!isOpen)}
                 alt="tania andrew"
                 className="border border-gray-900 p-0.5 w-6 h-6 object-cover rounded-full cursor-pointer"
-                src="https://images.unsplash.com/photo-1633332755192-727a05c4013d?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1480&q=80"
+                src={
+                  user.avatar === undefined
+                    ? "https://images.unsplash.com/photo-1633332755192-727a05c4013d?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1480&q=80"
+                    : user.avatar
+                }
               />
 
               <Transition
@@ -187,7 +194,10 @@ function HeaderComponent() {
                           className="block flex items-center px-1 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900"
                           role="menuitem"
                           onClick={() => {
-                            Navigate(`/asset/${user.id}`, page = "myArtworks");
+                            Navigate(
+                              `/asset/${user.id}`,
+                              (page = "myArtworks")
+                            );
                             setIsOpen(false);
                           }}
                         >
@@ -214,7 +224,7 @@ function HeaderComponent() {
                           role="menuitem"
                           onClick={() => {
                             // Navigate(`/cart/${user.id}`)
-                            Navigate(`/cart`)
+                            Navigate(`/cart`);
                             setIsOpen(false);
                           }}
                         >

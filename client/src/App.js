@@ -24,7 +24,7 @@ import ArtworkList from "./pages/ArtworkList";
 
 function App() {
   return (
-    <AuthProvider>
+    // <AuthProvider>
       <div className="page-container">
         <Router>
           <Routes>
@@ -50,7 +50,7 @@ function App() {
           </Routes>
         </Router>
       </div>
-    </AuthProvider>
+    // </AuthProvider>
   );
 }
 

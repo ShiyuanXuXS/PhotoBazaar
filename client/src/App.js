@@ -7,7 +7,7 @@ import Home from "./pages/Home";
 import AddArtwork from "./pages/AddArtwork";
 import Message from "./pages/Message";
 // import Payment from "./pages/Payment";
-import TrackPayments from "./pages/AdminTrackPayments"
+// import TrackPayments from "./pages/AdminTrackPayments"
 import { AuthProvider } from "./Helpers/AuthContext";
 import ChangePassword from "./pages/ChangePassword";
 import ForgotPassword from "./pages/ForgotPassword";
@@ -34,7 +34,7 @@ function App() {
             <Route path="/profile/:id" element={<Profile />} />
             <Route path="/message" element={<Message />} />
             {/* <Route path="/payment" element={<Payment />} /> */}
-            <Route path="/trackpayments" element={<TrackPayments />} />
+            {/* <Route path="/trackpayments" element={<TrackPayments />} /> */}
             <Route path="/artwork" element={<Artwork />} />
             <Route path="/addArtwork" element={<AddArtwork />} />
             <Route path="/updateArtworkMainInfo/:artworkId" element={<UpdateArtwork />} />

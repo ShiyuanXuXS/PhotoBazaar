@@ -143,7 +143,9 @@ function ProfileComponent() {
 
   // save profile image to s3 bucket
   const saveImage = (img) => {
-    let newFileName = `${Date.now()}_${user._id}.avator.${img.name.split(".").pop()}`;
+    let newFileName = `${Date.now()}_${user._id}.avator.${img.name
+      .split(".")
+      .pop()}`;
     console.log("new file name:" + newFileName);
 
     const uploadParams = {
@@ -166,8 +168,24 @@ function ProfileComponent() {
   };
 
   // save new artwork to database
-  const saveArtwork = (event) => {
+  const saveProfileicon = (event) => {
     event.preventDefault();
+    if (user.avatar != undefined) {
+      // delete old profile image from s3 bucket
+      const parts = user.avatar.split(".com/");
+
+      const deleteFileName = parts.pop();
+
+      const deleteParams = {
+        Bucket: config.bucketName,
+        Key: deleteFileName, // Specify the path to the file you want to delete
+      };
+
+      client
+        .send(new DeleteObjectCommand(deleteParams))
+        .then((data) => console.log(data))
+        .catch((error) => console.log(error));
+    }
 
     //Validate Image
     const uploadPromises = []; // Create an array to store promises for image uploads
@@ -178,8 +196,7 @@ function ProfileComponent() {
     ) {
       alert("Please select a file less than 5MB");
       return;
-    }
-    else {
+    } else {
       // save image to s3 bucket
       uploadPromises.push(saveImage(uploadImg));
     }
@@ -188,27 +205,28 @@ function ProfileComponent() {
       .then((newFileNames) => {
         console.log("All images uploaded successfully.", newFileNames); // 'fileNames' contain an array of successfully uploaded file names
 
-        // save artwork to database
-        // axios
-        //   .put(`http://localhost:3001/api/users/profile/${user.email}`, {
-        //     avatar: `https://${config.bucketName}.s3.${config.region}.amazonaws.com/${config.dirName}/${fileName}`,
-        //   })
-        //   .then((response) => {
-        //     console.log(response);
-        //     alert("Artwork saved successfully!");
-        //   })
-        //   .catch((error) => {
-        //     console.error(error);
-        //   });
+        //save artwork to database
+        axios
+          .put(`http://localhost:3001/api/users/profile/${user.email}`, {
+            avatar: `https://${config.bucketName}.s3.${config.region}.amazonaws.com/${config.dirName}/${newFileNames}`,
+          })
+          .then((response) => {
+            console.log(response);
+            setMessage("Profile icon updated successfully!");
+          })
+          .catch((error) => {
+            console.error(error);
+          });
       })
       .catch((uploadErrors) => {
         console.error("Error uploading images:", uploadErrors);
-      }
-      )
+      });
   };
 
   return (
     <>
+      {error && <div className="text-red-500 mb-8">{error}</div>}
+      {message && <div className="text-green-500 mb-8">{message}</div>}
       {user.role == "user" ? (
         <>
           <div className="my-4">
@@ -355,11 +373,7 @@ function ProfileComponent() {
                     )
                   }
                 >
-                  {user.avatar == null ? (
-                    <>Add Profile Icon</>
-                  ) : (
-                    <>Update Profile Icon</>
-                  )}
+                  Update Profile Icon
                 </button>
                 {updateProfile ? (
                   <div>
@@ -382,7 +396,7 @@ function ProfileComponent() {
                       <button
                         type="submit"
                         className={`font-serif capitalize p-1 text-sm inline ml-2 rounded-lg bg-sky-600 text-white mt-2`}
-                        onClick={(event) => saveArtwork(event)}
+                        onClick={(event) => saveProfileicon(event)}
                       >
                         Upload Profile Icon
                       </button>

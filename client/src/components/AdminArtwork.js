@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
-import axios from 'axios';
-import { useNavigate, useParams } from "react-router-dom";
+import React, { useState,useEffect } from 'react';
+import Modal from "react-modal"
+import Axios from 'axios';
+import { useNavigate } from "react-router-dom";
 function AdminArtwork() {
   const [artworkId, setArtworkId] = useState('');
   const [artwork, setArtwork] = useState();
@@ -9,7 +10,7 @@ function AdminArtwork() {
   const token = localStorage.getItem('accessToken');
   const searchArtwork = async () => {
     try {
-      const response = await axios.get(`${url}/api/artworks/${artworkId}`,{
+      const response = await Axios.get(`${url}/api/artworks/${artworkId}`,{
         headers: { Authorization: `Bearer ${token}` }
         }); 
       setArtwork(response.data);
@@ -20,8 +21,67 @@ function AdminArtwork() {
   };
 
 
+  useEffect(() => {
+    Modal.setAppElement('#artwork-container');
+}, []);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+//   const [idToDelete, setIdToDelete] = useState(null);
+
+  const openModal = () => {
+      setIsModalOpen(true);
+    //   setIdToDelete(artwork._id);
+  };
+
+  const closeModal = () => {
+      setIsModalOpen(false);
+    //   setIdToDelete(null);
+  };
+
+  const handleDelete = () => {
+      if (artwork && artwork._id) {
+          Axios.delete(`${url}/api/artworks/${artwork._id}`)
+              .then((response) => {
+                  console.log(response.data);
+                  setArtwork(null);
+                  closeModal();
+              })
+              .catch((error) => {
+                  console.log(error);
+                  closeModal();
+              });
+      }
+  };
+
   return (
-    <div className="p-4 border border-gray-300 rounded-md shadow-md hover:shadow-lg hover:border-blue-500 transform hover:-translate-y-1 transition duration-300">
+    <div id="artwork-container" 
+        className="p-4 border border-gray-300 rounded-md shadow-md hover:shadow-lg hover:border-blue-500 transform hover:-translate-y-1 transition duration-300">
+        
+        <Modal
+            isOpen={isModalOpen}
+            onRequestClose={closeModal}
+            contentLabel="Delete Confirmation Modal"
+            className="fixed inset-0 flex items-center justify-center z-50"
+            overlayClassName="fixed inset-0"
+        >
+            <div className="bg-red-200 w-80 p-4 rounded shadow-lg">
+                <h2 className="text-lg font-semibold">Confirm delete</h2>
+                <p>Are you sure you want to remove it?</p>
+                <div className="mt-4 flex justify-end">
+                    <button
+                        className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"
+                        onClick={handleDelete}
+                    >
+                        Confirm
+                    </button>
+                    <button
+                        className="px-4 py-2 ml-2 bg-gray-300 rounded hover:bg-gray-400"
+                        onClick={closeModal}
+                    >
+                        Cancel
+                    </button>
+                </div>
+            </div>
+        </Modal>
       <h3 className="text-xl font-bold text-blue-600 mb-4">Artwork Management</h3>
       <label htmlFor="purchaseId" className="block text-sm font-medium text-gray-600 text-left mx-2">
         Enter Artwork ID:
@@ -80,9 +140,7 @@ function AdminArtwork() {
                     </button>
                     <button
                       className={`font-serif capitalize p-1 text-sm inline ml-2 rounded-lg bg-red-600 text-white mt-2`}
-                      onClick={() => {
-                        
-                      }}
+                      onClick={openModal}
                     >
                      Delete
                     </button>

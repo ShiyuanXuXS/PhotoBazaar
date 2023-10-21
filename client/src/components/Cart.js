@@ -12,7 +12,7 @@ function CartComponent({ buyerId }) {
     const token = localStorage.getItem('accessToken');
     const [purchases, setPurchases] = useState([]);
     const [selectedPurchase, setSelectedPurchase] = useState(null);
-
+    const [isLoading,setIsLoading]=useState(true)
     useEffect(() => {
         Axios.get(`${url}/api/purchases/unpaid/buyer`, {
             headers: { Authorization: `Bearer ${token}` }
@@ -35,6 +35,7 @@ function CartComponent({ buyerId }) {
                 Promise.all(promises)
                     .then(updatedPurchases => {
                         setPurchases(updatedPurchases);
+                        setIsLoading(false)
                     });
             })
             .catch((error) => {
@@ -45,50 +46,6 @@ function CartComponent({ buyerId }) {
     useEffect(() => {
         Modal.setAppElement('#cart-container');
     }, []);
-
-    // const removeFromCart = (purchase_id) => {
-
-    // delete the purchase record
-    // if (!window.confirm("Are you sure you to delete it from cart?")) {
-    //     return;
-    // } else {
-    //         console.log(purchase_id)
-    //         Axios.delete(`${url}/api/purchases/${purchase_id}`)
-    //             .then((response) => {
-    //                 console.log(response.data);
-    //                 // remove the artwork from artworkInCart
-    //                 const newPurchases = purchases.filter((purchase) => purchase._id !==purchase_id);
-    //                 setPurchases(newPurchases);
-    //                 // window.location.href = `/cart/${buyerId}`;
-    //             })
-    //             .catch((error) => {
-    //                 console.log(error);
-    //             }
-    //             );
-    //     // }
-    // };
-
-    // const removeAllFromCart = () => {
-    //     // delete all the purchase record
-    //     if (!window.confirm("Are you sure you to delete all items from cart?")) {
-    //         return;
-    //     } else {
-    //         // map through all the artwork in cart, delete the purchase record
-    //         artworkInCart.map((artwork) => {
-    //             Axios.delete(`http://localhost:3001/api/purchases/${artwork.artwork_id}`)
-    //                 .then((response) => {
-    //                     console.log(response.data);
-    //                     // remove the artwork from artworkInCart
-    //                     setArtworkInCart([]);
-    //                     window.location.href = `/cart/${buyerId}`;
-    //                 })
-    //                 .catch((error) => {
-    //                     console.log(error);
-    //                 }
-    //                 );
-    //         })
-    //     }
-    // }
 
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [purchaseIdToDelete, setPurchaseIdToDelete] = useState(null);
@@ -153,8 +110,16 @@ function CartComponent({ buyerId }) {
                 </div>
             </Modal>
 
+            {
+                (isLoading) &&
+                (
+                    <div>
+                        <div className="text-4xl font-medium subpixel-antialiased p-5 m-5 text-center">Loading...</div>
+                    </div>
+                )
+            }
 
-            {(!purchases || purchases.length === 0) &&
+            {(!isLoading && (!purchases || purchases.length === 0)) &&
                 (
                     <div className="flex items-center justify-center">
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-10 h-10">

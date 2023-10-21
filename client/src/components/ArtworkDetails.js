@@ -8,6 +8,8 @@ import {
     PutObjectCommand,
 } from "@aws-sdk/client-s3";
 import { useLocation } from 'react-router-dom';
+import Modal from './Modal';
+
 export default ArtworkDetailsComponent;
 
 //S3 config
@@ -62,16 +64,16 @@ function ArtworkDetailsComponent({ artworkId }) {
             Axios.get(`http://localhost:3001/api/purchases/checkPurchased/${artworkId}/${userId}`)
                 .then((response) => {
                     console.log(response.data);
-                    setIsPaid(response.data.is_paid);
-                    console.log(response.data.is_paid);
+                    if (response.data) {
+                        setIsPaid(response.data.is_paid);
+                    }
+                    // console.log(response.data.is_paid);
                 })
                 .catch((error) => {
                     console.error(error);
                 });
         }
     }, [user]);
-
-    console.log(page);
 
     useEffect(() => {
         Axios.get(`http://localhost:3001/api/artworks/${artworkId}`)
@@ -131,7 +133,7 @@ function ArtworkDetailsComponent({ artworkId }) {
         setPhotoToDelete(photo);
         // check if it's the last photo in the artwork
         if (artworkToUpdate.photos.length == 1) {
-            alert("You cannot delete the last photo in the artwork");
+            openLastPhotoModal();
             return;
         }
         if (!window.confirm("Are you sure you want to delete this photo?")) {
@@ -169,6 +171,15 @@ function ArtworkDetailsComponent({ artworkId }) {
         }
     }
 
+    const [showLastPhotoModal, setShowLastPhotoModal] = useState(false);
+
+    const openLastPhotoModal = () => {
+        setShowLastPhotoModal(true);
+    };
+    const closeLastPhotoModal = () => {
+        setShowLastPhotoModal(false);
+    };
+
     const addPhoto = () => {
         validationSchema
             .validate({ photoName, photoDescription }, { abortEarly: false })
@@ -176,7 +187,7 @@ function ArtworkDetailsComponent({ artworkId }) {
                 const uploadPromises = [];
                 // valide photo to upload
                 if (photoFile == null || photoFile.size > 5000000 || photoFile == undefined) {
-                    alert("Please select a file less than 5MB");
+                    openImgSizeLimitModal();
                     return;
                 } else {
                     // upload the photo to s3
@@ -205,6 +216,13 @@ function ArtworkDetailsComponent({ artworkId }) {
                     });
             })
     }
+    const [showImgSizeLimitModal, setShowImgSizeLimitModal] = useState(false);
+    const openImgSizeLimitModal = () => {
+        setShowImgSizeLimitModal(true);
+    };
+    const closeImgSizeLimitModal = () => {
+        setShowImgSizeLimitModal(false);
+    };
 
     const updatePhoto = (photoToUpdate) => {
         validationSchema
@@ -216,7 +234,7 @@ function ArtworkDetailsComponent({ artworkId }) {
                 // check if photo is changed
                 if (photoFile != null) {  // changed, check size and type
                     if (photoFile.size > 5000000 || photoFile.size == undefined) {
-                        alert("Image size should be less than 5MB");
+                        openImgSizeLimitModal();
                         return;
                     } else {
                         changePhoto = true;
@@ -289,11 +307,27 @@ function ArtworkDetailsComponent({ artworkId }) {
             )
             .required("Description is required"),
     });
-    console.log(author_id);
-    console.log(userId);
 
     return (
         <>
+            <Modal
+                title="Last Image"
+                content="You cannot delete the last photo in the artwork!"
+                onClick={closeLastPhotoModal}
+                isOpen={showLastPhotoModal}
+                onClose={closeLastPhotoModal}
+                alert={false}
+            />
+
+            <Modal
+                title="Image Size Limit Exceeded"
+                content="Please select a file less than 5MB!"
+                onClick={closeImgSizeLimitModal}
+                isOpen={showImgSizeLimitModal}
+                onClose={closeImgSizeLimitModal}
+                alert={false}
+            />
+
             <div className='mainInfo m-5 p-3'>
                 <div className='font-bold text-3xl'>{artworkToUpdate.title}</div>
                 <div className="text-2xl p-3">{artworkToUpdate.description}</div>

@@ -15,9 +15,30 @@ class TagModel {
     return result.insertedId;
   }
 
-  async getAllTags() {
-    const tags = await this.collection.find({}).toArray();
-    return tags;
+  // async getAllTags() {
+  //   const tags = await this.collection.find({}).toArray();
+  //   return tags;
+  // }
+  async getAllTags(page, perPage, searchFor) {
+    try {
+      let query = this.collection.find({});
+      
+      if (searchFor) {
+        const searchRegex = new RegExp(searchFor, 'i');
+        query = query.filter({ tag: searchRegex });
+      }
+  
+      if (page && perPage) {
+        const skipCount = (page - 1) * perPage;
+        query = query.skip(skipCount).limit(perPage);
+      }
+      
+      const tags = await query.toArray();
+      
+      return tags;
+    } catch (error) {
+      throw error;
+    }
   }
 
   async getTagById(id) {

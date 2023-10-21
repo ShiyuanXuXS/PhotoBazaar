@@ -139,7 +139,7 @@ function AdminArtwork() {
                      View
                     </button>
                     <button
-                      className={`font-serif capitalize p-1 text-sm inline ml-2 rounded-lg bg-red-600 text-white mt-2`}
+                      className={`font-serif capitalize p-1 text-sm inline ml-2 rounded-lg bg-red-900 text-white mt-2`}
                       onClick={openModal}
                     >
                      Delete

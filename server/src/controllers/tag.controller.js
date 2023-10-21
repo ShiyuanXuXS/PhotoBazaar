@@ -16,16 +16,30 @@ class TagController {
         }
     }
 
+    // async getAllTags(req, res) {
+    //     try {
+    //         const tags = await tagModel.getAllTags();
+    //         res.status(200).json(tags);
+    //         // console.log(tags);
+    //     } catch (error) {
+    //         console.error('Error fetching tags:', error);
+    //         res.status(500).json({ message: 'Error fetching tags' });
+    //     }
+    // }
     async getAllTags(req, res) {
         try {
-            const tags = await tagModel.getAllTags();
-            res.status(200).json(tags);
-            // console.log(tags);
+            let page = parseInt(req.query.page) ;
+            let perPage = parseInt(req.query.perPage);
+            let searchFor = req.query.searchFor;
+      
+          const tags = await tagModel.getAllTags(page, perPage, searchFor);
+      
+          res.status(200).json(tags);
         } catch (error) {
-            console.error('Error fetching tags:', error);
-            res.status(500).json({ message: 'Error fetching tags' });
+          console.error('Error fetching tags:', error);
+          res.status(500).json({ message: 'Error fetching tags' });
         }
-    }
+      }
 
     async getTagById(req, res) {
         try {

@@ -5,13 +5,14 @@ import Footer from "../components/Footer";
 import AdminPaymentTrack from "../components/AdminPaymentTrack"
 import AdminUser from "../components/AdminUser";
 import AdminArtwork from "../components/AdminArtwork";
+import AdminTag from "../components/AdminTag";
 function Admincenter() {
   return (
     <div>
       <Header />
         <div className="text-center p-6 z-50">
         <h1 className="text-3xl font-semibold">Admin Center</h1>
-        <div className="mt-8 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-2 gap-4">
+        <div className="mt-8 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-4">
           <div className="p-4 bg-gray-100 rounded shadow">
             <AdminPaymentTrack/>
           </div>
@@ -19,11 +20,12 @@ function Admincenter() {
             <AdminUser />
           </div>
           <div className="p-4 bg-gray-100 rounded shadow">
-            <AdminArtwork/>
+            <AdminTag/>
           </div>
           <div className="p-4 bg-gray-100 rounded shadow">
-            Tag Manage
+            <AdminArtwork/>
           </div>
+          
         </div>
         </div>
       <Footer  fixBottom={true} />

@@ -9,13 +9,13 @@ function Admincenter() {
   return (
     <div>
       <Header />
-        <div className="text-center p-6">
+        <div className="text-center p-6 z-50">
         <h1 className="text-3xl font-semibold">Admin Center</h1>
         <div className="mt-8 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-2 gap-4">
           <div className="p-4 bg-gray-100 rounded shadow">
             <AdminPaymentTrack/>
           </div>
-          <div className="p-4 bg-gray-100 rounded shadow">
+          <div className="p-4 bg-gray-100 rounded shadow z-40">
             <AdminUser />
           </div>
           <div className="p-4 bg-gray-100 rounded shadow">

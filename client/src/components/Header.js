@@ -40,6 +40,20 @@ function HeaderComponent() {
     // Navigate("/");
   };
 
+  //click anywhere to collapse dropdown menu
+  useEffect(() => {
+    function handleClickOutside(event) {
+      if (myRef.current && !myRef.current.contains(event.target)) {
+        setIsOpen(false);
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside);
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
+
   return (
     <header className="bg-white">
       <nav
@@ -110,7 +124,7 @@ function HeaderComponent() {
                 </svg>
               </button>
             </div>
-            <div className="relative inline-block text-left">
+            <div className="relative inline-block text-left z-50">
               <img
                 onClick={() => setIsOpen(!isOpen)}
                 alt="tania andrew"
@@ -134,7 +148,7 @@ function HeaderComponent() {
                 {(ref) => (
                   <div
                     ref={myRef}
-                    className="origin-top-right absolute right-0 mt-2 w-50 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5"
+                    className="z-50 origin-top-right absolute right-0 mt-2 w-50 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5"
                     role="menu"
                     aria-orientation="vertical"
                     aria-labelledby="options-menu"

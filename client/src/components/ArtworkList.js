@@ -6,6 +6,8 @@ import {
     DeleteObjectCommand,
 } from "@aws-sdk/client-s3";
 import SearchBoxComponent from './SearchBox';
+import Modal from './Modal';
+
 export default ArtworkListComponent;
 
 
@@ -22,7 +24,7 @@ const config = {
 
 const client = new S3Client(config);
 
-function ArtworkListComponent({ page, option, searchKey }) {
+function ArtworkListComponent({ userId, page, option, searchKey }) {
     const [artworkList, setArtworkList] = useState([]);
     const [tagList, setTagList] = useState([]);
     const navigate = useNavigate();
@@ -31,8 +33,9 @@ function ArtworkListComponent({ page, option, searchKey }) {
     const [user, setUser] = useState(null);
     const [userList, setUserList] = useState([]);
     const [userRole, setUserRole] = useState([]);
-    const [userId, setUserId] = useState(null);
+    // const [userId, setUserId] = useState(null);
 
+    // console.log(userId);
     useEffect(() => {
         Axios.get("http://localhost:3001/api/users")
             .then((response) => {
@@ -50,7 +53,7 @@ function ArtworkListComponent({ page, option, searchKey }) {
                     setToken(response.data.token);
                     setUser(response.data.user);
                     setUserRole(response.data.user.role);
-                    setUserId(response.data.user.id);
+                    // setUserId(response.data.user.id);
                 })
                 .catch(() => {
                     localStorage.removeItem("token");
@@ -128,7 +131,14 @@ function ArtworkListComponent({ page, option, searchKey }) {
                 Axios.get(`http://localhost:3001/api/artworks/search/keywords/${searchKey}`)
                     .then((response) => {
                         if (response.data.length === 0) {
-                            alert("No results found!");
+                            openNoResultsModal();
+                            Axios.get("http://localhost:3001/api/artworks")
+                                .then((response) => {
+                                    setArtworkList(response.data);
+                                })
+                                .catch((error) => {
+                                    console.error(error);
+                                });
                         }
                         setArtworkList(response.data);
                     })
@@ -141,7 +151,14 @@ function ArtworkListComponent({ page, option, searchKey }) {
                 Axios.get(`http://localhost:3001/api/tags/search/${searchKey}`)
                     .then((response) => {
                         if (response.data.length === 0) {
-                            alert("No results found!");
+                            openNoResultsModal();
+                            Axios.get("http://localhost:3001/api/artworks")
+                                .then((response) => {
+                                    setArtworkList(response.data);
+                                })
+                                .catch((error) => {
+                                    console.error(error);
+                                });
                         }
                         //get all artworks that have the tagIds
                         let tagIds = response.data;
@@ -173,10 +190,18 @@ function ArtworkListComponent({ page, option, searchKey }) {
             });
     }, [userId, option, searchKey]);
 
+    const [showNoResultsModal, setShowNoResultsModal] = useState(false);
+    const openNoResultsModal = () => {
+        setShowNoResultsModal(true);
+    };
+    const closeNoResultsModal = () => {
+        setShowNoResultsModal(false);
+    };
+
     const addToCart = (artworkId, authorId, userId) => {
         // check if userId is author
         if (authorId === userId || authorId === user.id) {
-            alert("You cannot add your own artwork to cart!");
+            openYourOwnArtworkModal();
             return;
         }
         console.log("next");
@@ -187,7 +212,6 @@ function ArtworkListComponent({ page, option, searchKey }) {
                 console.log("enter");
                 console.log(artworkId);
                 if (response.data == null) {
-
                     // if no, add artworkId to purchase
                     Axios.post(`http://localhost:3001/api/purchases`, {
                         artwork_id: artworkId,
@@ -196,13 +220,17 @@ function ArtworkListComponent({ page, option, searchKey }) {
                     )
                         .then((response) => {
                             console.log(response.data);
-                            alert("Artwork added to cart!");
+                            openAddToCartModal();
                         })
                         .catch((error) => {
                             console.error(error);
                         });
                 } else {
-                    response.data.is_paid === true ? alert("Artwork has been purchased!") : alert("Artwork has already been added to cart!");
+                    if (response.data.is_paid === true) {
+                        openHasPurchasedModal();
+                    } else {
+                        openAddToCartModal();
+                    }
                 }
             })
             .catch((error) => {
@@ -210,8 +238,24 @@ function ArtworkListComponent({ page, option, searchKey }) {
             });
 
     }
+    const [showAddToCartModal, setShowAddToCartModal] = useState(false);
+    const openAddToCartModal = () => {
+        setShowAddToCartModal(true);
+    };
+    const closeAddToCartModal = () => {
+        setShowAddToCartModal(false);
+    };
+
+    const [showYourOwnArtworkModal, setShowYourOwnArtworkModal] = useState(false);
+    const openYourOwnArtworkModal = () => {
+        setShowYourOwnArtworkModal(true);
+    };
+    const closeYourOwnArtworkModal = () => {
+        setShowYourOwnArtworkModal(false);
+    };
 
     const deleteArtwork = (artwork) => {
+        // openConfirmDeteteModal(artwork);
         if (!window.confirm("Are you sure you to delete it?")) {
             return;
         } else {
@@ -254,8 +298,7 @@ function ArtworkListComponent({ page, option, searchKey }) {
                             Axios.delete(`http://localhost:3001/api/artworks/${artwork._id}`)
                                 .then((response) => {
                                     console.log(response.data);
-                                    alert("Artwork deleted!");
-                                    window.location.reload();
+                                    openDeleteSuccessfullyModal();
                                 })
                                 .catch((error) => {
                                     console.error(error);
@@ -267,12 +310,30 @@ function ArtworkListComponent({ page, option, searchKey }) {
                     }
                     else {
                         // if yes, alert user that artwork has been purchased
-                        alert("Artwork has been purchased!");
+                        openHasPurchasedModal();
                     }
                 })
         }
     }
-    console.log(userList);
+
+    const [showConfirmDeteteModal, setShowConfirmDeteteModal] = useState(false);
+    const openConfirmDeteteModal = (artwork) => {
+        setShowConfirmDeteteModal(true);
+    };
+    const closeConfirmDeteteModal = () => {
+        setShowConfirmDeteteModal(false);
+    };
+
+    const [showDeleteSuccessfullyModal, setShowDeleteSuccessfullyModal] = useState(false);
+    const openDeleteSuccessfullyModal = () => {
+        setShowDeleteSuccessfullyModal(true);
+    };
+    const closeDeleteSuccessfullyModal = () => {
+        setShowDeleteSuccessfullyModal(false);
+        window.location.reload();
+    };
+
+    // console.log(userList);
     const [sort, setSort] = useState();
 
     const showAll = () => {
@@ -286,6 +347,13 @@ function ArtworkListComponent({ page, option, searchKey }) {
                 });
         });
     }
+    const [showHasPurchasedModal, setShowHasPurchasedModal] = useState(false);
+    const openHasPurchasedModal = () => {
+        setShowHasPurchasedModal(true);
+    };
+    const closeHasPurchasedModal = () => {
+        setShowHasPurchasedModal(false);
+    };
 
     useEffect(() => {
         if (sort === "showAll") {
@@ -320,9 +388,71 @@ function ArtworkListComponent({ page, option, searchKey }) {
 
     }, [sort])
 
-    console.log(artworkList);
+    const [showLoginModal, setShowLoginModal] = useState(false);
+    const openLoginModal = () => {
+        setShowLoginModal(true);
+    };
+    const closeLoginModal = () => {
+        setShowLoginModal(false);
+    };
+
+
     return (
         <>
+            <Modal
+                title=""
+                content="Please login first!"
+                onClick={closeLoginModal}
+                isOpen={showLoginModal}
+                onClose={closeLoginModal}
+                alert={false}
+            />
+
+            <Modal
+                title="Cannot delete"
+                content="Artwork has been purchased!"
+                onClick={closeHasPurchasedModal}
+                isOpen={showHasPurchasedModal}
+                onClose={closeHasPurchasedModal}
+                alert={false}
+            />
+
+            <Modal
+                title="Add to cart"
+                content="Artwork is already in the cart!"
+                onClick={closeAddToCartModal}
+                isOpen={showAddToCartModal}
+                onClose={closeAddToCartModal}
+                alert={false}
+            />
+
+            <Modal
+                title=""
+                content="You cannot add your own artwork to cart!"
+                onClick={closeYourOwnArtworkModal}
+                isOpen={showYourOwnArtworkModal}
+                onClose={closeYourOwnArtworkModal}
+                alert={false}
+            />
+
+            <Modal
+                title=""
+                content="No result found!"
+                onClick={closeNoResultsModal}
+                isOpen={showNoResultsModal}
+                onClose={closeNoResultsModal}
+                alert={false}
+            />
+
+            <Modal
+                title="Complete"
+                content="Artwork deleted successfully!"
+                onClick={closeDeleteSuccessfullyModal}
+                isOpen={showDeleteSuccessfullyModal}
+                onClose={closeDeleteSuccessfullyModal}
+                alert={false}
+            />
+
             <div>
                 {page === "search" ? (<><SearchBoxComponent page="search" /></>) : (<></>)}
             </div>
@@ -348,7 +478,7 @@ function ArtworkListComponent({ page, option, searchKey }) {
                                 <div className='flex pr-3'>
                                     <img alt="tania andrew"
                                         className="border border-gray-900 p-0.5 w-6 h-6 object-cover rounded-full cursor-pointer"
-                                        src={userList.find(user => user._id === artwork.author_id)?.avator || "https://images.unsplash.com/photo-1633332755192-727a05c4013d?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1480&q=80"}></img>
+                                        src={userList.find(user => user._id === artwork.author_id)?.avatar || "https://images.unsplash.com/photo-1633332755192-727a05c4013d?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1480&q=80"}></img>
                                     <div className="text-base pl-2">{userList.find(user => user._id === artwork.author_id)?.username || ""}</div>
                                 </div>
                             </div>
@@ -396,7 +526,7 @@ function ArtworkListComponent({ page, option, searchKey }) {
                                     <button className={`${page === "home" || page === "myAssets" || page === "search" ? 'border-r-2 pr-1' : ''} items-center pl-1`}
                                         onClick={() => {
                                             if (userId === null || userId === undefined) {
-                                                alert("Please login first!");
+                                                openLoginModal();
                                                 navigate('/Login')
                                             } else { navigate(`/details/${artwork._id}`, { state: { page: page } }); }
                                         }}>
@@ -421,7 +551,7 @@ function ArtworkListComponent({ page, option, searchKey }) {
                                             <button className={`${page === "home" || page === "search" ? '' : 'border-r-2'} items-center px-1`}
                                                 onClick={() => {
                                                     if (userId === null || userId === undefined) {
-                                                        alert("Please login first!");
+                                                        openLoginModal();
                                                         navigate('/Login')
                                                     } else {
                                                         addToCart(artwork._id, artwork.author_id, userId)

@@ -106,7 +106,8 @@ module.exports = {
     } catch (error) {
       console.log(error);
       res.status(500).json({
-        message: "User Controllers: create failed. Internal Server Error",
+        // message: "User Controllers: create failed. Internal Server Error",
+        error: error.response.data,
       });
     }
   },
@@ -383,6 +384,9 @@ module.exports = {
           }
         });
         // smtp end
+        res.status(201).json({
+          message: `change password email has been sent to ${existingUser.username}.`,
+        });
       } else {
         res.status(404).send({
           message: "No such user email found",

@@ -24,10 +24,12 @@ function ForgotpasswordComponent() {
     })
       .then((response) => {
         if (response.data.error) {
-          // alert("fff"); // Display the error message
-          alert(response.data.error);
+          const { message: resMessage } = response.data.message;
+          setError(resMessage);
         } else {
-          alert(response.data.message); // Display success message or token
+          const { message: resMessage } = response.data.message;
+          setMessage(resMessage);
+          // alert(response.data.message); // Display success message or token
         }
       })
       .catch((error) => {

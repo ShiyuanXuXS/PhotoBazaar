@@ -27,8 +27,8 @@ const config = {
 const client = new S3Client(config);
 
 function ArtworkDetailsComponent({ artworkId }) {
-  const location = useLocation();
-  const page = location.state.page;
+  // const location = useLocation();
+  // const page = location.state.page;
   const [artworkToUpdate, setArtworkToUpdate] = useState([]);
   const navigate = useNavigate();
   const [tagList, setTagList] = useState([]);
@@ -101,6 +101,10 @@ function ArtworkDetailsComponent({ artworkId }) {
 
   const handleEditBox = (photo, index) => {
     // if index is true, it's edit photo, if false, it's add photo
+    // disable edit button and add photo button
+    setIsEditButtonDisabled(true);
+    setIsAddButtonDisabled(true);
+    setIsDeleteButtonDisabled(true);
     // show the edit box
     setShowEdit(!showEdit);
     // if it's edit photo, pass the photo value to update
@@ -138,31 +142,32 @@ function ArtworkDetailsComponent({ artworkId }) {
     return uploadPromise;
   };
 
-  const deletePhoto = (photo) => {
-    setPhotoToDelete(photo);
-    // check if it's the last photo in the artwork
-    if (artworkToUpdate.photos.length == 1) {
-      openLastPhotoModal();
-      return;
-    }
-    if (!window.confirm("Are you sure you want to delete this photo?")) {
-      return;
-    } else {
-      console.log("enter");
-      // delete the photo from database
-      Axios.delete(
-        `${deploy_api_url}/api/artworks/${artworkId}/deletePhoto/${photo._id}`
-      )
-        .then((response) => {
-          console.log(response.data);
-          // reload the page
-          navigate(`/details/${artworkId}`, { replace: true });
-        })
-        .catch((error) => {
-          console.error("Error deleting photo:", error);
-        });
+  const [showDeleteConfirmModal, setShowDeleteConfirmModal] = useState(false);
+  const openDeleteConfirmModal = () => {
+    setShowDeleteConfirmModal(true);
+  };
+  const closeDeleteConfirmModal = () => {
+    setShowDeleteConfirmModal(false);
+  };
 
-      // delete the photo from s3
+  const deletePhoto = (photo) => {
+    // delete the photo from database
+    Axios.delete(`http://localhost:3001/api/artworks/${artworkId}/deletePhoto/${photo._id}`)
+      .then((response) => {
+        console.log(response.data);
+        deleteFromS3(photo);
+        // reload the page
+        // navigate(`/details/${artworkId}`, { replace: true });
+      })
+      .catch((error) => {
+        console.error("Error deleting photo:", error);
+      });
+
+    // delete the photo from s3
+    const parts = photoToDelete.file_url.split(".com/");
+    const deleteFileName = parts.pop();
+    // delete the photo from s3
+    const deleteFromS3 = (photoToDelete) => {
       const parts = photoToDelete.file_url.split(".com/");
       const deleteFileName = parts.pop();
 
@@ -174,12 +179,24 @@ function ArtworkDetailsComponent({ artworkId }) {
       client
         .send(new DeleteObjectCommand(deleteParams))
         .then((deleteResult) => {
-          console.log("Image deleted:", deleteResult);
+          console.log("Image deleted:", deleteResult)
+          setPhotoToUpdate(null);
+          openDeleteSuccessModal();
         })
         .catch((error) => {
           console.error("Error deleting image:", error);
         });
-    }
+    };
+
+  }
+
+  const [showDeleteSuccessModal, setShowDeleteSuccessModal] = useState(false);
+  const openDeleteSuccessModal = () => {
+    setShowDeleteSuccessModal(true);
+  };
+  const closeDeleteSuccessModal = () => {
+    setShowDeleteSuccessModal(false);
+    window.location.reload(`/details/${artworkId}`, { replace: true });
   };
 
   const [showLastPhotoModal, setShowLastPhotoModal] = useState(false);
@@ -192,44 +209,68 @@ function ArtworkDetailsComponent({ artworkId }) {
   };
 
   const addPhoto = () => {
+    setIsUpdateButtonDisabled(true);
+    setIsCancelButtonDisabled(true);
     validationSchema
       .validate({ photoName, photoDescription }, { abortEarly: false })
       .then(() => {
         const uploadPromises = [];
         // valide photo to upload
-        if (
-          photoFile == null ||
-          photoFile.size > 5000000 ||
-          photoFile == undefined
-        ) {
+        if (photoFile == null || photoFile.size > 5000000 || photoFile == undefined) {
           openImgSizeLimitModal();
           return;
         } else {
           // upload the photo to s3
           uploadPromises.push(uploadPhoto(photoFile));
         }
-        Promise.all(uploadPromises).then((newFileName) => {
-          console.log("All images uploaded successfully.", newFileName); // 'fileNames' contain an array of successfully uploaded file names
-          // add photo to database
-          Axios.post(`${deploy_api_url}/api/artworks/${artworkId}/addPhoto`, {
-            photo_name: photoName,
-            description: photoDescription,
-            file_url: `https://${config.bucketName}.s3.${config.region}.amazonaws.com/artwork/${newFileName}`,
-            upload_time: new Date(),
-            modify_time: new Date(),
-          })
-            .then((response) => {
-              console.log(response.data);
-              setPhotoFile(null);
-              // reload the page
-              window.location.href = `/details/${artworkId}`;
+        Promise.all(uploadPromises)
+          .then((newFileName) => {
+            console.log("All images uploaded successfully.", newFileName); // 'fileNames' contain an array of successfully uploaded file names
+            // add photo to database
+            Axios.post(`http://localhost:3001/api/artworks/${artworkId}/addPhoto`, {
+              photo_name: photoName,
+              description: photoDescription,
+              file_url: `https://${config.bucketName}.s3.${config.region}.amazonaws.com/artwork/${newFileName}`,
+              upload_time: new Date(),
+              modify_time: new Date()
             })
-            .catch((error) => {
-              console.error("Error adding photo:", error);
-            });
-        });
+              .then((response) => {
+                console.log(response.data);
+                setPhotoFile(null);
+                setIsUpdateButtonDisabled(false);
+                setIsCancelButtonDisabled(false);
+                setIsAddButtonDisabled(false);
+                setIsDeleteButtonDisabled(false);
+                setIsEditButtonDisabled(false);
+                openAddSuccessModal();
+              })
+              .catch((error) => {
+                console.error("Error adding photo:", error);
+              });
+          })
+          .catch((uploadErrors) => {
+            console.error("Error uploading images:", uploadErrors);
+          });
+      })
+      .catch((validationErrors) => {
+        console.error("Validation errors:", validationErrors);
+        // openValidationErrorModal(validationErrors);
+        // clear content in the input box
+        setPhotoName("");
+        setPhotoDescription("");
+        setPhotoFile(null);
       });
+  }
+
+  const [showAddSuccessModal, setShowAddSuccessModal] = useState(false);
+  const openAddSuccessModal = () => {
+    setShowAddSuccessModal(true);
   };
+  const closeAddSuccessModal = () => {
+    setShowAddSuccessModal(false);
+    window.location.href = `/details/${artworkId}`;
+  };
+
   const [showImgSizeLimitModal, setShowImgSizeLimitModal] = useState(false);
   const openImgSizeLimitModal = () => {
     setShowImgSizeLimitModal(true);
@@ -239,6 +280,8 @@ function ArtworkDetailsComponent({ artworkId }) {
   };
 
   const updatePhoto = (photoToUpdate) => {
+    setIsUpdateButtonDisabled(true);
+    setIsCancelButtonDisabled(true);
     validationSchema
       .validate({ photoName, photoDescription }, { abortEarly: false })
       .then(() => {
@@ -280,24 +323,25 @@ function ArtworkDetailsComponent({ artworkId }) {
           .then((newFileName) => {
             console.log("All images uploaded successfully.", newFileName); // 'fileNames' contain an array of successfully uploaded file names
             // patch photo
-            Axios.patch(
-              `${deploy_api_url}/api/artworks/${artworkId}/editPhoto/${photoToUpdate._id}`,
-              {
-                // newPhoto
-                photo_name: photoName,
-                description: photoDescription,
-                file_url: !changePhoto
-                  ? photoToUpdate.file_url
-                  : `https://${config.bucketName}.s3.${config.region}.amazonaws.com/artwork/${newFileName[0]}`,
-                upload_time: photoToUpdate.upload_time,
-                modify_time: new Date(),
-              }
-            )
+            Axios.patch(`http://localhost:3001/api/artworks/${artworkId}/editPhoto/${photoToUpdate._id}`, {
+              // newPhoto
+              photo_name: photoName,
+              description: photoDescription,
+              file_url: !changePhoto ? photoToUpdate.file_url : `https://${config.bucketName}.s3.${config.region}.amazonaws.com/artwork/${newFileName[0]}`,
+              upload_time: photoToUpdate.upload_time,
+              modify_time: new Date()
+            })
               .then((response) => {
                 console.log(response.data);
                 setPhotoFile(null);
+                setIsEditButtonDisabled(false);
+                setIsAddButtonDisabled(false);
+                setIsDeleteButtonDisabled(false);
+                setIsCancelButtonDisabled(false);
+                setIsUpdateButtonDisabled(false);
+                openUpdateSuccessModal();
                 // reload the page
-                window.location.href = `/details/${artworkId}`;
+
               })
               .catch((error) => {
                 console.error("Error updating photo:", error);
@@ -310,6 +354,15 @@ function ArtworkDetailsComponent({ artworkId }) {
       .catch((validationErrors) => {
         console.error("Validation errors:", validationErrors);
       });
+  };
+
+  const [showUpdateSuccessModal, setShowUpdateSuccessModal] = useState(false);
+  const openUpdateSuccessModal = () => {
+    setShowUpdateSuccessModal(true);
+  };
+  const closeUpdateSuccessModal = () => {
+    setShowUpdateSuccessModal(false);
+    window.location.href = `/details/${artworkId}`;
   };
 
   const validationSchema = Yup.object().shape({
@@ -328,6 +381,14 @@ function ArtworkDetailsComponent({ artworkId }) {
       .required("Description is required"),
   });
 
+  // button control
+  const [isDownloadButtonDisabled, setIsDownloadButtonDisabled] = useState(false);
+  const [isEditButtonDisabled, setIsEditButtonDisabled] = useState(false);
+  const [isDeleteButtonDisabled, setIsDeleteButtonDisabled] = useState(false);
+  const [isAddButtonDisabled, setIsAddButtonDisabled] = useState(false);
+  const [isUpdateButtonDisabled, setIsUpdateButtonDisabled] = useState(false);
+  const [isCancelButtonDisabled, setIsCancelButtonDisabled] = useState(false);
+
   return (
     <>
       <Modal
@@ -335,8 +396,7 @@ function ArtworkDetailsComponent({ artworkId }) {
         content="You cannot delete the last photo in the artwork!"
         onClick={closeLastPhotoModal}
         isOpen={showLastPhotoModal}
-        onClose={closeLastPhotoModal}
-        alert={false}
+        confirm={false}
       />
 
       <Modal
@@ -344,8 +404,43 @@ function ArtworkDetailsComponent({ artworkId }) {
         content="Please select a file less than 5MB!"
         onClick={closeImgSizeLimitModal}
         isOpen={showImgSizeLimitModal}
-        onClose={closeImgSizeLimitModal}
-        alert={false}
+        confirm={false}
+      />
+
+      <Modal
+        title="Confirm"
+        content="Are you sure you want to delete this photo?"
+        onClick={closeDeleteConfirmModal}
+        isOpen={showDeleteConfirmModal}
+        proceed={() => {
+          deletePhoto(photoToDelete);
+          closeDeleteConfirmModal();
+        }}
+        confirm={true}
+      />
+
+      <Modal
+        title="Complete"
+        content="Photo deleted successfully!"
+        onClick={closeDeleteSuccessModal}
+        isOpen={showDeleteSuccessModal}
+        confirm={false}
+      />
+
+      <Modal
+        title="Complete"
+        content="Photo added successfully!"
+        onClick={closeAddSuccessModal}
+        isOpen={showAddSuccessModal}
+        confirm={false}
+      />
+
+      <Modal
+        title="Complete"
+        content="Photo updated successfully!"
+        onClick={closeUpdateSuccessModal}
+        isOpen={showUpdateSuccessModal}
+        confirm={false}
       />
 
       <div className="mainInfo m-5 p-3">
@@ -353,7 +448,7 @@ function ArtworkDetailsComponent({ artworkId }) {
         <div className="text-2xl p-3">{artworkToUpdate.description}</div>
         <div className="p-1 flex">
           {artworkToUpdate.tags == undefined ||
-          artworkToUpdate.tags.length == 0 ? (
+            artworkToUpdate.tags.length == 0 ? (
             <></>
           ) : (
             artworkToUpdate.tags.map((tag, tagIndex) => {
@@ -372,10 +467,10 @@ function ArtworkDetailsComponent({ artworkId }) {
         </div>
       </div>
 
-      <div className="photos  m-5 p-3 flex">
+      <div className="photos  m-5 p-3 flex capitalize">
         <div className="flex flex-wrap justify-center">
           {artworkToUpdate.photos == undefined ||
-          artworkToUpdate.photos.length == 0 ? (
+            artworkToUpdate.photos.length == 0 ? (
             <></>
           ) : (
             <>
@@ -403,14 +498,8 @@ function ArtworkDetailsComponent({ artworkId }) {
                             className="flex justify-center"
                           >
                             <button className="border-2 items-center p-1">
-                              <svg
-                                xmlns="http://www.w3.org/2000/svg"
-                                fill="none"
-                                viewBox="0 0 24 24"
-                                strokeWidth={2}
-                                stroke="currentColor"
-                                className="w-6 h-6"
-                              >
+                              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke={isDownloadButtonDisabled ? 'gray' : 'currentColor'} className="w-6 h-6">
+
                                 <path
                                   strokeLinecap="round"
                                   strokeLinejoin="round"
@@ -429,15 +518,10 @@ function ArtworkDetailsComponent({ artworkId }) {
                           <button
                             className="border-2 items-center p-1"
                             onClick={() => handleEditBox(photo, true)}
+                            disabled={isEditButtonDisabled}
                           >
-                            <svg
-                              xmlns="http://www.w3.org/2000/svg"
-                              fill="none"
-                              viewBox="0 0 24 24"
-                              strokeWidth={1.5}
-                              stroke="currentColor"
-                              className="w-6 h-6"
-                            >
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke={isEditButtonDisabled ? 'gray' : 'currentColor'} className="w-6 h-6">
+
                               <path
                                 strokeLinecap="round"
                                 strokeLinejoin="round"
@@ -447,16 +531,20 @@ function ArtworkDetailsComponent({ artworkId }) {
                           </button>
                           <button
                             className="items-center border-2 p-1"
-                            onClick={() => deletePhoto(photo)}
+                            onClick={() => {
+                              if (artworkToUpdate.photos.length == 1) {
+                                openLastPhotoModal();
+                              }
+                              else {
+                                setPhotoToDelete(photo);
+                                openDeleteConfirmModal();
+                              }
+                              setIsEditButtonDisabled(false)
+                            }}
+                            disabled={isDeleteButtonDisabled}
                           >
-                            <svg
-                              xmlns="http://www.w3.org/2000/svg"
-                              fill="none"
-                              viewBox="0 0 24 24"
-                              strokeWidth={1.5}
-                              stroke="currentColor"
-                              className="w-6 h-6"
-                            >
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke={isDeleteButtonDisabled ? 'gray' : 'currentColor'} className="w-6 h-6">
+
                               <path
                                 strokeLinecap="round"
                                 strokeLinejoin="round"
@@ -503,98 +591,163 @@ function ArtworkDetailsComponent({ artworkId }) {
                 <div className="text-2xl font-bold subpixel-antialiased capitalize">
                   add photo
                 </div>
-              </button>
+                {/* only author can add photo */}
+                {author_id !== userId ? (<></>) : (<>
+                  <div className='addPhotoBtn flex flex-wrap justify-center pt-3 m-5 p-5'>
+                    <button className="border-4 w-60 h-60 m-auto flex flex-col justify-center items-center rounded-full" onClick={() => { handleEditBox(false) }} disabled={isAddButtonDisabled}>
+                      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke={isAddButtonDisabled ? 'gray' : 'currentColor'} className="w-20 h-20">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M12 10.5v6m3-3H9m4.06-7.19l-2.12-2.12a1.5 1.5 0 00-1.061-.44H4.5A2.25 2.25 0 002.25 6v12a2.25 2.25 0 002.25 2.25h15A2.25 2.25 0 0021.75 18V9a2.25 2.25 0 00-2.25-2.25h-5.379a1.5 1.5 0 01-1.06-.44z" />
+                      </svg>
+                      <div className="text-2xl font-bold subpixel-antialiased capitalize">add photo</div>
+                    </button>
+                  </div></>)}
             </div>
-          </>
-        )}
-      </div>
 
-      {!showEdit ? (
-        <></>
-      ) : (
-        <div className="editBox mb-2">
-          <div className="text-2xl font-semibold capitalize text-center">
-            {isAdd ? <>Add photo</> : <>Edit Photo</>}
-          </div>
-          <div className="flex justify-center items-center">
-            <div className="editForm border-2 m-5 p-3">
-              <div className="mb-4 p-3 pt-0">
-                <label
-                  htmlFor="formPhotoName"
-                  className="block font-medium mb-2"
-                >
-                  photo Name:
-                </label>
-                <input
-                  type="text"
-                  id="formPhotoName"
-                  name="photoName"
-                  className="block w-full border border-gray-300 rounded p-2"
-                  defaultValue={isAdd ? "" : photoToUpdate.photo_name}
-                  onChange={(e) => setPhotoName(e.target.value)}
-                />
-                <p className="text-gray-500 text-sm">
-                  Required, 10-50 Characters, Only Letters Or Spaces.
-                </p>
-              </div>
-              <div className="mb-4 p-3">
-                <label
-                  htmlFor="formPhotoDes"
-                  className="block font-medium mb-2"
-                >
-                  photo Description:
-                </label>
-                <input
-                  type="text"
-                  id="formPhotoDes"
-                  name="photoDes"
-                  className="block w-full border border-gray-300 rounded p-2"
-                  defaultValue={isAdd ? "" : photoToUpdate.description}
-                  onChange={(e) => setPhotoDescription(e.target.value)}
-                />
-                <p className="text-gray-500 text-sm">
-                  Required, 50-100 Characters.
-                </p>
-              </div>
-              <div className="mb-4 p-3">
-                <label htmlFor="formUploadPhoto" className="block font-medium">
-                  Upload Image:
-                </label>
-                <input
-                  type="file"
-                  id="formUploadPhoto"
-                  name="uploadPhoto"
-                  accept=".jpg, .png, .jpeg"
-                  className="block w-full border border-gray-300 rounded p-2"
-                  onChange={(e) => setPhotoFile(e.target.files[0])}
-                />
-                <p className="text-gray-500 text-sm">
-                  Required, Image Format Should Be JPG Or PNG.
-                </p>
-              </div>
-              <div className="flex items-center mt-4 font-bold justify-center">
-                <button
-                  className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 mr-4"
-                  variant="warning"
-                  onClick={() => {
-                    isAdd ? addPhoto() : updatePhoto(photoToUpdate);
-                  }}
-                >
-                  {isAdd ? <>Save</> : <>Update</>}
-                </button>
+            {!showEdit ? (
+              <></>
+            ) : (
+              <div className="editBox mb-2">
+                <div className="text-2xl font-semibold capitalize text-center">
+                  {isAdd ? <>Add photo</> : <>Edit Photo</>}
+                </div>
+                <div className="flex justify-center items-center">
+                  <div className="editForm border-2 m-5 p-3">
+                    <div className="mb-4 p-3 pt-0">
+                      <label
+                        htmlFor="formPhotoName"
+                        className="block font-medium mb-2"
+                      >
+                        photo Name:
+                      </label>
+                      <input
+                        type="text"
+                        id="formPhotoName"
+                        name="photoName"
+                        className="block w-full border border-gray-300 rounded p-2"
+                        defaultValue={isAdd ? "" : photoToUpdate.photo_name}
+                        onChange={(e) => setPhotoName(e.target.value)}
+                      />
+                      <p className="text-gray-500 text-sm">
+                        Required, 10-50 Characters, Only Letters Or Spaces.
+                      </p>
+                    </div>
+                    <div className="mb-4 p-3">
+                      <label
+                        htmlFor="formPhotoDes"
+                        className="block font-medium mb-2"
+                      >
+                        photo Description:
+                      </label>
+                      <input
+                        type="text"
+                        id="formPhotoDes"
+                        name="photoDes"
+                        className="block w-full border border-gray-300 rounded p-2"
+                        defaultValue={isAdd ? "" : photoToUpdate.description}
+                        onChange={(e) => setPhotoDescription(e.target.value)}
+                      />
+                      <p className="text-gray-500 text-sm">
+                        Required, 50-100 Characters.
+                      </p>
+                    </div>
+                    <div className="mb-4 p-3">
+                      <label htmlFor="formUploadPhoto" className="block font-medium">
+                        Upload Image:
+                      </label>
+                      <input
+                        type="file"
+                        id="formUploadPhoto"
+                        name="uploadPhoto"
+                        accept=".jpg, .png, .jpeg"
+                        className="block w-full border border-gray-300 rounded p-2"
+                        onChange={(e) => setPhotoFile(e.target.files[0])}
+                      />
+                      <p className="text-gray-500 text-sm">
+                        Required, Image Format Should Be JPG Or PNG.
+                      </p>
+                    </div>
+                    <div className="flex items-center mt-4 font-bold justify-center">
+                      <button
+                        className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 mr-4"
+                        variant="warning"
+                        onClick={() => {
+                          isAdd ? addPhoto() : updatePhoto(photoToUpdate);
+                        }}
+                      >
+                        {isAdd ? <>Save</> : <>Update</>}
+                      </button>
+                      {!showEdit ? (<></>) : (
+                        <div className='editBox mb-2'>
+                          <div className="text-2xl font-semibold capitalize text-center">{isAdd ? (<>Add photo</>) : (<>Edit Photo</>)}</div>
+                          <div className="flex justify-center items-center">
+                            <div className='editForm border-2 m-5 p-3'>
+                              <div className="mb-4 p-3 pt-0">
+                                <label htmlFor="formPhotoName" className="block font-medium mb-2">photo Name:</label>
+                                <input
+                                  type="text"
+                                  id="formPhotoName"
+                                  name="photoName"
+                                  className="block w-full border border-gray-300 rounded p-2"
+                                  defaultValue={isAdd ? '' : photoToUpdate.photo_name}
+                                  onChange={(e) => setPhotoName(e.target.value)}
+                                />
+                                <p className="text-gray-500 text-sm">Required, 10-50 Characters, Only Letters Or Spaces.
+                                </p>
+                              </div>
+                              <div className="mb-4 p-3">
+                                <label htmlFor="formPhotoDes" className="block font-medium mb-2">photo Description:</label>
+                                <input
+                                  type="text"
+                                  id="formPhotoDes"
+                                  name="photoDes"
+                                  className="block w-full border border-gray-300 rounded p-2"
+                                  defaultValue={isAdd ? '' : photoToUpdate.description}
+                                  onChange={(e) => setPhotoDescription(e.target.value)}
+                                />
+                                <p className="text-gray-500 text-sm">Required, 50-100 Characters.</p>
+                              </div>
+                              <div className="mb-4 p-3">
+                                <label htmlFor="formUploadPhoto" className="block font-medium">Upload Image:</label>
+                                <input
+                                  type="file"
+                                  id="formUploadPhoto"
+                                  name="uploadPhoto"
+                                  accept=".jpg, .png, .jpeg"
+                                  className="block w-full border border-gray-300 rounded p-2"
+                                  onChange={(e) => setPhotoFile(e.target.files[0])}
 
-                <button
-                  className="bg-yellow-500 text-white px-4 py-2 rounded-lg hover:bg-yellow-600"
-                  variant="warning"
-                  onClick={() => setShowEdit(!showEdit)}
-                >
-                  Cancel
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-    </>
-  );
+                                />
+                                <p className="text-gray-500 text-sm">Required, Image Format Should Be JPG Or PNG.</p>
+                              </div>
+                              <div className="flex items-center mt-4 font-bold justify-center">
+                                <button
+                                  className={`text-white px-4 py-2 rounded-lg hover:bg-blue-600 mr-4 ${isUpdateButtonDisabled ? 'bg-gray-500' : 'bg-blue-500'}`}
+                                  variant="warning"
+                                  onClick={() => { isAdd ? (addPhoto()) : (updatePhoto(photoToUpdate)) }}
+                                  disabled={isUpdateButtonDisabled}
+                                >
+                                  {isAdd ? (<>Save</>) : (<>Update</>)}
+                                </button>
+
+                                <button
+                                  className={`text-white px-4 py-2 rounded-lg hover:bg-yellow-600 mr-4 ${isCancelButtonDisabled ? 'bg-gray-500' : 'bg-yellow-500 '}`}
+                                  variant="warning"
+                                  onClick={() => {
+                                    setShowEdit(!showEdit)
+                                    setIsEditButtonDisabled(false)
+                                    setIsDeleteButtonDisabled(false)
+                                    setIsAddButtonDisabled(false)
+                                    setIsAddButtonDisabled(false)
+                                  }}
+                                  disabled={isCancelButtonDisabled}
+                                >
+                                  Cancel
+                                </button>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      )}
+                    </>
+                    );
 }

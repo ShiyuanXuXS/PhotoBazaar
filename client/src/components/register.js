@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import Axios from "axios";
 import * as Yup from "yup";
 import { deploy_api_url } from "../Config"; //the api base url
+import { useNavigate } from "react-router-dom";
 
 function SignupComponent() {
   const [username, setUserName] = useState("");
@@ -12,6 +13,8 @@ function SignupComponent() {
   const [emailExists, setEmailExists] = useState([]);
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
+  const Navigate = useNavigate("");
+
   // useEffect(() => {
   //   Axios.get("http://localhost:3001/api/users")
   //     .then((response) => {
@@ -85,11 +88,13 @@ function SignupComponent() {
         })
           .then((response) => {
             // Handle the response if needed
-            console.log("response data:" + response.data);
+            setMessage("User created");
+            Navigate("/Login");
           })
           .catch((error) => {
-            // Handle errors
-            setError(error.response.data.message);
+            console.log("inside register error");
+            const { message: resMessage } = error.response.data;
+            setError(resMessage);
           });
       })
       .catch((validationErrors) => {

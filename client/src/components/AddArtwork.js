@@ -132,7 +132,7 @@ function AddArtworkComponent({ isAdd, artwork_id }) {
         });
     }
     // get all the tags
-    Axios.get("http://localhost:3001/api/tags")
+    Axios.get(`${deploy_api_url}/api/tags`)
       .then((response) => {
         setTagList(response.data);
       })
@@ -245,7 +245,7 @@ function AddArtworkComponent({ isAdd, artwork_id }) {
             }
 
             // save artwork to database
-            Axios.post("http://localhost:3001/api/artworks", {
+            Axios.post(`${deploy_api_url}/api/artworks`, {
               author_id: user.id,
               title: title,
               description: description,

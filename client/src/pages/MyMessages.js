@@ -21,7 +21,7 @@ function Message() {
     }, [])
     useEffect(() => {
 
-        const newSocket = io.connect('http://localhost:3001');
+        const newSocket = io.connect(`${deploy_api_url});
         newSocket.on('connect', () => {
             newSocket.emit('user_info', { username: currentUser })
             console.log(currentUser + ' Connected to server');

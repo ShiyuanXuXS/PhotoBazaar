@@ -169,7 +169,7 @@ function ProfileComponent() {
     return uploadPromise;
   };
 
-  // save new artwork to database
+  // save new profile icon to database
   const saveProfileicon = (event) => {
     event.preventDefault();
     if (user.avatar != undefined) {
@@ -215,6 +215,7 @@ function ProfileComponent() {
           .then((response) => {
             console.log(response);
             setMessage("Profile icon updated successfully!");
+            window.location.reload();
           })
           .catch((error) => {
             console.error(error);

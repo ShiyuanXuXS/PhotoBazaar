@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 import * as Yup from "yup";
-import { deploy_api_url } from "../Config"; //the api base url
 
 export default UploadImagesBoxComponent;
 

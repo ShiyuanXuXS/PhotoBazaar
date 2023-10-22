@@ -298,7 +298,7 @@ function ArtworkListComponent({ userId, page, option, searchKey }) {
                 });
                 Promise.all(deleteFilesPromises).then(() => {
                     // delete artwork from db
-                    Axios.delete(`http://localhost:3001/api/artworks/${artwork._id}`)
+                    Axios.delete(`${deploy_api_url}/api/artworks/${artwork._id}`)
                         .then((response) => {
                             console.log(response.data);
                             openDeleteSuccessfullyModal();

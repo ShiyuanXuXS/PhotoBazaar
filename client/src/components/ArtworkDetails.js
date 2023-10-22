@@ -152,7 +152,7 @@ function ArtworkDetailsComponent({ artworkId }) {
 
   const deletePhoto = (photo) => {
     // delete the photo from database
-    Axios.delete(`http://localhost:3001/api/artworks/${artworkId}/deletePhoto/${photo._id}`)
+    Axios.delete(`${deploy_api_url}/api/artworks/${artworkId}/deletePhoto/${photo._id}`)
       .then((response) => {
         console.log(response.data);
         deleteFromS3(photo);
@@ -227,7 +227,7 @@ function ArtworkDetailsComponent({ artworkId }) {
           .then((newFileName) => {
             console.log("All images uploaded successfully.", newFileName); // 'fileNames' contain an array of successfully uploaded file names
             // add photo to database
-            Axios.post(`http://localhost:3001/api/artworks/${artworkId}/addPhoto`, {
+            Axios.post(`${deploy_api_url}/api/artworks/${artworkId}/addPhoto`, {
               photo_name: photoName,
               description: photoDescription,
               file_url: `https://${config.bucketName}.s3.${config.region}.amazonaws.com/artwork/${newFileName}`,
@@ -323,7 +323,7 @@ function ArtworkDetailsComponent({ artworkId }) {
           .then((newFileName) => {
             console.log("All images uploaded successfully.", newFileName); // 'fileNames' contain an array of successfully uploaded file names
             // patch photo
-            Axios.patch(`http://localhost:3001/api/artworks/${artworkId}/editPhoto/${photoToUpdate._id}`, {
+            Axios.patch(`${deploy_api_url}/api/artworks/${artworkId}/editPhoto/${photoToUpdate._id}`, {
               // newPhoto
               photo_name: photoName,
               description: photoDescription,

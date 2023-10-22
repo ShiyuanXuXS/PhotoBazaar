@@ -24,7 +24,6 @@ function ForgotpasswordComponent() {
     })
       .then((response) => {
         if (response.data.error) {
-          // alert("fff"); // Display the error message
           alert(response.data.error);
         } else {
           alert(response.data.message); // Display success message or token

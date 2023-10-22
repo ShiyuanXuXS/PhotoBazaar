@@ -20,9 +20,7 @@ module.exports = {
       console.log("insede find all user control" + users);
     } catch (error) {
       console.log(error);
-      res
-        .status(500)
-        .json({ message: "User Controllers: Internal Server Error" });
+      res.status(500).json({ message: "Internal Server Error" });
     }
   },
 
@@ -35,7 +33,7 @@ module.exports = {
           res.send(result).status(200);
         } else {
           res.status(404).send({
-            message: "error from user controller: No such user found",
+            message: "No such user found",
           });
         }
       })
@@ -56,7 +54,7 @@ module.exports = {
           res.send(result).status(200);
         } else {
           res.status(404).send({
-            message: "error from user controller: No such user found",
+            message: "No such user found",
           });
         }
       })
@@ -245,9 +243,12 @@ module.exports = {
       // find if user email exists
       const existingUser = await User.findOne({ email: user.email });
       if (!existingUser) {
-        return res
-          .status(400)
-          .json({ message: `User email ${user.email} doesn't exists.` });
+        return (
+          res
+            .status(400)
+            // .json({ message: `User email ${user.email} doesn't exists.` });
+            .json({ message: `Wrong Username or password.` })
+        );
       }
 
       // compare the password

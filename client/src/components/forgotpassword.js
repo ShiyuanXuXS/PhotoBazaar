@@ -27,13 +27,13 @@ function ForgotpasswordComponent() {
           alert(response.data.error);
         } else {
           const { message: resMessage } = error.response.data;
-          setError(resMessage);
-          alert(response.data.message); // Display success message or token
+          setMessage(resMessage);
+          // alert(response.data.message); // Display success message or token
         }
       })
       .catch((error) => {
         const { message: resMessage } = error.response.data;
-        setMessage(resMessage);
+        setError(resMessage);
       });
   };
 

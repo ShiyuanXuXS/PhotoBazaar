@@ -3,6 +3,7 @@ import Axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../Helpers/AuthContext";
 // const { sign, verify } = require("jsonwebtoken");
+import { deploy_api_url } from "../Config"; //the api base url
 
 function ForgotpasswordComponent() {
   const navigate = useNavigate("");
@@ -18,7 +19,7 @@ function ForgotpasswordComponent() {
   const submitHandler = async (e) => {
     e.preventDefault();
 
-    Axios.post("http://localhost:3001/api/users/forgotpassword", {
+    Axios.post(`${deploy_api_url}/api/users/forgotpassword`, {
       forgotemail: forgotemail,
     })
       .then((response) => {

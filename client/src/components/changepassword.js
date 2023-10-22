@@ -2,6 +2,7 @@ import React, { useContext, useEffect, useState } from "react";
 import Axios from "axios";
 import { useNavigate, useParams } from "react-router-dom";
 import { AuthContext } from "../Helpers/AuthContext";
+import { deploy_api_url } from "../Config"; //the api base url
 
 function ChangepasswordComponent() {
   const navigate = useNavigate("");
@@ -19,7 +20,7 @@ function ChangepasswordComponent() {
 
   const submitHandler = async (e) => {
     e.preventDefault();
-    Axios.put(`http://localhost:3001/api/users/changepassword/${email}`, {
+    Axios.put(`${deploy_api_url}/api/users/changepassword/${email}`, {
       password,
       confirmPassword,
     })

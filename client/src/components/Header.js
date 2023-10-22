@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Transition } from "@headlessui/react";
 import axios from "axios";
+import { deploy_api_url } from "../Config"; //the api base url
 
 function HeaderComponent() {
   const url = process.env.REACT_APP_API_URL;
@@ -15,7 +16,7 @@ function HeaderComponent() {
   useEffect(() => {
     if (token) {
       axios
-        .get(`http://localhost:3001/api/users/auth`, {
+        .get(`${deploy_api_url}/api/users/auth`, {
           headers: { accessToken: token },
         })
         .then((response) => {
@@ -25,18 +26,18 @@ function HeaderComponent() {
         })
         .catch(() => {
           localStorage.removeItem("accessToken");
-          setToken(null)
+          setToken(null);
         });
-    }else{
-      setUser(null)
+    } else {
+      setUser(null);
     }
   }, [token]);
 
   const handleLogout = () => {
-    localStorage.removeItem('accessToken');
+    localStorage.removeItem("accessToken");
     setUser(null);
     setToken(null);
-    Navigate('/login')
+    Navigate("/login");
     // Navigate("/");
   };
 
@@ -47,10 +48,10 @@ function HeaderComponent() {
         setIsOpen(false);
       }
     }
-    document.addEventListener('mousedown', handleClickOutside);
+    document.addEventListener("mousedown", handleClickOutside);
 
     return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener("mousedown", handleClickOutside);
     };
   }, []);
 

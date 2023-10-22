@@ -3,6 +3,7 @@ import axios from "axios";
 import { useNavigate, useParams } from "react-router-dom";
 import { AuthContext } from "../Helpers/AuthContext";
 import { Transition } from "@headlessui/react";
+import { deploy_api_url } from "../Config"; //the api base url
 
 function AdmincenterCompoment() {
   // the id of admin
@@ -32,19 +33,17 @@ function AdmincenterCompoment() {
 
   useEffect(() => {
     //fetch current user information
-    axios
-      .get(`http://localhost:3001/api/users/userProfile/${id}`)
-      .then((res) => {
-        setUser(res.data.user);
-        if (res.data.user.role == "admin") {
-          axios.get("http://localhost:3001/api/users").then((response) => {
-            setUserList(response.data);
-          });
-        }
-      });
+    axios.get(`${deploy_api_url}/api/users/userProfile/${id}`).then((res) => {
+      setUser(res.data.user);
+      if (res.data.user.role == "admin") {
+        axios.get(`{deploy_api_url}/api/users`).then((response) => {
+          setUserList(response.data);
+        });
+      }
+    });
     //fetch artwork list
     axios
-      .get("http://localhost:3001/api/artworks")
+      .get(`{deploy_api_url}/api/artworks`)
       .then((response) => {
         setArtworkList(response.data);
       })
@@ -54,7 +53,7 @@ function AdmincenterCompoment() {
 
     // Fetch the tag list
     axios
-      .get("http://localhost:3001/api/tags")
+      .get(`{deploy_api_url}/api/tags`)
       .then((response) => {
         setTagList(response.data);
       })
@@ -68,9 +67,9 @@ function AdmincenterCompoment() {
     event.preventDefault();
     let requestUrl = "";
     if (disableorenable == "disable") {
-      requestUrl = `http://localhost:3001/api/users/disableuser/${email}`;
+      requestUrl = `${deploy_api_url}/api/users/disableuser/${email}`;
     } else {
-      requestUrl = `http://localhost:3001/api/users/enable/${email}`;
+      requestUrl = `${deploy_api_url}/api/users/enable/${email}`;
     }
     axios
       .get(requestUrl)
@@ -94,7 +93,7 @@ function AdmincenterCompoment() {
   const deleteArtworkById = (event, artworkid) => {
     event.preventDefault();
     axios
-      .delete(`http://localhost:3001/api/artworks/${artworkid}`)
+      .delete(`${deploy_api_url}/api/artworks/${artworkid}`)
       .then((response) => {
         window.location.reload();
         const { message: resMessage } = response.data;
@@ -109,7 +108,7 @@ function AdmincenterCompoment() {
   const deleteTagById = (event, tagid) => {
     event.preventDefault();
     axios
-      .delete(`http://localhost:3001/api/tags/${tagid}`)
+      .delete(`${deploy_api_url}/api/tags/${tagid}`)
       .then((response) => {
         window.location.reload();
 
@@ -124,7 +123,7 @@ function AdmincenterCompoment() {
   const updateTagById = (event, tagid) => {
     event.preventDefault();
     axios
-      .put(`http://localhost:3001/api/tags/${tagid}`)
+      .put(`${deploy_api_url}/api/tags/${tagid}`)
       .then((response) => {
         window.location.reload();
         const { message: resMessage } = response.data;
@@ -139,7 +138,7 @@ function AdmincenterCompoment() {
   const addTag = (event) => {
     event.preventDefault();
     axios
-      .post("http://localhost:3001/api/tags", {
+      .post(`{deploy_api_url}/api/tags`, {
         tag,
       })
       .then((response) => {

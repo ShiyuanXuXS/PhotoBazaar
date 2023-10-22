@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import Axios from "axios";
 import * as Yup from "yup";
+import { deploy_api_url } from "../Config"; //the api base url
 
 function SignupComponent() {
   const [username, setUserName] = useState("");
@@ -75,7 +76,7 @@ function SignupComponent() {
         { abortEarly: false } // Collect all validation errors, not just the first one
       )
       .then(() => {
-        Axios.post("http://localhost:3001/api/users", {
+        Axios.post(`${deploy_api_url}/api/users`, {
           username,
           password,
           email,

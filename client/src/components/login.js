@@ -2,13 +2,12 @@ import React, { useContext, useEffect, useState } from "react";
 import Axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../Helpers/AuthContext";
-// import ForgotPassword from "../pages/ForgotPassword";
+import { deploy_api_url } from "../Config"; //the api base url
 
 function LoginComponent() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const { setLoginStatus, setRole, setUserId } = useContext(AuthContext);
-  const { loginStatus, role, userId } = useContext(AuthContext);
   const Navigate = useNavigate("");
   const navigateToForgot = () => {
     Navigate("/forgotpassword");
@@ -17,16 +16,10 @@ function LoginComponent() {
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
 
-  // useEffect(() => {
-  //   //fixme:
-  //   if (loginStatus) Navigate("/");
-  //   else Navigate("/login");
-  //   // if (loginStatus) Navigate("/");
-  // });
   //user login
   const authUser = (e) => {
     e.preventDefault();
-    Axios.post("http://localhost:3001/api/users/auth", {
+    Axios.post(`${deploy_api_url}/api/users/auth`, {
       email,
       password,
     })
@@ -41,8 +34,6 @@ function LoginComponent() {
           localStorage.setItem("user", response.data.user);
           console.log("inside login:" + localStorage.getItem("user"));
 
-          // setUserEmail(response.data.email);
-          // setUsername(response.data.username);
           setUserId(response.data._id);
           setRole(response.data.role);
           setLoginStatus(true);
@@ -91,7 +82,6 @@ function LoginComponent() {
         >
           Login
         </button>
-        {/* forgot password */}
       </form>
       {/* fix me: change to link text */}
       <button onClick={navigateToForgot} className="mb-3">

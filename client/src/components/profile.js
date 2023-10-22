@@ -3,6 +3,8 @@ import { Link, useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
 import { AuthContext } from "../Helpers/AuthContext";
 import UploadImagesBoxComponent from "./UploadImagesBox";
+import { deploy_api_url } from "../Config"; //the api base url
+
 import {
   S3Client,
   DeleteObjectCommand,
@@ -19,6 +21,7 @@ const config = {
   },
 };
 const client = new S3Client(config);
+
 function ProfileComponent() {
   let { id } = useParams();
   const Navigate = useNavigate();
@@ -40,20 +43,18 @@ function ProfileComponent() {
   console.log(uploadImg);
 
   useEffect(() => {
-    axios
-      .get(`http://localhost:3001/api/users/userProfile/${id}`)
-      .then((res) => {
-        setUser(res.data.user);
-        if (res.data.user.role == "admin") {
-          setadminBoolean(true);
-          console.log("user role is admin");
-          axios.get("http://localhost:3001/api/users").then((response) => {
-            setUserList(response.data);
-            console.log("users list" + response.data[0].email);
-          });
-        }
-        console.log("profile basic infor res.data.user:" + res.data.user.email);
-      });
+    axios.get(`${deploy_api_url}/api/users/userProfile/${id}`).then((res) => {
+      setUser(res.data.user);
+      if (res.data.user.role == "admin") {
+        setadminBoolean(true);
+        console.log("user role is admin");
+        axios.get(`${deploy_api_url}/api/users`).then((response) => {
+          setUserList(response.data);
+          console.log("users list" + response.data[0].email);
+        });
+      }
+      console.log("profile basic infor res.data.user:" + res.data.user.email);
+    });
   }, [id]);
 
   // useEffect(() => {
@@ -67,7 +68,7 @@ function ProfileComponent() {
     event.preventDefault();
     console.log("inside edit user name function front end" + username);
     axios
-      .put(`http://localhost:3001/api/users/changeusername/${user.email}`, {
+      .put(`${deploy_api_url}/api/users/changeusername/${user.email}`, {
         username,
       })
       .then((response) => {
@@ -88,7 +89,7 @@ function ProfileComponent() {
   const updatePassword = (event) => {
     event.preventDefault();
     axios
-      .put(`http://localhost:3001/api/users/changepassword/${user.email}`, {
+      .put(`${deploy_api_url}/api/users/changepassword/${user.email}`, {
         password,
         confirmPassword,
       })
@@ -112,7 +113,7 @@ function ProfileComponent() {
     event.preventDefault();
     console.log("inside delete user function front end" + email);
     axios
-      .get(`http://localhost:3001/api/users/disableuser/${email}`)
+      .get(`${deploy_api_url}/api/users/disableuser/${email}`)
       .then((response) => {
         if (response.data.error) {
           const { message: resMessage } = error.response.data;
@@ -208,7 +209,7 @@ function ProfileComponent() {
 
         //save artwork to database
         axios
-          .put(`http://localhost:3001/api/users/profile/${user.email}`, {
+          .put(`${deploy_api_url}/api/users/profile/${user.email}`, {
             avatar: `https://${config.bucketName}.s3.${config.region}.amazonaws.com/${config.dirName}/${newFileNames}`,
           })
           .then((response) => {

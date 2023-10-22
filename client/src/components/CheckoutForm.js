@@ -3,14 +3,15 @@ import {
   PaymentElement,
   LinkAuthenticationElement,
   useStripe,
-  useElements
+  useElements,
 } from "@stripe/react-stripe-js";
+import { deploy_api_url } from "../Config"; //the api base url
 
-export default function CheckoutForm({purchase_id}) {
+export default function CheckoutForm({ purchase_id }) {
   const stripe = useStripe();
   const elements = useElements();
 
-  const [email, setEmail] = useState('');
+  const [email, setEmail] = useState("");
   const [message, setMessage] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -58,7 +59,7 @@ export default function CheckoutForm({purchase_id}) {
       elements,
       confirmParams: {
         // todo: navigate to payment result page
-        return_url: process.env.REACT_APP_URL+`/payment_result/${purchase_id}`,
+        return_url: deploy_api_url + `/payment_result/${purchase_id}`,
       },
     });
 
@@ -77,24 +78,47 @@ export default function CheckoutForm({purchase_id}) {
   };
 
   const paymentElementOptions = {
-    layout: "tabs"
-  }
+    layout: "tabs",
+  };
 
   return (
-    <form id="payment-form" onSubmit={handleSubmit} className="max-w-md mx-auto bg-white p-6 rounded-lg shadow-lg">
+    <form
+      id="payment-form"
+      onSubmit={handleSubmit}
+      className="max-w-md mx-auto bg-white p-6 rounded-lg shadow-lg"
+    >
       <LinkAuthenticationElement
-              id="link-authentication-element"
-              onChange={(e) => setEmail(e.value.email)}
-              className="mb-4"
+        id="link-authentication-element"
+        onChange={(e) => setEmail(e.value.email)}
+        className="mb-4"
       />
-      <PaymentElement id="payment-element" options={paymentElementOptions} className="mb-4"/>
-      <button disabled={isLoading || !stripe || !elements} id="submit" className="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded">
+      <PaymentElement
+        id="payment-element"
+        options={paymentElementOptions}
+        className="mb-4"
+      />
+      <button
+        disabled={isLoading || !stripe || !elements}
+        id="submit"
+        className="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded"
+      >
         <span id="button-text" className="relative">
-          {isLoading ? <div className="spinner absolute inset-0 flex items-center justify-center" id="spinner"></div> : "Pay now"}
+          {isLoading ? (
+            <div
+              className="spinner absolute inset-0 flex items-center justify-center"
+              id="spinner"
+            ></div>
+          ) : (
+            "Pay now"
+          )}
         </span>
       </button>
       {/* Show any error or success messages */}
-      {message && <div id="payment-message" className="mt-4 text-red-500">{message}</div>}
+      {message && (
+        <div id="payment-message" className="mt-4 text-red-500">
+          {message}
+        </div>
+      )}
     </form>
   );
 }

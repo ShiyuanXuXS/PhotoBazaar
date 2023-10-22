@@ -58,7 +58,7 @@ export default function CheckoutForm({ purchase_id }) {
     const { error } = await stripe.confirmPayment({
       elements,
       confirmParams: {
-        // todo: navigate to payment result page
+        
         return_url: deploy_api_url + `/payment_result/${purchase_id}`,
       },
     });

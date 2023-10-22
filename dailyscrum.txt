@@ -208,6 +208,13 @@ Xiaoxing Pan
 - home page
 2. To do
 - search box, search logic, search page
+Shiyuan Xu
+1. Done
+- Cart payment and remove
+- Fix a bug of duplicate require caused by strict mode
+2. To do
+- Admin / Payment tracking
+
 
 2023/10/20
 Xiaoxing Pan
@@ -219,6 +226,12 @@ Xiaoxing Pan
 - search by tags postman self-test
 - pagination
 - change alert to modal
+Shiyuan Xu
+1. Done
+- Admin/ Payment tracking
+- Admin/ tags: search, pagination, add and modify
+2. Todo
+- Debugging
 
 
 

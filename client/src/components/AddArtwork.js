@@ -299,28 +299,6 @@ function AddArtworkComponent({ isAdd, artwork_id }) {
     //     setShowValidationErrorModal(false);
     // };
 
-    const validationSchema = Yup.object().shape({
-        title: Yup.string()
-            .min(1, "Title must be at least 10 Characters, Only Letters Or Spaces.")
-            .max(50, "Title must not exceed 50 characters.")
-            .matches(/^[a-zA-Z ]*$/, "Only letters and spaces are allowed")
-            .required("Title is required"),
-        description: Yup.string()
-            .min(5, "Description must be at least 5 characters")
-            .max(100, "Description must not exceed 100 characters")
-            .matches(
-                /^[a-zA-Z0-9 ./,_()-]*$/,
-                "Item name must only contain uppercase, lowercase, digits, spaces, and: ./,_()-"
-            )
-            .required("Description is required"),
-        price: Yup.number()
-            .min(0, "price must be equal or higher than 0")
-            .required("price is required")
-            .test("is-decimal", "Price must be a decimal number", (value) => {
-                if (value === undefined) return true; // Allow undefined values
-                return /^\d+(\.\d+)?$/.test(value);
-            }),
-    });
 
     const [isSaveBtnDisabled, setIsSaveBtnDisabled] = useState(false);
     const validationSchema = Yup.object().shape({
@@ -468,85 +446,65 @@ function AddArtworkComponent({ isAdd, artwork_id }) {
         window.location.href = `/artwork/${user.id}`;
     };
     return (
-        <Fragment>
-            <div className="editArtworkBox m-5 p-5 capitalize" id='editForm'>
 
+        <Fragment>
+            <div className="editArtworkBox m-5 p-5 capitalize" id="editForm">
                 <Modal
                     title="Image Limit Exceeded"
                     content="You can only upload 8 images!"
                     onClick={closeImageLimitModal}
                     isOpen={showImageLimitModal}
-                    // onClose={closeImageLimitModal}
+                    alert={false}
+                />
+
+                <Modal
+                    title="Tag Limit Exceeded"
+                    content="You can only upload 5 images!"
+                    onClick={closeTagLimitModal}
+                    isOpen={showTagLimitModal}
+                    // onClose={closeTagLimitModal}
                     confirm={false}
                 />
-                const [showUpdateSuccessfullyModal, setShowUpdateSuccessfullyModal] =
-                useState(false);
-  const openUpdateSuccessfullyModal = () => {
-                    setShowUpdateSuccessfullyModal(true);
-  };
-  const closeUpdateSuccessfullyModal = () => {
-                    setShowUpdateSuccessfullyModal(false);
-                window.location.href = `/artwork/${user.id}`;
-  };
-                return (
-                <Fragment>
-                    <div className="editArtworkBox m-5 p-5 capitalize" id="editForm">
-                        <Modal
-                            title="Image Limit Exceeded"
-                            content="You can only upload 8 images!"
-                            onClick={closeImageLimitModal}
-                            isOpen={showImageLimitModal}
-                            alert={false}
-                        />
 
-                        <Modal
-                            title="Tag Limit Exceeded"
-                            content="You can only upload 5 images!"
-                            onClick={closeTagLimitModal}
-                            isOpen={showTagLimitModal}
-                            // onClose={closeTagLimitModal}
-                            confirm={false}
-                        />
+                <Modal
+                    title="Image Size Limit Exceeded"
+                    content="Please select a file less than 5MB!"
+                    onClick={closeImgSizeLimitModal}
+                    isOpen={showImgSizeLimitModal}
+                    // onClose={closeImgSizeLimitModal}
+                    confirm={false}
+                />
 
-                        <Modal
-                            title="Image Size Limit Exceeded"
-                            content="Please select a file less than 5MB!"
-                            onClick={closeImgSizeLimitModal}
-                            isOpen={showImgSizeLimitModal}
-                            // onClose={closeImgSizeLimitModal}
-                            confirm={false}
-                        />
+                <Modal
+                    title="Complete"
+                    content="Artwork updated successfully!"
+                    onClick={closeUpdateSuccessfullyModal}
+                    isOpen={showUpdateSuccessfullyModal}
+                    // onClose={closeUpdateSuccessfullyModal}
+                    confirm={false}
+                />
 
-                        <Modal
-                            title="Complete"
-                            content="Artwork updated successfully!"
-                            onClick={closeUpdateSuccessfullyModal}
-                            isOpen={showUpdateSuccessfullyModal}
-                            // onClose={closeUpdateSuccessfullyModal}
-                            confirm={false}
-                        />
+                <Modal
+                    title="Complete"
+                    content="Artwork created successfully!"
+                    onClick={closeCreateSuccessfullyModal}
+                    isOpen={showCreateSuccessfullyModal}
+                    // onClose={closeCreateSuccessfullyModal}
+                    confirm={false}
+                />
 
-                        <Modal
-                            title="Complete"
-                            content="Artwork created successfully!"
-                            onClick={closeCreateSuccessfullyModal}
-                            isOpen={showCreateSuccessfullyModal}
-                            // onClose={closeCreateSuccessfullyModal}
-                            confirm={false}
-                        />
-
-                        <Modal
-                            title="Confirm"
-                            content="Are you sure you want to delete this ?"
-                            onClick={closeDeleteConfirmModal}
-                            isOpen={showDeleteConfirmModal}
-                            proceed={() => {
-                                deletePhoto(photoToDelete);
-                                closeDeleteConfirmModal();
-                            }}
-                            confirm={true}
-                        />
-                        {/* <Modal
+                <Modal
+                    title="Confirm"
+                    content="Are you sure you want to delete this ?"
+                    onClick={closeDeleteConfirmModal}
+                    isOpen={showDeleteConfirmModal}
+                    proceed={() => {
+                        deletePhoto(photoToDelete);
+                        closeDeleteConfirmModal();
+                    }}
+                    confirm={true}
+                />
+                {/* <Modal
                     title=""
                     content={validationErrors}
                     onClick={closeValidationErrorModal}
@@ -557,171 +515,171 @@ function AddArtworkComponent({ isAdd, artwork_id }) {
                 /> */}
 
 
-                        <div className="text-2xl font-bold subpixel-antialiased"> {isAdd ? (<>Create artwork</>) : (<>Edit artwork</>)}</div>
-                        <div className='mainInfoBox'>
-                            <div className='text-xl font-semibold capitalize mt-5 mb-4'>General Information</div>
-                            <div className='generalInfoBox flex items-center'>
-                                <form>
-                                    <div>
-                                        {isAdd ? (<></>) : (<>
-                                            <div className="mb-4">
-                                                <label htmlFor="formArtworkId" className="block font-medium mb-2">artwork Id:</label>
-                                                <input
-                                                    type="text"
-                                                    id="formArtworkId"
-                                                    name="artworkId"
-                                                    className="block w-full border border-gray-300 rounded p-2"
-                                                    defaultValue={artwork_id}
-                                                    readOnly
-                                                />
-                                            </div></>)}
+                <div className="text-2xl font-bold subpixel-antialiased"> {isAdd ? (<>Create artwork</>) : (<>Edit artwork</>)}</div>
+                <div className='mainInfoBox'>
+                    <div className='text-xl font-semibold capitalize mt-5 mb-4'>General Information</div>
+                    <div className='generalInfoBox flex items-center'>
+                        <form>
+                            <div>
+                                {isAdd ? (<></>) : (<>
+                                    <div className="mb-4">
+                                        <label htmlFor="formArtworkId" className="block font-medium mb-2">artwork Id:</label>
+                                        <input
+                                            type="text"
+                                            id="formArtworkId"
+                                            name="artworkId"
+                                            className="block w-full border border-gray-300 rounded p-2"
+                                            defaultValue={artwork_id}
+                                            readOnly
+                                        />
+                                    </div></>)}
 
-                                        <div className="mb-4">
-                                            <label htmlFor="formArtworkTitle" className="block font-medium mb-2">title:</label>
-                                            <input
-                                                type="text"
-                                                id="formArtworkTitle"
-                                                name="artworkTitle"
-                                                defaultValue={isAdd ? '' : artworkToUpdate.title}
-                                                className="block w-full border border-gray-300 rounded p-2"
-                                                onChange={(e) => setTitle(e.target.value)}
-                                            />
-                                            <p className="text-gray-500 text-sm">Required, 10-50 characters, only letters or spaces.</p>
-                                        </div>
+                                <div className="mb-4">
+                                    <label htmlFor="formArtworkTitle" className="block font-medium mb-2">title:</label>
+                                    <input
+                                        type="text"
+                                        id="formArtworkTitle"
+                                        name="artworkTitle"
+                                        defaultValue={isAdd ? '' : artworkToUpdate.title}
+                                        className="block w-full border border-gray-300 rounded p-2"
+                                        onChange={(e) => setTitle(e.target.value)}
+                                    />
+                                    <p className="text-gray-500 text-sm">Required, 10-50 characters, only letters or spaces.</p>
+                                </div>
 
-                                        <div className="mb-4">
-                                            <label htmlFor="formArtworkDescription" className="block font-medium mb-2">Description:</label>
-                                            <input
-                                                type="text"
-                                                id="formArtworkDescription"
-                                                name="artworkDescription"
-                                                defaultValue={isAdd ? '' : artworkToUpdate.description}
-                                                className="block w-full border border-gray-300 rounded p-2"
-                                                onChange={(e) => setDescription(e.target.value)}
-                                            />
-                                            <p className="text-gray-500 text-sm">Required, 50-100 characters.</p>
-                                        </div>
+                                <div className="mb-4">
+                                    <label htmlFor="formArtworkDescription" className="block font-medium mb-2">Description:</label>
+                                    <input
+                                        type="text"
+                                        id="formArtworkDescription"
+                                        name="artworkDescription"
+                                        defaultValue={isAdd ? '' : artworkToUpdate.description}
+                                        className="block w-full border border-gray-300 rounded p-2"
+                                        onChange={(e) => setDescription(e.target.value)}
+                                    />
+                                    <p className="text-gray-500 text-sm">Required, 50-100 characters.</p>
+                                </div>
 
-                                        <div className="mb-4">
-                                            <label htmlFor="formCoverUrl" className="block font-medium mb-2">cover image:</label>
-                                            {isAdd ? (<></>) : (<><img src={artworkToUpdate.cover_url} alt="cover image" className="w-1/3 my-3 border-2" /></>)}
-                                            <input
-                                                type="file"
-                                                id="formCoverUrl"
-                                                name="coverUrl"
-                                                accept=".jpg, .png, .jpeg"
-                                                multiple={false}
-                                                className="block w-full border border-gray-300 rounded p-2"
-                                                onChange={handleSaveCoverImage}
-                                            />
-                                            <p className="text-gray-500 text-sm">Required, image format should be JPG or PNG.</p>
-                                        </div>
+                                <div className="mb-4">
+                                    <label htmlFor="formCoverUrl" className="block font-medium mb-2">cover image:</label>
+                                    {isAdd ? (<></>) : (<><img src={artworkToUpdate.cover_url} alt="cover image" className="w-1/3 my-3 border-2" /></>)}
+                                    <input
+                                        type="file"
+                                        id="formCoverUrl"
+                                        name="coverUrl"
+                                        accept=".jpg, .png, .jpeg"
+                                        multiple={false}
+                                        className="block w-full border border-gray-300 rounded p-2"
+                                        onChange={handleSaveCoverImage}
+                                    />
+                                    <p className="text-gray-500 text-sm">Required, image format should be JPG or PNG.</p>
+                                </div>
 
-                                        <div className="mb-4">
-                                            <label htmlFor="formArtworkTag" className="block font-medium mb-2">Tags:</label>
-                                            <input
-                                                type="text"
-                                                id="formArtworkTag"
-                                                name="artworkTag"
-                                                defaultValue={tagArray.map((id) => {
-                                                    const matchingTag = tagList.find((tag) => tag._id === id);
-                                                    return matchingTag ? matchingTag.tag : ''; // If a matching tag is found, return its tag, otherwise an empty string
-                                                }).join(', ')}
-                                                className="block w-full border border-gray-300 rounded p-2 mb-2"
-                                            />
-                                            <p className="text-gray-500 text-sm">Required, maximum choose 5 tags.</p>
-                                            {tagList.map((tag, index) => {
-                                                return (
-                                                    <button
-                                                        key={index}
-                                                        className={`font-serif capitalize p-1 text-sm inline ml-2 rounded-lg bg-sky-600 text-white mt-2`}
-                                                        onClick={(event) => handleTags(event, tag._id)}
-                                                    >
-                                                        {tag.tag}
-                                                    </button>
-                                                );
-                                            })}
-                                        </div>
-
-                                        <div className="mb-4">
-                                            <label htmlFor="formArtworkPrice" className="block font-medium">Price:</label>
-                                            <input
-                                                type="number"
-                                                id="formArtworkPrice"
-                                                name="artworkPrice"
-                                                className="block w-full border border-gray-300 rounded p-2"
-                                                min="0"
-                                                step="any"
-                                                defaultValue={isAdd ? '' : artworkToUpdate.price}
-                                                onChange={(e) => setPrice(e.target.value)}
-                                            />
-                                            <p className="text-gray-500 text-sm">Required, must be equal or higher than 0.</p>
-                                        </div>
-                                    </div>
-
-                                    {isAdd ? (<>
-                                        <div className='flex items-center mb-4'>
-                                            <div className='text-xl font-bold capitalize'>Photo</div>
-                                            <button className={"items-center px-1 bg-blue"} onClick={handleAddImagesBox} disabled={imagesBoxes.length >= 8}>
-                                                <svg
-                                                    xmlns="http://www.w3.org/2000/svg"
-                                                    fill="none"
-                                                    viewBox="0 0 24 24"
-                                                    strokeWidth={3}
-                                                    stroke={imagesBoxes.length >= 8 ? 'gray' : 'blue'}
-                                                    className="w-6 h-6"
-                                                >
-                                                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v6m3-3H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                                </svg>
+                                <div className="mb-4">
+                                    <label htmlFor="formArtworkTag" className="block font-medium mb-2">Tags:</label>
+                                    <input
+                                        type="text"
+                                        id="formArtworkTag"
+                                        name="artworkTag"
+                                        defaultValue={tagArray.map((id) => {
+                                            const matchingTag = tagList.find((tag) => tag._id === id);
+                                            return matchingTag ? matchingTag.tag : ''; // If a matching tag is found, return its tag, otherwise an empty string
+                                        }).join(', ')}
+                                        className="block w-full border border-gray-300 rounded p-2 mb-2"
+                                    />
+                                    <p className="text-gray-500 text-sm">Required, maximum choose 5 tags.</p>
+                                    {tagList.map((tag, index) => {
+                                        return (
+                                            <button
+                                                key={index}
+                                                className={`font-serif capitalize p-1 text-sm inline ml-2 rounded-lg bg-sky-600 text-white mt-2`}
+                                                onClick={(event) => handleTags(event, tag._id)}
+                                            >
+                                                {tag.tag}
                                             </button>
-                                        </div>
-                                        <p className="text-gray-500 text-sm">Required, maximum 8 photos.</p>
+                                        );
+                                    })}
+                                </div>
 
-                                        <div className="flex flex-wrap">
-                                            {imagesBoxes.map((imagesBox, index) => (
-                                                <div key={index} >
-                                                    <UploadImagesBoxComponent
-                                                        key={index}
-                                                        index={imagesBox.index}
-                                                        status={imagesBox.status}
-                                                        handleShowImagesBox={(index) => handleShowImagesBox(index)}
-                                                        handleSaveChildrenPhoto={handleSaveChildrenPhoto}
-                                                    />
-                                                </div>
-                                            ))}
-                                        </div></>) : (<></>)}
-
-
-
-                                    <div className="flex items-center mt-4 font-bold">
-                                        {isAdd ? (<><button
-                                            onClick={(e) => saveArtwork(e)}
-                                            disabled={isSaveBtnDisabled}
-                                            className={`bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 mr-4 ${isSaveBtnDisabled ? 'bg-gray-500' : ''}`}
-                                        >
-                                            Save
-                                        </button></>) : (<><button
-                                            onClick={(e) => updateArtwork(e)}
-                                            className={`bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 mr-4 ${isSaveBtnDisabled ? 'bg-gray-500' : ''}`}
-                                            disabled={isSaveBtnDisabled}
-                                        >
-                                            Update
-                                        </button></>)}
-
-                                        <button
-                                            className={`bg-yellow-500 text-white px-4 py-2 rounded-lg hover:bg-yellow-600 mr-4 ${isSaveBtnDisabled ? 'bg-gray-500' : ''}`}
-                                            variant="warning"
-                                            disabled={isSaveBtnDisabled}
-                                            onClick={() => navigate(`/artwork/${user.id}`)}
-                                        >
-                                            Cancel
-                                        </button>
-                                    </div>
-                                </form>
+                                <div className="mb-4">
+                                    <label htmlFor="formArtworkPrice" className="block font-medium">Price:</label>
+                                    <input
+                                        type="number"
+                                        id="formArtworkPrice"
+                                        name="artworkPrice"
+                                        className="block w-full border border-gray-300 rounded p-2"
+                                        min="0"
+                                        step="any"
+                                        defaultValue={isAdd ? '' : artworkToUpdate.price}
+                                        onChange={(e) => setPrice(e.target.value)}
+                                    />
+                                    <p className="text-gray-500 text-sm">Required, must be equal or higher than 0.</p>
+                                </div>
                             </div>
-                        </div>
-                    </div >
 
-                </Fragment>
-                )
+                            {isAdd ? (<>
+                                <div className='flex items-center mb-4'>
+                                    <div className='text-xl font-bold capitalize'>Photo</div>
+                                    <button className={"items-center px-1 bg-blue"} onClick={handleAddImagesBox} disabled={imagesBoxes.length >= 8}>
+                                        <svg
+                                            xmlns="http://www.w3.org/2000/svg"
+                                            fill="none"
+                                            viewBox="0 0 24 24"
+                                            strokeWidth={3}
+                                            stroke={imagesBoxes.length >= 8 ? 'gray' : 'blue'}
+                                            className="w-6 h-6"
+                                        >
+                                            <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v6m3-3H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                        </svg>
+                                    </button>
+                                </div>
+                                <p className="text-gray-500 text-sm">Required, maximum 8 photos.</p>
+
+                                <div className="flex flex-wrap">
+                                    {imagesBoxes.map((imagesBox, index) => (
+                                        <div key={index} >
+                                            <UploadImagesBoxComponent
+                                                key={index}
+                                                index={imagesBox.index}
+                                                status={imagesBox.status}
+                                                handleShowImagesBox={(index) => handleShowImagesBox(index)}
+                                                handleSaveChildrenPhoto={handleSaveChildrenPhoto}
+                                            />
+                                        </div>
+                                    ))}
+                                </div></>) : (<></>)}
+
+
+
+                            <div className="flex items-center mt-4 font-bold">
+                                {isAdd ? (<><button
+                                    onClick={(e) => saveArtwork(e)}
+                                    disabled={isSaveBtnDisabled}
+                                    className={`bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 mr-4 ${isSaveBtnDisabled ? 'bg-gray-500' : ''}`}
+                                >
+                                    Save
+                                </button></>) : (<><button
+                                    onClick={(e) => updateArtwork(e)}
+                                    className={`bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 mr-4 ${isSaveBtnDisabled ? 'bg-gray-500' : ''}`}
+                                    disabled={isSaveBtnDisabled}
+                                >
+                                    Update
+                                </button></>)}
+
+                                <button
+                                    className={`bg-yellow-500 text-white px-4 py-2 rounded-lg hover:bg-yellow-600 mr-4 ${isSaveBtnDisabled ? 'bg-gray-500' : ''}`}
+                                    variant="warning"
+                                    disabled={isSaveBtnDisabled}
+                                    onClick={() => navigate(`/artwork/${user.id}`)}
+                                >
+                                    Cancel
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div >
+
+        </Fragment>
+    )
 }

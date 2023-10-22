@@ -7,7 +7,7 @@ import {
   DeleteObjectCommand,
   PutObjectCommand,
 } from "@aws-sdk/client-s3";
-import { useLocation } from "react-router-dom";
+// import { useLocation } from "react-router-dom";
 import Modal from "./Modal";
 import { deploy_api_url } from "../Config"; //the api base url
 
@@ -564,190 +564,92 @@ function ArtworkDetailsComponent({ artworkId }) {
             </>
           )}
         </div>
+
         {/* only author can add photo */}
-        {author_id !== userId ? (
-          <></>
-        ) : (
-          <>
-            <div className="addPhotoBtn flex flex-wrap justify-center pt-3 m-5 p-5">
-              <button
-                className="border-4 w-60 h-60 m-auto flex flex-col justify-center items-center rounded-full"
-                onClick={() => handleEditBox(false)}
-              >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  strokeWidth={1.5}
-                  stroke="currentColor"
-                  className="w-20 h-20"
+        {author_id !== userId ? (<></>) : (<>
+          <div className='addPhotoBtn flex flex-wrap justify-center pt-3 m-5 p-5'>
+            <button className="border-4 w-60 h-60 m-auto flex flex-col justify-center items-center rounded-full" onClick={() => { handleEditBox(false) }} disabled={isAddButtonDisabled}>
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke={isAddButtonDisabled ? 'gray' : 'currentColor'} className="w-20 h-20">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M12 10.5v6m3-3H9m4.06-7.19l-2.12-2.12a1.5 1.5 0 00-1.061-.44H4.5A2.25 2.25 0 002.25 6v12a2.25 2.25 0 002.25 2.25h15A2.25 2.25 0 0021.75 18V9a2.25 2.25 0 00-2.25-2.25h-5.379a1.5 1.5 0 01-1.06-.44z" />
+              </svg>
+              <div className="text-2xl font-bold subpixel-antialiased capitalize">add photo</div>
+            </button>
+          </div></>)}
+      </div>
+
+
+      {!showEdit ? (<></>) : (
+        <div className='editBox mb-2'>
+          <div className="text-2xl font-semibold capitalize text-center">{isAdd ? (<>Add photo</>) : (<>Edit Photo</>)}</div>
+          <div className="flex justify-center items-center">
+            <div className='editForm border-2 m-5 p-3'>
+              <div className="mb-4 p-3 pt-0">
+                <label htmlFor="formPhotoName" className="block font-medium mb-2">photo Name:</label>
+                <input
+                  type="text"
+                  id="formPhotoName"
+                  name="photoName"
+                  className="block w-full border border-gray-300 rounded p-2"
+                  defaultValue={isAdd ? '' : photoToUpdate.photo_name}
+                  onChange={(e) => setPhotoName(e.target.value)}
+                />
+                <p className="text-gray-500 text-sm">Required, 10-50 Characters, Only Letters Or Spaces.
+                </p>
+              </div>
+              <div className="mb-4 p-3">
+                <label htmlFor="formPhotoDes" className="block font-medium mb-2">photo Description:</label>
+                <input
+                  type="text"
+                  id="formPhotoDes"
+                  name="photoDes"
+                  className="block w-full border border-gray-300 rounded p-2"
+                  defaultValue={isAdd ? '' : photoToUpdate.description}
+                  onChange={(e) => setPhotoDescription(e.target.value)}
+                />
+                <p className="text-gray-500 text-sm">Required, 50-100 Characters.</p>
+              </div>
+              <div className="mb-4 p-3">
+                <label htmlFor="formUploadPhoto" className="block font-medium">Upload Image:</label>
+                <input
+                  type="file"
+                  id="formUploadPhoto"
+                  name="uploadPhoto"
+                  accept=".jpg, .png, .jpeg"
+                  className="block w-full border border-gray-300 rounded p-2"
+                  onChange={(e) => setPhotoFile(e.target.files[0])}
+
+                />
+                <p className="text-gray-500 text-sm">Required, Image Format Should Be JPG Or PNG.</p>
+              </div>
+              <div className="flex items-center mt-4 font-bold justify-center">
+                <button
+                  className={`text-white px-4 py-2 rounded-lg hover:bg-blue-600 mr-4 ${isUpdateButtonDisabled ? 'bg-gray-500' : 'bg-blue-500'}`}
+                  variant="warning"
+                  onClick={() => { isAdd ? (addPhoto()) : (updatePhoto(photoToUpdate)) }}
+                  disabled={isUpdateButtonDisabled}
                 >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M12 10.5v6m3-3H9m4.06-7.19l-2.12-2.12a1.5 1.5 0 00-1.061-.44H4.5A2.25 2.25 0 002.25 6v12a2.25 2.25 0 002.25 2.25h15A2.25 2.25 0 0021.75 18V9a2.25 2.25 0 00-2.25-2.25h-5.379a1.5 1.5 0 01-1.06-.44z"
-                  />
-                </svg>
-                <div className="text-2xl font-bold subpixel-antialiased capitalize">
-                  add photo
-                </div>
-                {/* only author can add photo */}
-                {author_id !== userId ? (<></>) : (<>
-                  <div className='addPhotoBtn flex flex-wrap justify-center pt-3 m-5 p-5'>
-                    <button className="border-4 w-60 h-60 m-auto flex flex-col justify-center items-center rounded-full" onClick={() => { handleEditBox(false) }} disabled={isAddButtonDisabled}>
-                      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke={isAddButtonDisabled ? 'gray' : 'currentColor'} className="w-20 h-20">
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M12 10.5v6m3-3H9m4.06-7.19l-2.12-2.12a1.5 1.5 0 00-1.061-.44H4.5A2.25 2.25 0 002.25 6v12a2.25 2.25 0 002.25 2.25h15A2.25 2.25 0 0021.75 18V9a2.25 2.25 0 00-2.25-2.25h-5.379a1.5 1.5 0 01-1.06-.44z" />
-                      </svg>
-                      <div className="text-2xl font-bold subpixel-antialiased capitalize">add photo</div>
-                    </button>
-                  </div></>)}
+                  {isAdd ? (<>Save</>) : (<>Update</>)}
+                </button>
+
+                <button
+                  className={`text-white px-4 py-2 rounded-lg hover:bg-yellow-600 mr-4 ${isCancelButtonDisabled ? 'bg-gray-500' : 'bg-yellow-500 '}`}
+                  variant="warning"
+                  onClick={() => {
+                    setShowEdit(!showEdit)
+                    setIsEditButtonDisabled(false)
+                    setIsDeleteButtonDisabled(false)
+                    setIsAddButtonDisabled(false)
+                    setIsAddButtonDisabled(false)
+                  }}
+                  disabled={isCancelButtonDisabled}
+                >
+                  Cancel
+                </button>
+              </div>
             </div>
-
-            {!showEdit ? (
-              <></>
-            ) : (
-              <div className="editBox mb-2">
-                <div className="text-2xl font-semibold capitalize text-center">
-                  {isAdd ? <>Add photo</> : <>Edit Photo</>}
-                </div>
-                <div className="flex justify-center items-center">
-                  <div className="editForm border-2 m-5 p-3">
-                    <div className="mb-4 p-3 pt-0">
-                      <label
-                        htmlFor="formPhotoName"
-                        className="block font-medium mb-2"
-                      >
-                        photo Name:
-                      </label>
-                      <input
-                        type="text"
-                        id="formPhotoName"
-                        name="photoName"
-                        className="block w-full border border-gray-300 rounded p-2"
-                        defaultValue={isAdd ? "" : photoToUpdate.photo_name}
-                        onChange={(e) => setPhotoName(e.target.value)}
-                      />
-                      <p className="text-gray-500 text-sm">
-                        Required, 10-50 Characters, Only Letters Or Spaces.
-                      </p>
-                    </div>
-                    <div className="mb-4 p-3">
-                      <label
-                        htmlFor="formPhotoDes"
-                        className="block font-medium mb-2"
-                      >
-                        photo Description:
-                      </label>
-                      <input
-                        type="text"
-                        id="formPhotoDes"
-                        name="photoDes"
-                        className="block w-full border border-gray-300 rounded p-2"
-                        defaultValue={isAdd ? "" : photoToUpdate.description}
-                        onChange={(e) => setPhotoDescription(e.target.value)}
-                      />
-                      <p className="text-gray-500 text-sm">
-                        Required, 50-100 Characters.
-                      </p>
-                    </div>
-                    <div className="mb-4 p-3">
-                      <label htmlFor="formUploadPhoto" className="block font-medium">
-                        Upload Image:
-                      </label>
-                      <input
-                        type="file"
-                        id="formUploadPhoto"
-                        name="uploadPhoto"
-                        accept=".jpg, .png, .jpeg"
-                        className="block w-full border border-gray-300 rounded p-2"
-                        onChange={(e) => setPhotoFile(e.target.files[0])}
-                      />
-                      <p className="text-gray-500 text-sm">
-                        Required, Image Format Should Be JPG Or PNG.
-                      </p>
-                    </div>
-                    <div className="flex items-center mt-4 font-bold justify-center">
-                      <button
-                        className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 mr-4"
-                        variant="warning"
-                        onClick={() => {
-                          isAdd ? addPhoto() : updatePhoto(photoToUpdate);
-                        }}
-                      >
-                        {isAdd ? <>Save</> : <>Update</>}
-                      </button>
-                      {!showEdit ? (<></>) : (
-                        <div className='editBox mb-2'>
-                          <div className="text-2xl font-semibold capitalize text-center">{isAdd ? (<>Add photo</>) : (<>Edit Photo</>)}</div>
-                          <div className="flex justify-center items-center">
-                            <div className='editForm border-2 m-5 p-3'>
-                              <div className="mb-4 p-3 pt-0">
-                                <label htmlFor="formPhotoName" className="block font-medium mb-2">photo Name:</label>
-                                <input
-                                  type="text"
-                                  id="formPhotoName"
-                                  name="photoName"
-                                  className="block w-full border border-gray-300 rounded p-2"
-                                  defaultValue={isAdd ? '' : photoToUpdate.photo_name}
-                                  onChange={(e) => setPhotoName(e.target.value)}
-                                />
-                                <p className="text-gray-500 text-sm">Required, 10-50 Characters, Only Letters Or Spaces.
-                                </p>
-                              </div>
-                              <div className="mb-4 p-3">
-                                <label htmlFor="formPhotoDes" className="block font-medium mb-2">photo Description:</label>
-                                <input
-                                  type="text"
-                                  id="formPhotoDes"
-                                  name="photoDes"
-                                  className="block w-full border border-gray-300 rounded p-2"
-                                  defaultValue={isAdd ? '' : photoToUpdate.description}
-                                  onChange={(e) => setPhotoDescription(e.target.value)}
-                                />
-                                <p className="text-gray-500 text-sm">Required, 50-100 Characters.</p>
-                              </div>
-                              <div className="mb-4 p-3">
-                                <label htmlFor="formUploadPhoto" className="block font-medium">Upload Image:</label>
-                                <input
-                                  type="file"
-                                  id="formUploadPhoto"
-                                  name="uploadPhoto"
-                                  accept=".jpg, .png, .jpeg"
-                                  className="block w-full border border-gray-300 rounded p-2"
-                                  onChange={(e) => setPhotoFile(e.target.files[0])}
-
-                                />
-                                <p className="text-gray-500 text-sm">Required, Image Format Should Be JPG Or PNG.</p>
-                              </div>
-                              <div className="flex items-center mt-4 font-bold justify-center">
-                                <button
-                                  className={`text-white px-4 py-2 rounded-lg hover:bg-blue-600 mr-4 ${isUpdateButtonDisabled ? 'bg-gray-500' : 'bg-blue-500'}`}
-                                  variant="warning"
-                                  onClick={() => { isAdd ? (addPhoto()) : (updatePhoto(photoToUpdate)) }}
-                                  disabled={isUpdateButtonDisabled}
-                                >
-                                  {isAdd ? (<>Save</>) : (<>Update</>)}
-                                </button>
-
-                                <button
-                                  className={`text-white px-4 py-2 rounded-lg hover:bg-yellow-600 mr-4 ${isCancelButtonDisabled ? 'bg-gray-500' : 'bg-yellow-500 '}`}
-                                  variant="warning"
-                                  onClick={() => {
-                                    setShowEdit(!showEdit)
-                                    setIsEditButtonDisabled(false)
-                                    setIsDeleteButtonDisabled(false)
-                                    setIsAddButtonDisabled(false)
-                                    setIsAddButtonDisabled(false)
-                                  }}
-                                  disabled={isCancelButtonDisabled}
-                                >
-                                  Cancel
-                                </button>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      )}
-                    </>
-                    );
+          </div>
+        </div>
+      )}
+    </>
+  );
 }

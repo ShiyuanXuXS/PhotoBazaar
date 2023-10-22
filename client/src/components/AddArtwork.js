@@ -15,7 +15,7 @@ export default AddArtworkComponent;
 
 //S3 config
 const config = {
-    bucketName: config.bucketName,
+    bucketName: "photobazarr",
     dirName: "artwork",
     region: "ca-central-1",
     credentials: {
@@ -493,7 +493,7 @@ function AddArtworkComponent({ isAdd, artwork_id }) {
                     confirm={false}
                 />
 
-                <Modal
+                {/* <Modal
                     title="Confirm"
                     content="Are you sure you want to delete this ?"
                     onClick={closeDeleteConfirmModal}
@@ -503,7 +503,7 @@ function AddArtworkComponent({ isAdd, artwork_id }) {
                         closeDeleteConfirmModal();
                     }}
                     confirm={true}
-                />
+                /> */}
                 {/* <Modal
                     title=""
                     content={validationErrors}

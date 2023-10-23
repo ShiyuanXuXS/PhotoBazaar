@@ -399,7 +399,7 @@ function ArtworkListComponent({ userId, page, option, searchKey }) {
                 content="Please login first!"
                 onClick={closeLoginModal}
                 isOpen={showLoginModal}
-                alert={false}
+                confirm={false}
             />
 
             <Modal
@@ -407,7 +407,7 @@ function ArtworkListComponent({ userId, page, option, searchKey }) {
                 content="Artwork has been purchased!"
                 onClick={closeHasPurchasedModal}
                 isOpen={showHasPurchasedModal}
-                alert={false}
+                confirm={false}
             />
 
             <Modal
@@ -415,7 +415,7 @@ function ArtworkListComponent({ userId, page, option, searchKey }) {
                 content="Artwork is already in the cart!"
                 onClick={closeAddToCartModal}
                 isOpen={showAddToCartModal}
-                alert={false}
+                confirm={false}
             />
 
             <Modal
@@ -423,7 +423,7 @@ function ArtworkListComponent({ userId, page, option, searchKey }) {
                 content="You cannot add your own artwork to cart!"
                 onClick={closeYourOwnArtworkModal}
                 isOpen={showYourOwnArtworkModal}
-                alert={false}
+                confirm={false}
             />
 
             <Modal
@@ -432,7 +432,7 @@ function ArtworkListComponent({ userId, page, option, searchKey }) {
                 onClick={closeNoResultsModal}
                 isOpen={showNoResultsModal}
                 onClose={closeNoResultsModal}
-                alert={false}
+                confirm={false}
             />
 
             <Modal
@@ -441,7 +441,7 @@ function ArtworkListComponent({ userId, page, option, searchKey }) {
                 onClick={closeDeleteSuccessfullyModal}
                 isOpen={showDeleteSuccessfullyModal}
                 onClose={closeDeleteSuccessfullyModal}
-                alert={false}
+                confirm={false}
             />
 
             <Modal
@@ -458,12 +458,8 @@ function ArtworkListComponent({ userId, page, option, searchKey }) {
 
             <div>
                 {page === "search" ? (
-                    <>
-                        <SearchBoxComponent page="search" />
-                    </>
-                ) : (
-                    <></>
-                )}
+                    <><SearchBoxComponent page="search" /></>
+                ) : (<></>)}
             </div>
 
             {page !== "search" ? (
@@ -573,9 +569,7 @@ function ArtworkListComponent({ userId, page, option, searchKey }) {
                                                 className={`${page === "home" ||
                                                     page === "myAssets" ||
                                                     page === "search"
-                                                    ? "border-r-2 pr-1"
-                                                    : ""
-                                                    } items-center pl-1`}
+                                                    ? "border-r-2 pr-1" : ""} items-center pl-1`}
                                                 onClick={() => {
                                                     if (userId === null || userId === undefined && user.id === undefined) {
                                                         openLoginModal();

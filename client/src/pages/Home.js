@@ -45,7 +45,7 @@ function Home() {
     <div>
       <Header />
       <div className="search p-3 m-5">
-        <img className="w-full" src="./homepagebg.png" alt="photobazaar"></img>
+        <img className="w-full" src="./homepagebg.jpg" alt="photobazaar"></img>
         <SearchBoxComponent />
       </div>
 

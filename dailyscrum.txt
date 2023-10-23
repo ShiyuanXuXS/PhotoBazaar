@@ -237,6 +237,15 @@ Chang liu
 - user can modify their profile icon
 - user can visit the deployed domain
 
+2023/10/21
+Xiaoxing Pan
+1.  Done
+- search by tags postman self-test
+- change alert to modal
+2. Todo
+- pagination
+
+
 
 
 

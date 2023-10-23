@@ -60,9 +60,6 @@ export default function CheckoutForm({ purchase_id }) {
       confirmParams: {
         return_url:
           process.env.REACT_APP_URL + `/payment_result/${purchase_id}`,
-
-        return_url:
-          process.env.REACT_APP_URL + `/payment_result/${purchase_id}`,
       },
     });
 

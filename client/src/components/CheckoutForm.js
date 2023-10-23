@@ -59,7 +59,8 @@ export default function CheckoutForm({ purchase_id }) {
       elements,
       confirmParams: {
         return_url:
-          process.env.REACT_APP_URL + `/payment_result/${purchase_id}`,
+         // process.env.REACT_APP_URL + `/payment_result/${purchase_id}`,
+          `https://photobazaar.vercel.app/payment_result/${purchase_id}`,
       },
     });
 

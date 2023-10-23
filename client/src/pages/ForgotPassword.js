@@ -8,7 +8,7 @@ function ForgotPassword() {
     <div>
       <Header />
       <ForgotpasswordComponent />
-      {/* <Footer /> */}
+      <Footer fixBottom={true} />
     </div>
   );
 }

@@ -100,6 +100,9 @@ function ProfileComponent() {
         } else {
           const { message: resMessage } = response.data;
           setMessage(resMessage);
+          setTimeout(() => {
+            window.location.reload();
+          }, 2000);
           // Navigate("/login");
         }
       })
@@ -228,9 +231,6 @@ function ProfileComponent() {
 
   return (
     <>
-      {error && <div className="text-red-500 mb-8">{error}</div>}
-      {message && <div className="text-green-500 mb-8">{message}</div>}
-
       <>
         <div className="my-4">
           <div className="container mx-auto capitalize">
@@ -409,6 +409,8 @@ function ProfileComponent() {
           </div>
         </div>
       </>
+      {error && <div className="text-red-500 mb-8">{error}</div>}
+      {message && <div className="text-green-500 mb-8">{message}</div>}
     </>
   );
 }

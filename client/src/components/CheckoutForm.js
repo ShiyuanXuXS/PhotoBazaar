@@ -58,9 +58,8 @@ export default function CheckoutForm({ purchase_id }) {
     const { error } = await stripe.confirmPayment({
       elements,
       confirmParams: {
-        return_url:
-         // process.env.REACT_APP_URL + `/payment_result/${purchase_id}`,
-          `https://photobazaar.vercel.app/payment_result/${purchase_id}`,
+        
+        return_url: process.env.REACT_APP_URL + `/payment_result/${purchase_id}`,
       },
     });
 

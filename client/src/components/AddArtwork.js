@@ -349,7 +349,7 @@ function AddArtworkComponent({ isAdd, artwork_id }) {
                         const deleteFileName = parts.pop();
                         const deleteParams = {
                             Bucket: config.bucketName,
-                            Key: deleteFileName, // Specify the path to the file you want to delete
+                            Key: deleteFileName,
                         };
 
                         client
@@ -454,7 +454,7 @@ function AddArtworkComponent({ isAdd, artwork_id }) {
                     content="You can only upload 8 images!"
                     onClick={closeImageLimitModal}
                     isOpen={showImageLimitModal}
-                    alert={false}
+                    confirm={false}
                 />
 
                 <Modal

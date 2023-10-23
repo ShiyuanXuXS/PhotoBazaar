@@ -1,0 +1,8 @@
+Github: 
+    https://github.com/ShiyuanXuXS/PhotoBazaar
+Trello:
+    https://trello.com/b/H6j4eqPj/photobazzar
+hosting:
+    https://photobazaar.vercel.app/
+backup hosting:
+    https://photobazaar-client-897084de3d92.herokuapp.com/

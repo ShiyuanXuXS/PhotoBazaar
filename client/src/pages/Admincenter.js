@@ -27,7 +27,7 @@ function Admincenter() {
           </div>
         </div>
       </div>
-      <Footer />
+      <Footer fixBottom={true} />
     </div>
   );
 }

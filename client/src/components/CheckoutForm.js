@@ -59,7 +59,7 @@ export default function CheckoutForm({ purchase_id }) {
       elements,
       confirmParams: {
         
-        return_url: deploy_api_url + `/payment_result/${purchase_id}`,
+        return_url: process.env.REACT_APP_URL + `/payment_result/${purchase_id}`,
       },
     });
 

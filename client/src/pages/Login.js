@@ -7,7 +7,7 @@ function Login() {
     <div>
       <Header />
       <LoginComponent />
-      {/* <Footer/> */}
+      <Footer fixBottom={true} />
     </div>
   );
 }

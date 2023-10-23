@@ -1,7 +1,36 @@
 const Artwork = require('../models/artwork.model');
 const TagModel = require('../models/tag.model');
+const perPage = 10; // Number of artworks per page
 
 module.exports = {
+    // getAllArtworks: async (req, res) => {
+    //     const searchFor = req.query.searchFor;
+    //     const page = req.query.page || 1; // Get the page number from the query parameters
+    //     const skip = (page - 1) * perPage; // Calculate how many documents to skip
+
+    //     try {
+    //         const totalArtworks = await Artwork.countDocuments({
+    //             $text: { $search: searchFor },
+    //         }); // Get the total number of artworks matching the search keyword
+    //         const artworks = await Artwork.find({
+    //             $text: { $search: searchFor },
+    //         })
+    //             .sort({ _id: 1 })
+    //             .skip(skip) // Skip the appropriate number of documents
+    //             .limit(perPage); // Limit the results to the desired page size
+
+    //         res.status(200).json({
+    //             artworks,
+    //             totalArtworks,
+    //         });
+    //     } catch (err) {
+    //         console.error(err);
+    //         res.status(500).json({
+    //             message: "Server error",
+    //         });
+    //     }
+    // },
+
     getAllArtworks: async (req, res) => {
         await Artwork.find()
             .sort({ _id: 1 })

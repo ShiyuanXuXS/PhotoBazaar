@@ -8,7 +8,7 @@ function Profile() {
     <div>
       <Header />
       <ProfileComponent />
-      {/* <Footer/> */}
+      <Footer />
     </div>
   );
 }

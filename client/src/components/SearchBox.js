@@ -29,18 +29,16 @@ function SearchBoxComponent({ page }) {
 
   return (
     <div
-      className={`${
-        page === "search"
-          ? "flex justify-center mt-5"
-          : "absolute top-1/3 left-1/2 transform -translate-x-1/2 -translate-y-1/2"
-      } p-4 searchBox`}
+      className={`${page === "search"
+        ? "flex justify-center mt-5"
+        : "absolute top-1/4 left-1/2 transform -translate-x-1/2 -translate-y-1/2"
+        } p-4 searchBox`}
     >
       <div
-        className={`${
-          page === "search"
-            ? "bg-gray-300 bg-opacity-70"
-            : "bg-white bg-opacity-70"
-        } rounded-lg p-2`}
+        className={`${page === "search"
+          ? "bg-gray-300 bg-opacity-70"
+          : "bg-white bg-opacity-70"
+          } rounded-lg p-2`}
       >
         <select
           className="bg-transparent px-2 py-1 mx-2 rounded-l-md outline-none"

@@ -356,7 +356,6 @@ module.exports = {
         );
         //smtp start
         const nodemailer = require("nodemailer");
-
         var transport = nodemailer.createTransport({
           service: "gmail",
           auth: {
@@ -364,7 +363,6 @@ module.exports = {
             pass: `${process.env.GMAIL_PASSWORD}`,
           },
         });
-
         const mailoptions = {
           from: `${process.env.GMAIL}`,
           to: `${req.body.forgotemail}`,
@@ -375,7 +373,6 @@ module.exports = {
              <a href="http://localhost:3000/changepassword/${req.body.forgotemail}">Reset Password</a>
              `,
         };
-
         transport.sendMail(mailoptions, (err, info) => {
           if (err) {
             console.log(err);

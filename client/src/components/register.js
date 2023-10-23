@@ -89,7 +89,10 @@ function SignupComponent() {
           .then((response) => {
             // Handle the response if needed
             setMessage("User created");
-            Navigate("/Login");
+            setTimeout(() => {
+              Navigate("/Login");
+            }, 2000);
+            // Navigate("/Login");
           })
           .catch((error) => {
             console.log("inside register error");

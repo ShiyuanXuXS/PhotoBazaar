@@ -305,15 +305,15 @@ function AddArtworkComponent({ isAdd, artwork_id }) {
         title: Yup.string()
             .min(1, "Title must be at least 10 Characters, Only Letters Or Spaces.")
             .max(50, "Title must not exceed 50 characters.")
-            .matches(/^[a-zA-Z ]*$/, "Only letters and spaces are allowed")
+            // .matches(/^[a-zA-Z ]*$/, "Only letters and spaces are allowed")
             .required("Title is required"),
         description: Yup.string()
-            .min(5, "Description must be at least 5 characters")
+            .min(1, "Description must be at least 1 characters")
             .max(100, "Description must not exceed 100 characters")
-            .matches(
-                /^[a-zA-Z0-9 ./,_()-]*$/,
-                "Item name must only contain uppercase, lowercase, digits, spaces, and: ./,_()-"
-            )
+            // .matches(
+            //     /^[a-zA-Z0-9 ./,_()-]*$/,
+            //     "Item name must only contain uppercase, lowercase, digits, spaces, and: ./,_()-"
+            // )
             .required("Description is required"),
         price: Yup.number()
             .min(0, "price must be equal or higher than 0")

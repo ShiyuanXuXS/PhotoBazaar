@@ -15,7 +15,7 @@ function AdminTag() {
 
   const searchTags = async () => {
     setTags(null);
-    if (!searchFor) return;
+    // if (!searchFor) return;
     try {
       const response = await axios.get(`${deploy_api_url}/api/tags`, {
         headers: { Authorization: `Bearer ${token}` },

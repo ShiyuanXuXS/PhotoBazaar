@@ -232,6 +232,11 @@ Shiyuan Xu
 - Admin/ tags: search, pagination, add and modify
 2. Todo
 - Debugging
+Chang liu
+1. Done
+- user can modify their profile icon
+- user can visit the deployed domain
+
 
 
 

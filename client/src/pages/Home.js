@@ -34,7 +34,7 @@ function Home() {
         const tagList = response.data;
         // sort by count
         const sortedTagList = tagList.sort((a, b) => b.count - a.count);
-        setTopTags(sortedTagList.slice(0, 3));
+        setTopTags(sortedTagList.slice(0, 2));
       })
       .catch((error) => {
         console.log(error);
